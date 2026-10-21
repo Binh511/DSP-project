@@ -1,20 +1,49 @@
-.venv/
+﻿# Python cache and environments
 __pycache__/
-.vscode/
-models/
-runs/
-chroma_db/
-BAAI_bge_m3/
-data_*/
-input_pdf/
-*.pdf
 *.py[cod]
+.venv/
+venv/
+env/
+.vscode/
+.ipynb_checkpoints/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Model weights and downloaded model
+models/
+BAAI_bge_m3/
 *.safetensors
 *.pt
+*.pth
 *.bin
-pseudo_candidates.csv
-cleaning_report.csv
-label_changes.csv
-label_conflicts.csv
-label_ties.csv
-ties_resolved.csv
+*.onnx
+
+# Datasets and processed documents
+input_pdf/
+data/
+data_chunked/
+data_cleaned/
+data_embedded/
+data_extracted/
+data_labeled/
+data_processed/
+data_unprocessing/
+data_segment_cls/
+datasets/
+
+# Vector database and generated outputs
+chroma_db/
+runs/
+outputs/
+logs/
+*.log
+
+# Generated CSV results/labels
+*.csv
+
+# OS files
+.DS_Store
+Thumbs.db
