@@ -1,14 +1,12 @@
 from pathlib import Path
+import argparse
 import json
 import re
 import hashlib
-from typing import Iterator
-
-import tiktoken
 
 
 # ============================================================
-# PSAI CHUNKING PIPELINE v2
+# PSAI CHUNKING PIPELINE v3
 #
 # Input:
 #   <thư mục chứa file>/data_cleaned/<doc_id>/<doc_id>.md
@@ -22,7 +20,8 @@ import tiktoken
 #   - Keep heading_path in each chunk (prefix cho MỌI chunk)
 #   - Max 512 tokens, overlap 64
 #   - Tables: gom nhiều dòng vào một chunk (~350 token)
-#   - Diagrams kept whole
+#   - Diagrams retained, split when needed to respect the token budget
+#   - Source line ranges identify the enclosing Markdown block, not exact chunk spans
 # ============================================================
 
 
@@ -35,12 +34,12 @@ BASE_DIR = Path(__file__).resolve().parent
 INPUT_DIR = BASE_DIR / "data_cleaned"
 OUTPUT_DIR = BASE_DIR / "data_chunked"
 
-RESET_OUTPUT = True
+RESET_OUTPUT = False  # Existing outputs require explicit --overwrite; never delete the tree.
 
 MAX_TOKENS = 512
 OVERLAP_TOKENS = 64
 TABLE_GROUP_TOKENS = 350
-MIN_CHUNK_TOKENS = 20          # bỏ chunk rác
+MIN_CHUNK_TOKENS = 1          # Short requirements/results must not silently disappear.
 TOKENIZER_NAME = "cl100k_base"
 
 
@@ -54,6 +53,7 @@ _ENCODER = None
 def get_encoder():
     global _ENCODER
     if _ENCODER is None:
+        import tiktoken
         _ENCODER = tiktoken.get_encoding(TOKENIZER_NAME)
     return _ENCODER
 
@@ -68,7 +68,7 @@ def count_tokens(text: str) -> int:
 
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*)$")
 
-CODE_FENCE_RE = re.compile(r"^```")
+CODE_FENCE_RE = re.compile(r"^(`{3,}|~{3,})(.*)$")
 
 
 def parse_blocks(text: str):
@@ -86,6 +86,9 @@ def parse_blocks(text: str):
     current_lines = []
     inside_fence = False
     fence_lines = []
+    fence_marker = ""
+    fence_start = 0
+    section_start = 0
 
     def flush_section():
         nonlocal current_lines
@@ -100,6 +103,8 @@ def parse_blocks(text: str):
                 "heading_path": path,
                 "content": content,
                 "block_type": "section",
+                "source_start_line": section_start + 1,
+                "source_end_line": i,
             })
         current_lines = []
 
@@ -109,11 +114,17 @@ def parse_blocks(text: str):
         s = line.strip()
 
         # --- code fence ---
-        if CODE_FENCE_RE.match(s):
+        fence_match = CODE_FENCE_RE.match(s)
+        if fence_match and (not inside_fence or (
+                fence_match.group(1)[0] == fence_marker[0]
+                and len(fence_match.group(1)) >= len(fence_marker)
+                and not fence_match.group(2).strip())):
             if not inside_fence:
                 flush_section()
                 inside_fence = True
                 fence_lines = [line]
+                fence_marker = fence_match.group(1)
+                fence_start = i
             else:
                 fence_lines.append(line)
                 inside_fence = False
@@ -124,6 +135,8 @@ def parse_blocks(text: str):
                     "heading_path": path,
                     "content": "\n".join(fence_lines).strip(),
                     "block_type": "diagram",
+                    "source_start_line": fence_start + 1,
+                    "source_end_line": i + 1,
                 })
                 fence_lines = []
             i += 1
@@ -152,6 +165,7 @@ def parse_blocks(text: str):
         if s.startswith("|") and s.endswith("|"):
             flush_section()
             table_lines = []
+            table_start = i
             while i < len(lines):
                 t = lines[i].strip()
                 if t.startswith("|") and t.endswith("|"):
@@ -167,13 +181,26 @@ def parse_blocks(text: str):
                 "heading_path": path,
                 "content": "\n".join(table_lines),
                 "block_type": "table",
+                "source_start_line": table_start + 1,
+                "source_end_line": i,
             })
             continue
 
         # --- normal line ---
+        if not current_lines:
+            section_start = i
         current_lines.append(line)
         i += 1
 
+    if inside_fence:
+        blocks.append({
+            "level": current_heading[0] if current_heading else 0,
+            "heading": current_heading[1] if current_heading else "",
+            "heading_path": [h for _, h in heading_stack],
+            "content": "\n".join(fence_lines).strip(), "block_type": "diagram",
+            "source_start_line": fence_start + 1, "source_end_line": len(lines),
+            "unterminated_fence": True,
+        })
     flush_section()
     return blocks
 
@@ -216,8 +243,15 @@ def serialize_table_rows(table_text: str):
     if not header:
         yield table_text
         return
+    if not rows:
+        yield table_text
+        return
 
     for row in rows:
+        if len(row) > len(header):
+            # Malformed tables must remain visible instead of dropping trailing cells.
+            yield " | ".join(row)
+            continue
         padded = row + [""] * (len(header) - len(row))
         parts = []
         for h, c in zip(header, padded):
@@ -240,35 +274,52 @@ def split_text_by_tokens(text: str,
     có overlap. Mảnh nào cũng được gắn lại prefix.
     """
     enc = get_encoder()
-    budget = max(max_tokens - count_tokens(prefix), overlap_tokens * 2)
-    ids = enc.encode(text)
-
-    if len(ids) <= budget:
+    if max_tokens < 1 or overlap_tokens < 0 or overlap_tokens >= max_tokens:
+        raise ValueError("Require max_tokens > overlap_tokens >= 0.")
+    budget = max_tokens - count_tokens(prefix)
+    if budget <= 0:
+        raise ValueError("Heading prefix consumes the complete token budget; shorten it explicitly.")
+    effective_overlap = min(overlap_tokens, budget - 1)
+    if count_tokens(prefix + text) <= max_tokens:
         yield prefix + text
         return
 
+    # Slice the original Unicode string. Decoding arbitrary token windows can split
+    # a UTF-8 character and introduce replacement characters absent from the source.
     start = 0
-    while start < len(ids):
-        end = min(start + budget, len(ids))
-        piece = enc.decode(ids[start:end])
+    while start < len(text):
+        low, high = start + 1, len(text)
+        end = start
+        while low <= high:
+            middle = (low + high) // 2
+            if count_tokens(prefix + text[start:middle]) <= max_tokens:
+                end, low = middle, middle + 1
+            else:
+                high = middle - 1
+        if end == start:
+            raise ValueError("Token budget cannot fit one source character with the heading prefix.")
+        piece = text[start:end]
 
         # cố gắng cắt ở ranh giới đoạn / câu gần cuối
-        if end < len(ids):
+        if end < len(text):
             for sep in ["\n\n", "\n", ". ", "! ", "? "]:
                 idx = piece.rfind(sep)
                 if idx > len(piece) * 0.5:
                     piece = piece[: idx + len(sep)]
                     break
             # số token THỰC SỰ đã dùng sau khi cắt
-            end = start + max(1, len(enc.encode(piece)))
+            end = start + len(piece)
 
         piece = piece.strip()
         if piece:
             yield prefix + piece
 
-        if end >= len(ids):
+        if end >= len(text):
             break
-        start = max(end - overlap_tokens, start + 1)
+        next_start = end
+        while next_start > start + 1 and count_tokens(text[next_start - 1:end]) <= effective_overlap:
+            next_start -= 1
+        start = max(next_start, start + 1)
 
 
 # ============================================================
@@ -311,12 +362,14 @@ def build_chunks(doc_id: str, blocks) -> list[dict]:
 
         prefix = ("# " + " > ".join(heading_path) + "\n\n") if heading_path else ""
 
-        # --- diagram: một chunk, giữ nguyên ---
+        block_chunk_start = len(chunks)
+        # --- diagram ---
         if block_type == "diagram":
-            chunks.append(_chunk_record(
-                doc_id, idx, heading_path, heading, level,
-                "diagram", prefix + content))
-            idx += 1
+            for piece in split_text_by_tokens(content, MAX_TOKENS, OVERLAP_TOKENS, prefix=prefix):
+                chunks.append(_chunk_record(doc_id, idx, heading_path, heading, level, "diagram", piece))
+                idx += 1
+            for record in chunks[block_chunk_start:]:
+                record.update({key: block[key] for key in ("source_start_line", "source_end_line", "unterminated_fence") if key in block})
             continue
 
         # --- table: gom nhiều dòng vào một chunk, có heading prefix ---
@@ -326,10 +379,9 @@ def build_chunks(doc_id: str, blocks) -> list[dict]:
             for row_text in rows + [None]:
                 rt = count_tokens(row_text) if row_text else 0
                 if buf and (row_text is None or buf_tok + rt > TABLE_GROUP_TOKENS):
-                    chunks.append(_chunk_record(
-                        doc_id, idx, heading_path, heading, level,
-                        "table_rows", prefix + "\n".join(buf)))
-                    idx += 1
+                    for piece in split_text_by_tokens("\n".join(buf), MAX_TOKENS, OVERLAP_TOKENS, prefix=prefix):
+                        chunks.append(_chunk_record(doc_id, idx, heading_path, heading, level, "table_rows", piece))
+                        idx += 1
                     buf, buf_tok = [], 0
                 if row_text:
                     if rt > TABLE_GROUP_TOKENS:      # dòng quá dài: cắt riêng
@@ -342,6 +394,8 @@ def build_chunks(doc_id: str, blocks) -> list[dict]:
                         continue
                     buf.append(row_text)
                     buf_tok += rt
+            for record in chunks[block_chunk_start:]:
+                record.update({key: block[key] for key in ("source_start_line", "source_end_line") if key in block})
             continue
 
         # --- section ---
@@ -364,6 +418,9 @@ def build_chunks(doc_id: str, blocks) -> list[dict]:
                     doc_id, idx, heading_path, heading, level,
                     "section_split", piece))
                 idx += 1
+
+        for record in chunks[block_chunk_start:]:
+            record.update({key: block[key] for key in ("source_start_line", "source_end_line") if key in block})
 
     return chunks
 
@@ -409,15 +466,24 @@ def compute_stats(doc_id: str, chunks: list[dict]) -> dict:
 # PROCESS ONE DOCUMENT
 # ============================================================
 
-def process_document(md_file: Path) -> dict:
+def process_document(md_file: Path, *, output_dir=None, overwrite=False) -> dict:
+    md_file = Path(md_file)
     doc_id = md_file.parent.name
-
-    text = md_file.read_text(encoding="utf-8", errors="replace")
+    out_folder = Path(output_dir or OUTPUT_DIR) / doc_id
+    if out_folder.resolve() == md_file.parent.resolve():
+        raise ValueError("Chunk output must be separate from the source document.")
+    if out_folder.exists() and any(out_folder.iterdir()) and not overwrite:
+        raise FileExistsError(f"Output already exists: {out_folder}. Use --overwrite explicitly.")
+    source_bytes = md_file.read_bytes()
+    text = source_bytes.decode("utf-8")
 
     blocks = parse_blocks(text)
     chunks = build_chunks(doc_id, blocks)
+    for chunk in chunks:
+        chunk.update({"source_file": str(md_file.resolve()),
+                      "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
+                      "chunking_version": "psai-chunking-v3"})
 
-    out_folder = OUTPUT_DIR / doc_id
     out_folder.mkdir(parents=True, exist_ok=True)
 
     jsonl_file = out_folder / f"{doc_id}.jsonl"
@@ -426,6 +492,11 @@ def process_document(md_file: Path) -> dict:
             f.write(json.dumps(c, ensure_ascii=False) + "\n")
 
     stats = compute_stats(doc_id, chunks)
+    stats.update({"source_file": str(md_file.resolve()),
+                  "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
+                  "chunking_version": "psai-chunking-v3", "tokenizer_name": TOKENIZER_NAME,
+                  "max_tokens": MAX_TOKENS, "overlap_tokens": OVERLAP_TOKENS,
+                  "minimum_chunk_tokens": MIN_CHUNK_TOKENS})
     stats_file = out_folder / f"{doc_id}.stats.json"
     stats_file.write_text(
         json.dumps(stats, ensure_ascii=False, indent=2),
@@ -447,39 +518,45 @@ def process_document(md_file: Path) -> dict:
 # MAIN
 # ============================================================
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Chunk Markdown; retain short content and source provenance.")
+    parser.add_argument("--input-dir", type=Path, default=INPUT_DIR)
+    parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
+    parser.add_argument("--overwrite", action="store_true")
+    args = parser.parse_args(argv)
     print("=" * 75)
-    print("PSAI CHUNKING PIPELINE v2")
+    print("PSAI CHUNKING PIPELINE v3")
     print("=" * 75)
-    print(f"INPUT : {INPUT_DIR}")
-    print(f"OUTPUT: {OUTPUT_DIR}")
+    print(f"INPUT : {args.input_dir}")
+    print(f"OUTPUT: {args.output_dir}")
     print(f"MAX_TOKENS={MAX_TOKENS}  OVERLAP={OVERLAP_TOKENS}  TABLE_GROUP={TABLE_GROUP_TOKENS}")
     print()
 
-    if not INPUT_DIR.exists():
-        print("ERROR: input folder does not exist.")
-        return
-
-    if RESET_OUTPUT and OUTPUT_DIR.exists():
-        import shutil
-        shutil.rmtree(OUTPUT_DIR)
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    files = sorted(INPUT_DIR.rglob("*.md"))
+    if not args.input_dir.is_dir():
+        raise FileNotFoundError(f"Input folder does not exist: {args.input_dir}")
+    if args.output_dir.resolve() == args.input_dir.resolve() or args.output_dir.resolve() in args.input_dir.resolve().parents or args.input_dir.resolve() in args.output_dir.resolve().parents:
+        raise ValueError("Input and output trees must be separate and non-overlapping.")
+    files = sorted(args.input_dir.rglob("*.md"))
     if not files:
-        print("ERROR: no .md files found.")
-        return
+        raise ValueError("No .md files found; no output was changed.")
+    doc_ids = [path.parent.name for path in files]
+    if len(doc_ids) != len(set(doc_ids)):
+        raise ValueError("Multiple Markdown files map to the same document ID.")
+    if (args.output_dir / "_summary.json").exists() and not args.overwrite:
+        raise FileExistsError("Output summary already exists; choose a new output directory or --overwrite.")
 
     print(f"Found {len(files)} cleaned documents.")
     print()
 
     all_stats = []
+    failures = []
     for md_file in files:
         try:
-            stats = process_document(md_file)
+            stats = process_document(md_file, output_dir=args.output_dir, overwrite=args.overwrite)
             all_stats.append(stats)
         except Exception as e:
             print(f"[ERROR] {md_file}: {e}")
+            failures.append({"source": str(md_file), "error": str(e)})
 
     total_chunks = sum(s["num_chunks"] for s in all_stats)
     total_tokens = sum(s.get("total_tokens", 0) for s in all_stats)
@@ -489,9 +566,11 @@ def main():
         "total_chunks": total_chunks,
         "total_tokens": total_tokens,
         "per_document": all_stats,
+        "failures": failures,
     }
 
-    summary_file = OUTPUT_DIR / "_summary.json"
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    summary_file = args.output_dir / "_summary.json"
     summary_file.write_text(
         json.dumps(summary, ensure_ascii=False, indent=2),
         encoding="utf-8",
@@ -504,8 +583,10 @@ def main():
     print(f"Documents : {len(all_stats)}")
     print(f"Chunks    : {total_chunks}")
     print(f"Tokens    : {total_tokens:,}")
-    print(f"Output    : {OUTPUT_DIR}")
+    print(f"Output    : {args.output_dir}")
     print(f"Summary   : {summary_file}")
+    if failures:
+        raise RuntimeError("Chunking completed with errors; inspect the summary before embedding.")
 
 
 if __name__ == "__main__":

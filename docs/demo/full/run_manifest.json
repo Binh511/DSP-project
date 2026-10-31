@@ -1,0 +1,149 @@
+{
+  "created_utc": "2026-10-31T06:31:02.367427+00:00",
+  "input_path": "D:\\DSP_PROJECT\\DSP_PROJECT\\outputs\\extension\\verify_20261031T063102_b23723e6\\jobs\\c0e2e02046624b96baadcf42c3642d7f\\source.md",
+  "input_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+  "classifier": "ensemble",
+  "retrieval_mode": "hybrid",
+  "planner_mode": "local",
+  "ocr_mode": "auto",
+  "stages": [
+    {
+      "stage": "extract",
+      "returncode": 0,
+      "elapsed_seconds": 52.858518,
+      "request": "jobs/extract.request.json",
+      "response": "jobs/extract.response.json",
+      "stdout": "jobs/extract.stdout.log",
+      "stderr": "jobs/extract.stderr.log",
+      "local_only": true,
+      "gpu_lifecycle": "worker_process_exited_before_next_stage"
+    },
+    {
+      "stage": "retrieve",
+      "returncode": 0,
+      "elapsed_seconds": 19.035772,
+      "request": "jobs/retrieve.request.json",
+      "response": "jobs/retrieve.response.json",
+      "stdout": "jobs/retrieve.stdout.log",
+      "stderr": "jobs/retrieve.stderr.log",
+      "local_only": true,
+      "gpu_lifecycle": "worker_process_exited_before_next_stage"
+    },
+    {
+      "stage": "plan",
+      "returncode": 0,
+      "elapsed_seconds": 23.722551,
+      "request": "jobs/plan.request.json",
+      "response": "jobs/plan.response.json",
+      "stdout": "jobs/plan.stdout.log",
+      "stderr": "jobs/plan.stderr.log",
+      "local_only": true,
+      "gpu_lifecycle": "worker_process_exited_before_next_stage"
+    }
+  ],
+  "production_model_changed": false,
+  "human_content_review_complete": false,
+  "pipeline_quality_score": null,
+  "final_test_evaluated": false,
+  "worker_policy": "serial_processes_no_concurrent_model_allocations",
+  "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+  "source": {
+    "source_path": "D:\\DSP_PROJECT\\DSP_PROJECT\\outputs\\extension\\verify_20261031T063102_b23723e6\\jobs\\c0e2e02046624b96baadcf42c3642d7f\\source.md",
+    "method": "local_text",
+    "pdf_visual_review_complete": false,
+    "ocr_applied": false
+  },
+  "input_unchanged": true,
+  "source_snapshot_unchanged": true,
+  "completed_utc": "2026-10-31T06:32:37.988385+00:00",
+  "source_line_starts": [
+    0,
+    37,
+    38,
+    51,
+    125,
+    126,
+    142,
+    207,
+    208,
+    222,
+    278,
+    329,
+    376,
+    377,
+    393,
+    459,
+    460,
+    480,
+    540,
+    541,
+    555,
+    631
+  ],
+  "planner": {
+    "method": "local_llm_evidence_catalog_v1",
+    "status": "validated_candidate",
+    "human_review_complete": false,
+    "provenance": {
+      "protocol_version": "psai-local-evidence-catalog-v1",
+      "protocol_sha256": "e22eda88124ccff6666a7617205bcce676f3e901ee606a46845b7cf36d0620e1",
+      "config": {
+        "max_context_tokens": 4096,
+        "max_input_tokens": 3072,
+        "max_new_tokens": 1024,
+        "max_tasks": 12,
+        "max_resources": 12,
+        "max_external_references": 6,
+        "device": "auto",
+        "model_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306"
+      },
+      "prompt_sha256": "e8597797552e0c2dfe5c7513d1ace9de2b23069d0c6ad810dbf8c6980f31d0de",
+      "catalog_sha256": "3f3c12893132b741bcccbf39b6bda663c38738bb30d9bf85d50f80486e6df20e",
+      "model_revision": "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+      "model_loaded": true,
+      "model": {
+        "directory": "D:\\DSP_PROJECT\\DSP_PROJECT\\models\\project_completion\\hf_cache\\hub\\models--Qwen--Qwen2.5-1.5B-Instruct\\snapshots\\989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+        "files": {
+          "config.json": {
+            "sha256": "98d2ff8cc47488d08a2b0b3acf4eb99ef210779b42bd48605f6b8e36acdbf670",
+            "bytes": 660
+          },
+          "generation_config.json": {
+            "sha256": "e558847a8b4402616f1273797b015104dc266fe4b520056fca88823ba8f8ebe6",
+            "bytes": 242
+          },
+          "merges.txt": {
+            "sha256": "599bab54075088774b1733fde865d5bd747cbcc7a547c5bc12610e874e26f5e3",
+            "bytes": 1671839
+          },
+          "model.safetensors": {
+            "sha256": "dd924a11b4c220f385b51ffa522daea7c9f3d850e31b162bb5661df483c6d3ee",
+            "bytes": 3087467144
+          },
+          "tokenizer.json": {
+            "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+            "bytes": 7031645
+          },
+          "tokenizer_config.json": {
+            "sha256": "5b5d4f65d0acd3b2d56a35b56d374a36cbc1c8fa5cf3b3febbbfabf22f359583",
+            "bytes": 7305
+          },
+          "vocab.json": {
+            "sha256": "ca10d7e9fb3ed18575dd1e277a2579c16d108e32f27439684afa0e10b1440910",
+            "bytes": 2776833
+          }
+        },
+        "manifest_sha256": "75f02ee932e9b1d9c77738ce4684b82575cd9102733598bec42cad05d92b255f"
+      },
+      "input_tokens": 818,
+      "output_tokens": 131,
+      "device": "cuda",
+      "dtype": "torch.bfloat16",
+      "do_sample": false,
+      "torch_version": "2.14.1+cu126",
+      "transformers_version": "5.18.0",
+      "rendered_prompt_sha256": "d5ba2c1cc23dda5284a368b7b6e3146b919b2ff23eaa7e078a368026148a94ed",
+      "response_sha256": "86ccff4d0052c5e55f6143394cd0c0954ebc3127d49177d4328d6177bfc57669"
+    }
+  }
+}

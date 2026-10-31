@@ -1,0 +1,10 @@
+# Core runtime. Observed environment versions are recorded in
+# reports/project_review/environment.json; this is not a platform-specific lock.
+numpy
+pandas
+scikit-learn
+torch
+transformers
+sentencepiece
+safetensors
+tqdm

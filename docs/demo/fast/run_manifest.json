@@ -1,0 +1,89 @@
+{
+  "created_utc": "2026-10-31T06:30:46.393929+00:00",
+  "input_path": "D:\\DSP_PROJECT\\DSP_PROJECT\\outputs\\extension\\verify_20261031T063046_870226ce\\jobs\\acd8963665784729bc4b33e3e65d7614\\source.md",
+  "input_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+  "classifier": "rules",
+  "retrieval_mode": "bm25",
+  "planner_mode": "evidence",
+  "ocr_mode": "auto",
+  "stages": [
+    {
+      "stage": "extract",
+      "returncode": 0,
+      "elapsed_seconds": 0.263968,
+      "request": "jobs/extract.request.json",
+      "response": "jobs/extract.response.json",
+      "stdout": "jobs/extract.stdout.log",
+      "stderr": "jobs/extract.stderr.log",
+      "local_only": true,
+      "gpu_lifecycle": "worker_process_exited_before_next_stage"
+    },
+    {
+      "stage": "retrieve",
+      "returncode": 0,
+      "elapsed_seconds": 0.239617,
+      "request": "jobs/retrieve.request.json",
+      "response": "jobs/retrieve.response.json",
+      "stdout": "jobs/retrieve.stdout.log",
+      "stderr": "jobs/retrieve.stderr.log",
+      "local_only": true,
+      "gpu_lifecycle": "worker_process_exited_before_next_stage"
+    },
+    {
+      "stage": "plan",
+      "returncode": 0,
+      "elapsed_seconds": 0.232109,
+      "request": "jobs/plan.request.json",
+      "response": "jobs/plan.response.json",
+      "stdout": "jobs/plan.stdout.log",
+      "stderr": "jobs/plan.stderr.log",
+      "local_only": true,
+      "gpu_lifecycle": "worker_process_exited_before_next_stage"
+    }
+  ],
+  "production_model_changed": false,
+  "human_content_review_complete": false,
+  "pipeline_quality_score": null,
+  "final_test_evaluated": false,
+  "worker_policy": "serial_processes_no_concurrent_model_allocations",
+  "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+  "source": {
+    "source_path": "D:\\DSP_PROJECT\\DSP_PROJECT\\outputs\\extension\\verify_20261031T063046_870226ce\\jobs\\acd8963665784729bc4b33e3e65d7614\\source.md",
+    "method": "local_text",
+    "pdf_visual_review_complete": false,
+    "ocr_applied": false
+  },
+  "input_unchanged": true,
+  "source_snapshot_unchanged": true,
+  "completed_utc": "2026-10-31T06:30:47.134281+00:00",
+  "source_line_starts": [
+    0,
+    37,
+    38,
+    51,
+    125,
+    126,
+    142,
+    207,
+    208,
+    222,
+    278,
+    329,
+    376,
+    377,
+    393,
+    459,
+    460,
+    480,
+    540,
+    541,
+    555,
+    631
+  ],
+  "planner": {
+    "method": "evidence_ordered_source_items",
+    "status": "source_items",
+    "human_review_complete": false,
+    "provenance": null
+  }
+}

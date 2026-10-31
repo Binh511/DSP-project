@@ -1,0 +1,11 @@
+{
+  "torch": "2.14.1+cu126",
+  "transformers": "5.18.0",
+  "numpy": "2.3.4",
+  "peft": "0.21.2",
+  "tokenizers": "0.23.2",
+  "sentencepiece": "0.2.2",
+  "safetensors": "0.8.0",
+  "sentence-transformers": "6.1.0",
+  "pypdf": "6.21.3"
+}

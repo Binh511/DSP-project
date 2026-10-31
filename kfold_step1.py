@@ -156,6 +156,10 @@ def make_ds(sub):
 
 
 class WeightedTrainer(Trainer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model_accepts_loss_kwargs = False
+
     def compute_loss(self, model, inputs, return_outputs=False, **kw):
         labels = inputs.pop("labels")
         outputs = model(**inputs)

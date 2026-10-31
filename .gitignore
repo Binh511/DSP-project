@@ -47,3 +47,12 @@ logs/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Local distributions and private annotation workbooks
+dist/
+*.zip
+*.xlsx
+psai_rag_quality/artifacts/
+
+# Aggregate evidence is published through the reviewed GitHub handoff inventory.
+reports/

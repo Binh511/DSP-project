@@ -1,0 +1,15 @@
+[
+  {
+    "index": 0,
+    "label": "REQUIREMENT",
+    "confidence": 0.9375191330909729,
+    "probabilities": {
+      "OBJECTIVE": 0.014428121969103813,
+      "REQUIREMENT": 0.9375191330909729,
+      "ACTIVITY": 0.01635718159377575,
+      "EXPECTED_RESULT": 0.019486097618937492,
+      "OTHER": 0.012209387496113777
+    },
+    "id": "demo-01"
+  }
+]

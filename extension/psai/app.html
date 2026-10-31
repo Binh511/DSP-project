@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>PSAI · Không gian phân tích tài liệu</title>
+  <link rel="stylesheet" href="app.css">
+  <script type="module" src="app.mjs"></script>
+</head>
+<body>
+  <header class="header">
+    <a class="brand" href="app.html" aria-label="PSAI, trang chủ">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" rx="12" fill="currentColor"/><path d="M12 28V12h10a6 6 0 0 1 0 12h-5v4m0-9h5a1 1 0 0 0 0-2h-5v2" fill="#fff"/><circle cx="28" cy="28" r="3" fill="#9cddc6"/></svg>
+      <span>PSAI<span class="brand-caption">PROJECT INTELLIGENCE</span></span>
+    </a>
+    <div class="header-right"><span class="local-label"><span class="local-dot"></span>Không gian cục bộ</span><span class="version">v0.1.0</span></div>
+  </header>
+
+  <main class="shell">
+    <section class="hero" aria-labelledby="page-title">
+      <div><p class="eyebrow">TỪ ĐỀ XUẤT ĐẾN HÀNH ĐỘNG</p><h1 id="page-title">Đọc sâu tài liệu.<br><span>Lập kế hoạch có căn cứ.</span></h1><p class="hero-description">Phân tích đề xuất dự án, đối chiếu nguồn và mở kế hoạch<br class="desktop-break"> trong một không gian làm việc.</p></div>
+      <div class="hero-art" aria-hidden="true"><svg viewBox="0 0 240 170" fill="none"><circle cx="122" cy="84" r="72" fill="#e0eae4"/><path d="M31 132h180" stroke="#bfd2c6"/><rect x="65" y="20" width="103" height="126" rx="10" fill="#fff" stroke="#c7d6cd"/><path d="M84 45h45M84 57h63M84 69h56" stroke="#b6c5bd" stroke-width="5" stroke-linecap="round"/><rect x="83" y="86" width="66" height="38" rx="5" fill="#e8f0eb"/><path d="m94 110 12-12 12 7 18-14" stroke="#35745b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><rect x="151" y="84" width="58" height="58" rx="16" fill="#1c5b45"/><path d="m167 113 9 9 17-19" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="50" cy="53" r="9" fill="#e3b66c"/><path d="M183 32v14m-7-7h14" stroke="#6d927d" stroke-width="3" stroke-linecap="round"/></svg></div>
+    </section>
+
+    <section class="connection card" aria-labelledby="connection-title">
+      <div class="connection-summary"><div class="connection-title"><span id="connection-dot" class="status-dot offline"></span><h2 id="connection-title">Kết nối bộ xử lý</h2><span id="connection-badge" class="badge neutral">Chưa kết nối</span></div><button type="button" id="connection-toggle" class="text-button" aria-expanded="true" aria-controls="connection-form">Thu gọn <span aria-hidden="true">↑</span></button></div>
+      <p id="connection-message" class="connection-message" role="status" aria-live="polite">Khởi động backend PSAI trên máy, sau đó nhập mã ghép nối để bắt đầu.</p>
+      <form id="connection-form" class="connection-form">
+        <div class="field"><label for="backend-url">Địa chỉ backend</label><input id="backend-url" type="url" value="http://127.0.0.1:8765" spellcheck="false" autocomplete="off" required aria-describedby="backend-help"><small id="backend-help">Chỉ chấp nhận 127.0.0.1 với cổng cụ thể.</small></div>
+        <div class="field"><label for="pairing-token">Mã ghép nối</label><input id="pairing-token" type="password" placeholder="Dán mã từ cửa sổ backend" autocomplete="off" spellcheck="false" required aria-describedby="pairing-help"><small id="pairing-help">Lưu trên trình duyệt này để kết nối lại.</small></div>
+        <button type="submit" id="connect-button" class="button button-dark">Kết nối <span aria-hidden="true">↗</span></button>
+      </form>
+    </section>
+
+    <div id="notice" class="notice" role="alert" hidden><span id="notice-text"></span><button type="button" id="dismiss-notice" aria-label="Đóng thông báo">×</button></div>
+
+    <div class="workspace-grid">
+      <section class="card upload-card" aria-labelledby="upload-title">
+        <div class="section-heading"><span class="step-number">01</span><div><h2 id="upload-title">Tài liệu đầu vào</h2><p>Chọn đề xuất bạn muốn phân tích.</p></div></div>
+        <form id="analysis-form">
+          <label class="dropzone" id="dropzone" for="document-file"><input id="document-file" type="file" accept=".pdf,.md,.txt" aria-describedby="file-help"><svg width="42" height="42" viewBox="0 0 42 42" fill="none" aria-hidden="true"><rect x="8" y="4" width="26" height="34" rx="5" stroke="currentColor" stroke-width="1.7"/><path d="M15 14h12M15 20h12M15 26h7" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><strong id="file-title">Kéo thả tài liệu vào đây</strong><span id="file-description">hoặc <span class="file-link">chọn tệp từ máy</span></span><small id="file-help">PDF, Markdown, TXT · Tối đa 20 MB</small></label>
+          <div class="file-actions"><span id="file-status" role="status" aria-live="polite">Chưa chọn tài liệu</span><button type="button" id="remove-file" class="text-button" hidden>Bỏ chọn</button></div>
+          <fieldset class="mode-fieldset"><legend>Chế độ phân tích</legend><label class="mode-option"><input type="radio" name="mode" value="full" checked><span><span class="mode-title">Đầy đủ <span class="small-tag">AI CỤC BỘ</span></span><span class="mode-description">Ensemble classifier · Hybrid RAG · Qwen</span></span></label><label class="mode-option"><input type="radio" name="mode" value="fast"><span><span class="mode-title">Chạy nhanh <span class="small-tag muted-tag">KHÔNG MODEL HỌC</span></span><span class="mode-description">Quy tắc + tìm kiếm từ khóa; kiểm tra luồng xử lý.</span></span></label></fieldset>
+          <div class="options-grid"><div class="field"><label for="device">Thiết bị xử lý</label><select id="device"><option value="auto">Tự động</option><option value="cpu">CPU</option><option value="cuda">GPU (CUDA)</option></select></div><div class="field"><label for="ocr">Nhận dạng văn bản (OCR)</label><select id="ocr"><option value="auto">Tự động khi cần</option><option value="none">Không dùng OCR</option><option value="always">Luôn dùng OCR</option></select></div></div>
+          <button class="button button-primary submit-button" id="analyze-button" type="submit" disabled><span id="analyze-label">Bắt đầu phân tích</span><span aria-hidden="true">→</span></button><p class="processing-note">Chế độ đầy đủ cần model đã cài trên máy. PDF scan cần backend OCR.</p>
+        </form>
+      </section>
+
+      <section class="card progress-card" aria-labelledby="progress-title">
+        <div class="section-heading"><span class="step-number">02</span><div><h2 id="progress-title">Không gian kết quả</h2><p>Theo dõi tiến độ và mở đầu ra.</p></div></div>
+        <div id="empty-detail" class="empty-detail"><div class="empty-icon" aria-hidden="true">↗</div><h3>Sẵn sàng cho tài liệu đầu tiên</h3><p>Báo cáo phân tích và kế hoạch dự án<br>sẽ xuất hiện ở đây khi hoàn tất.</p><div class="output-preview"><span>01 <strong>Báo cáo</strong></span><span>02 <strong>Workspace</strong></span><span>03 <strong>Dữ liệu JSON</strong></span></div></div>
+        <div id="job-detail" hidden><div class="detail-header"><span id="detail-status" class="badge"></span><span id="detail-mode" class="detail-mode"></span></div><h3 id="detail-filename" class="detail-filename"></h3><p id="detail-time" class="detail-time"></p><div id="progress-track" class="progress-track"><span></span></div><p id="detail-stage" class="detail-stage" role="status" aria-live="polite"></p><p id="detail-error" class="job-error" hidden></p><div id="result-actions" class="result-actions" hidden><button type="button" id="open-report" class="result-button"><span class="result-icon" aria-hidden="true">≡</span><span><strong>Mở báo cáo</strong><small>Phân tích và dẫn chiếu nguồn</small></span><span aria-hidden="true">↗</span></button><button type="button" id="open-workspace" class="result-button"><span class="result-icon" aria-hidden="true">▦</span><span><strong>Mở workspace</strong><small>Kế hoạch và không gian làm việc</small></span><span aria-hidden="true">↗</span></button><a id="download-analysis" class="download-link" download="analysis.json" target="_blank" rel="noopener noreferrer">Tải dữ liệu phân tích (.json) <span aria-hidden="true">↓</span></a></div><details class="log-details"><summary>Nhật ký xử lý</summary><pre id="detail-log" tabindex="0"></pre></details><p class="job-id">Mã tác vụ <span id="detail-id"></span></p></div>
+      </section>
+    </div>
+
+    <section class="card history-card" aria-labelledby="history-title"><div class="history-heading"><div><h2 id="history-title">Lịch sử phân tích <span id="history-count" class="count">0</span></h2><p>Tác vụ được lưu tại backend đang kết nối.</p></div><button type="button" id="refresh-jobs" class="text-button" disabled><span aria-hidden="true">↻</span> Làm mới</button></div><p id="history-empty" class="history-empty">Chưa có tác vụ. Kết nối backend và chọn tài liệu để bắt đầu.</p><div id="job-list" class="job-list" aria-label="Danh sách tác vụ"></div></section>
+    <footer><span>PSAI <span class="footer-divider">/</span> Hiểu nguồn. Rõ kế hoạch.</span><span>Đối chiếu trích dẫn trước khi sử dụng kết quả.</span></footer>
+  </main>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "status": "passed",
+  "created_utc": "2026-10-31T06:54:25.171403+00:00",
+  "python": "3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]",
+  "source_files_copied": 35,
+  "stdlib_only_environment": true,
+  "model_files_copied": false,
+  "existing_reports_copied": false,
+  "private_documents_copied": false,
+  "cli": {
+    "input_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+    "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+    "exact_extracted_quotes": 10,
+    "verified_bm25_hits": 5,
+    "plan_steps": 3,
+    "actual_workers_completed": 3
+  },
+  "extension_api": {
+    "input_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+    "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+    "exact_extracted_quotes": 10,
+    "verified_bm25_hits": 5,
+    "plan_steps": 3,
+    "actual_workers_completed": 3
+  },
+  "api_auth_checked": true,
+  "result_capability_checked": true,
+  "scope": "Actual rules/BM25/evidence demo; no learned-model accuracy claim"
+}

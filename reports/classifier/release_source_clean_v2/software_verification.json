@@ -1,0 +1,19 @@
+{
+  "verified_local": "2026-10-28T11:20:28.915018+07:00",
+  "targeted_tests_passed": 19,
+  "targeted_tests_run": 19,
+  "exit_code": 0,
+  "command": "python -m unittest tools.test_classifier_release test_classifier_demo test_classifier_context_experiment test_classifier_source_split -v",
+  "scope": "Targeted release selection/integrity, demo, paired study inputs and source-purge checks; not the entire project suite.",
+  "source_sha256": {
+    "tools/test_classifier_release.py": "2d54ace81f28611347899d1c0cc6e6aad91afb1bff398970b1fed94ce02942ea",
+    "test_classifier_demo.py": "ebe4c1d7d0eb35f8a01907b3f48a1114afda688c7a0139c447abf3ca67790a09",
+    "test_classifier_context_experiment.py": "e5ddee554cce1452f8370a8549689c7325ef777d9fd2d96593032a492acab781",
+    "test_classifier_source_split.py": "827e7690fa94aa3b80f23b395d134c1c24c58ee32fb399142c88816e2ba76b0e",
+    "tools/finalize_classifier_release.py": "ba0757437e816387ca05f2c12c16af0e7473d28f209d49776e42c13ba4cbc9ee",
+    "tools/demo_classifier_final.py": "372fd8fd2dbbd169ab87646a8c9ad8c8c50fea962c812c699036dbe63264d295",
+    "classifier_demo.py": "8bf769eca2fa7ee8d23d5b861287afcc5e4cdbb6bc7abf76ea9426f6b268b132",
+    "classifier_source_split.py": "12956d1fd09cf3bfc5baeb9a5e5d3bb62671f6c5379a2158ab1fcda09012fab9",
+    "classifier_context_experiment.py": "b29a05dab535cf4680b238a6d1b96f83a4d20d3e12735f02cfd12e893138bda3"
+  }
+}

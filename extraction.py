@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import math
 import re
 from pathlib import Path
 from typing import Any, Iterator
@@ -29,9 +30,10 @@ LABEL_TO_FIELD = {
 # Các trường mô hình không phân loại: vẫn dùng regex như cũ
 RULE_ONLY_FIELDS = ("deliverables", "technologies", "resources")
 
-# Ngưỡng điểm tin cậy riêng cho từng nhãn (chọn từ bảng P/R trên tập test)
+# Legacy extraction thresholds, preserved here without selecting on test data.
+# These heuristics are not an independently validated operating point.
 MIN_SCORE_BY_LABEL = {
-    "OBJECTIVE": 0.60,
+    "OBJECTIVE": 0.70,
     "ACTIVITY": 0.70,
     "EXPECTED_RESULT": 0.70,
     "REQUIREMENT": 0.60,
@@ -110,12 +112,21 @@ def _is_noise(value: str) -> bool:
 _PROTECT = re.compile(r"\b(e\.g|i\.e|etc|vs|Fig|No|approx|Dr|Mr|Ms)\.", re.I)
 _HEAD = re.compile(r"^(#{1,6})\s+(.*)$")
 _TABLE_SEP = re.compile(r"^[|\s:\-]+$")
+_FENCE = re.compile(r"^(`{3,}|~{3,})(.*)$")
+SENTENCE_CONTEXT_VERSION = "source-context-v2-heading-stack-fences"
 
 
 def _split_sentences(line: str) -> list[str]:
-    protected = _PROTECT.sub(lambda m: m.group(0).replace(".", "§"), line)
-    parts = re.split(r"(?<=[.!?])\s+(?=[A-ZÀ-Ỹ0-9\"'(])", protected)
-    return [p.replace("§", ".").strip() for p in parts if p.strip()]
+    # Mask abbreviation dots only for boundary detection. Slice the ORIGINAL
+    # string so literal section signs or other source characters never change.
+    protected = _PROTECT.sub(lambda m: m.group(0).replace(".", "\ue000"), line)
+    boundaries = list(re.finditer(r"(?<=[.!?])\s+(?=[A-ZÀ-Ỹ0-9\"'(])", protected))
+    parts, start = [], 0
+    for boundary in boundaries:
+        parts.append(line[start:boundary.start()].strip())
+        start = boundary.end()
+    parts.append(line[start:].strip())
+    return [part for part in parts if part]
 
 
 def _sentences_with_context(text: str) -> Iterator[tuple[str, str, str]]:
@@ -126,9 +137,9 @@ def _sentences_with_context(text: str) -> Iterator[tuple[str, str, str]]:
 
 def sentences_with_context(text: str) -> Iterator[dict]:
     """Mỗi câu kèm: đường dẫn heading, heading cuối, câu trước, vị trí ký tự."""
-    path: list[str] = []
+    headings: list[tuple[int, str]] = []
     prev = ""
-    in_fence = False
+    fence = None
     offset = 0
     total_lines = max(len(text.split("\n")) - 1, 1)
     pending = None
@@ -138,10 +149,17 @@ def sentences_with_context(text: str) -> Iterator[dict]:
         offset += len(raw) + 1
         s = raw.strip()
 
-        if s.startswith("```"):
-            in_fence = not in_fence
+        marker = _FENCE.match(s)
+        if fence is not None:
+            if (marker and marker.group(1)[0] == fence[0]
+                    and len(marker.group(1)) >= fence[1]
+                    and not marker.group(2).strip()):
+                fence = None
             continue
-        if in_fence or not s or s.startswith(">"):
+        if marker:
+            fence = (marker.group(1)[0], len(marker.group(1)))
+            continue
+        if not s or s.startswith(">"):
             continue
         if _TABLE_SEP.match(s):
             continue
@@ -149,16 +167,24 @@ def sentences_with_context(text: str) -> Iterator[dict]:
         m = _HEAD.match(s)
         if m:
             level = len(m.group(1))
-            path = path[: level - 1] + [m.group(2).strip()]
+            # Markdown can skip levels. A new H3 must replace the preceding
+            # H3 even when no H2 exists, rather than become its child.
+            while headings and headings[-1][0] >= level:
+                headings.pop()
+            title = re.sub(r"\s+#+\s*$", "", m.group(2)).strip()
+            headings.append((level, title))
             prev = s
             continue
 
+        search_start = line_start
         for sent in _split_sentences(s):
-            pos = text.find(sent, line_start)
+            pos = text.find(sent, search_start, line_start + len(raw))
+            if pos >= 0:
+                search_start = pos + len(sent)
             item = {
                 "text": sent,
-                "section": " > ".join(path),
-                "section_last": path[-1] if path else "",
+                "section": " > ".join(title for _, title in headings),
+                "section_last": headings[-1][1] if headings else "",
                 "prev": prev,
                 "pos": line_no / total_lines,
                 "start": pos,
@@ -176,6 +202,10 @@ def sentences_with_context(text: str) -> Iterator[dict]:
 
 
 def extract_document(document_id: str, text: str, use_model: bool = True) -> dict[str, Any]:
+    if not isinstance(document_id, str) or not document_id.strip():
+        raise ValueError("document_id must be a non-empty string")
+    if not isinstance(text, str):
+        raise TypeError("Source text must be a string")
     fields: dict[str, list[dict[str, Any]]] = {name: [] for name in FIELD_CUES}
     items = list(sentences_with_context(text))
     for k, it in enumerate(items):
@@ -189,12 +219,24 @@ def extract_document(document_id: str, text: str, use_model: bool = True) -> dic
              "pos": i["pos"], "next_text": i["next"]}
             for i in items
         ])
+        if len(predictions) != len(items):
+            raise ValueError("Classifier returned a different number of predictions than sentences")
+        for pred in predictions:
+            if (not isinstance(pred, dict)
+                    or pred.get("label") not in {*LABEL_TO_FIELD, "OTHER"}
+                    or isinstance(pred.get("score"), bool)
+                    or not isinstance(pred.get("score"), (int, float))
+                    or not math.isfinite(pred["score"])
+                    or not 0 <= pred["score"] <= 1):
+                raise ValueError("Classifier returned an invalid label or confidence")
 
     for idx, (it, pred) in enumerate(zip(items, predictions)):
         sentence = it["text"]
         value = _clean_value(sentence)
         evidence_id = f"{document_id}:S{idx:05d}"
         verified = it["start"] >= 0 and text[it["start"]:it["end"]] == sentence
+        if not verified:
+            raise ValueError(f"Source span could not be verified for {evidence_id}")
 
         if pred is None:
             targets = [n for n, cue in FIELD_CUES.items() if cue.search(sentence)]
@@ -222,13 +264,21 @@ def extract_document(document_id: str, text: str, use_model: bool = True) -> dic
                 "verified": verified,
                 "verification": "offset_match" if verified else "failed",
             }
-            if pred is not None and field in LABEL_TO_FIELD.values():
+            if pred is not None and field in (*LABEL_TO_FIELD.values(), "deliverables"):
                 entry["label_score"] = pred["score"]
+                entry["evidence_method"] = "model_label_with_cue_rule" if field == "deliverables" else "model_label"
+            else:
+                entry["evidence_method"] = "cue_rule"
             fields[field].append(entry)
 
     return {
         "document_id": document_id,
         "source_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
         "extraction_method": "deberta_classifier_plus_cue_rules" if use_model else "source_cue_rules",
+        "extraction_config": {
+            "sentence_context_version": SENTENCE_CONTEXT_VERSION,
+            "min_score_by_label": dict(MIN_SCORE_BY_LABEL) if use_model else {},
+            "threshold_status": "legacy_preserved_not_reselected" if use_model else "not_applicable",
+        },
         "fields": fields,
     }

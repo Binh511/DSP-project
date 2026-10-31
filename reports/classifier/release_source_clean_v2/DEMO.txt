@@ -1,0 +1,16 @@
+﻿Demo classifier PSAI bản đã chốt
+
+1. Trong VS Code mở Terminal PowerShell và vào thư mục project.
+2. Mở examples/classifier_teacher_live.json; sửa câu/context nếu cần và lưu.
+3. Chạy lệnh sau:
+
+Set-Location "D:\DSP_PROJECT\DSP_PROJECT"
+python tools/demo_classifier_final.py
+
+Lệnh kiểm tra hash của bản v2 rồi suy luận thật bằng CPU. Model được in phải là baseline_seed_2026. Khi xong, chương trình in DEMO COMPLETE và đường dẫn OUTPUT để mở JSON. Confidence là điểm softmax, không phải accuracy của toàn model.
+
+Các số để trả lời thầy: Macro-F1 validation 0,632077; accuracy 0,760061; 1.317 câu. Điểm 0,654426 thuộc v1 lịch sử trước khi loại nguồn trùng, không phải model đang demo.
+
+Giải thích code theo thứ tự: classifier_source_split.prepare → study_inputs.context_for/encode_items → classifier_training.compute_loss → classifier_context_experiment.run → classifier_predict.predict. Model nền và năm nhãn ở train_human_cv.py. Mở code train để giải thích, không chạy train trong buổi demo.
+
+Trên máy khác cần chép riêng export model đầy đủ vào vị trí ghi trong manifest và thiết lập thư viện phù hợp. ZIP mã/bằng chứng không chứa weights dung lượng lớn hoặc môi trường .venv. CPU demo trên máy hiện tại dùng torch2.14.1+cpu và torchvision0.29.1+cpu trong môi trường riêng.

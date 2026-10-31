@@ -1,0 +1,51 @@
+{
+  "status": "NOT_SCORED",
+  "selected_release": "2.0-source-clean",
+  "independent_final_evaluation_complete": false,
+  "final_test_used_for_selection": false,
+  "reason": "Source independence and human reference-label gates are not approved.",
+  "gate_snapshots": [
+    {
+      "path": "reports/research_review/final_test_candidate/review_gate.json",
+      "sha256": "96516f95f4b176de3b46a389b23144c36542c42d517ff850e6c5c40a209ee97a",
+      "gate": {
+        "document_hashes": {
+          "PSAI068": "30a6b428d903a9569dca25212aa943f6f7ae502bfcccb353e7326e2b69e1cc5f",
+          "PSAI157": "26594cd6b2881c432eedf279bc2675648d85efbad2bff2c0eb31d5a71e5136e1",
+          "PSAI169": "b459fb6b63944571d06de225c9c13f7e583197720309e293d3714008422c25fb",
+          "PSAI170": "21f879c058865c610a566044dcbf44fd22adf754b4f1ddfce2bfcb9c2f97f262",
+          "PSAI171": "250b509ac304b6351c91bd531b73b605822033f950da15a8607f4b4d4f07956e",
+          "PSAI202": "276503d8741d0cf4d363839f682800efd684741ab8ddcf81c13b44eb58e0e689",
+          "PSAI240": "1b1225b6ca3d411173522b2e2722722a51e7aa260aa7c8f6faaaa02f440a3780",
+          "PSAI248": "1212ab8ee1bbf33bfe8d9f9930ca82f1a9aafb77601d733c29faa00f6d9650f2"
+        },
+        "candidate_rows_sha256": "5ff00a1091f9cf630227f8b35c7579a11650a7d0de35923212c8704446ab6c76",
+        "known_development_documents_disjoint": true,
+        "approved_for_final_test": false,
+        "independence_reviewed_by": "",
+        "annotation_reviewed_by": "",
+        "warning": "These documents were previously screened, not certified independent. No labels inferred by AI. Human review and valid labels required."
+      }
+    },
+    {
+      "path": "reports/research_review/fresh_source_candidates_v1/review_packet/review_gate.json",
+      "sha256": "a05f49b41ee82d2b765df5276b181e238266592885cce3ff17f126032d5be712",
+      "gate": {
+        "source_path": "D:\\DSP_PROJECT\\DSP_PROJECT\\reports\\research_review\\fresh_source_candidates_v1\\fortran_fpm_proposal.md",
+        "source_sha256": "aa289aa405c30fc45ce5ad36664ff2102e61f2512693b138d52d257c3c03e31f",
+        "sentence_candidates": 189,
+        "sampled_sentences": 80,
+        "sampling": "uniform without replacement; sorted back to source order",
+        "seed": 2027,
+        "source_document_count": 1,
+        "content_sha256": "4a1d0f0898949cb12e009c673103e22a9b00478d5d7e2de598f4cebaad8e6c27",
+        "source_review_complete": false,
+        "human_annotation_complete": false,
+        "approved_for_final_test": false,
+        "model_inference_performed": false,
+        "test_scored": false,
+        "limitation": "One-source pilot review packet, not a complete independent final test set."
+      }
+    }
+  ]
+}

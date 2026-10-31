@@ -1,0 +1,77 @@
+{
+  "status": "FINAL_CLASSIFIER_RELEASE_V1_VALIDATION_SELECTED",
+  "candidate_model": "models/controlled_study/classifier_stability_v1/seed_123",
+  "selection_basis": "highest Macro-F1 among the five completed controlled validation exports",
+  "validation_macro_f1": 0.6544263842960479,
+  "seed": 123,
+  "labels": [
+    "OBJECTIVE",
+    "REQUIREMENT",
+    "ACTIVITY",
+    "EXPECTED_RESULT",
+    "OTHER"
+  ],
+  "model_files": {
+    "model.safetensors": "f952ca33c953705fc154b7d15fa2fd73596459a4eac543c872447e716b6825f0",
+    "config.json": "21ac39be93d51bcfbb692301e41c8b6d5c01fc2eab20e6ff275d356c112c9e3b",
+    "tokenizer.json": "f1fc0fc3d7f208e8d9fd9c9a4e5ebf62075b0603f9ae58b34df09e7eb5991e88",
+    "tokenizer_config.json": "eb84e53d9b80fcc75c4016533ddf500f522be440ca30cf4a83b2ab1f876eecf8",
+    "inference_config.json": "9ba0ccc0f11f6ae63b0210a55207176c9c1c0c248820e7024074ddcc765a5c58",
+    "training_provenance.json": "b224ccb5830e5da4a1e69c664bece9fce985f9f5a7926a4a0d9124f9588d0309"
+  },
+  "input_protocol": {
+    "context_mode": "full",
+    "class_weight": true,
+    "label_smoothing": 0.1,
+    "include_human": true,
+    "seed": 123,
+    "learning_rate": 3e-05,
+    "epochs": 5,
+    "max_len": 256,
+    "text_max_chars": 600,
+    "input_protocol": "study-v1",
+    "warmup_ratio": 0.1,
+    "split_seed": 42,
+    "context_source": "fixed_dataset_v3",
+    "use_label_overlay": false
+  },
+  "context_dataset": "fixed_dataset_v3; context v2.1 NOT used by these weights",
+  "code_sha256": {
+    "classifier_predict.py": "881de483a2460a53508598ecf43760aee4122266948cb792914364b065f292e3",
+    "study_inputs.py": "5d631de18f473955dc1b9a1720a6b644d281392cf472a7d93a1067c3706dcfd3"
+  },
+  "validation_evidence_sha256": "ba9db6ff9f18e441906d6cbfaad60de679e976cae5b102522abec3df226740ef",
+  "train_sha256": "aa5516eec4b5398232a6cae8b410d45d1717c365f9265226b63e0a787258d277",
+  "validation_sha256": "85cce8739a97b64aafa2b47c5e7a8ec5fea52d09f44c0928f5308fca5c1bf683",
+  "production_ensemble_replaced": false,
+  "human_label_review_complete": false,
+  "independent_final_evaluation_complete": false,
+  "final_selection_file_created": true,
+  "limitations": [
+    "Validation was used in development.",
+    "No superiority claim over the old production ensemble.",
+    "Original-label/reference ambiguities remain."
+  ],
+  "release_version": "1.0",
+  "model_path": "models/controlled_study/classifier_stability_v1/seed_123",
+  "frozen_selection_path": "reports/research_review/final_selection.json",
+  "frozen_selection_sha256": "dd00814f5ea20bff1409d5a77c9ac7091a9d9a94df5abe278ddf3e9acebbac92",
+  "label_policy": "original reference labels, unchanged; not certified expert adjudicated",
+  "excluded_from_release": [
+    "AI label proposals not approved",
+    "context v2.1 not train/evaluated"
+  ],
+  "release_scope": "classifier model/software submission; independent test remains unmeasured",
+  "additional_evaluation_limit": {
+    "issue": "Original split had a full-source duplicate group crossing train/validation despite no exact target/context sentence overlap.",
+    "affected_training_documents": [
+      "PSAI069",
+      "PSAI086",
+      "PSAI100"
+    ],
+    "removed_rows_for_new_study": 202,
+    "original_release_kept_for_traceability": true,
+    "new_source_disjoint_study": "reports/research_review/studies/classifier_source_clean_context_study_v1",
+    "source_audit_manifest_sha256": "52e11a1c3a33912b834951a9532db1794a4c68ac39c675ccb8d04c2b363875f7"
+  }
+}

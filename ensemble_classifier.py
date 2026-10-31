@@ -10,7 +10,7 @@ import numpy as np
 import torch
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-MODEL_NAMES = ["psai_deberta_ctx_v5", "psai_deberta_ctx_v6", "psai_deberta_ctx_v7"]
+MODEL_NAMES = ["final_s11", "final_s22", "final_s33"]
 MODELS_DIR = Path(__file__).parent / "models"
 LABELS = ["OBJECTIVE", "REQUIREMENT", "ACTIVITY", "EXPECTED_RESULT", "OTHER"]
 _device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -50,13 +50,17 @@ def _load():
         config = json.loads((model_dir / "inference_config.json").read_text(encoding="utf-8"))
         if config["labels"] != LABELS:
             raise ValueError(f"Unexpected label order in {model_dir}: {config['labels']}")
-        tokenizer = AutoTokenizer.from_pretrained(model_dir)
-        model = AutoModelForSequenceClassification.from_pretrained(model_dir).to(_device).eval()
+        tokenizer = AutoTokenizer.from_pretrained(model_dir, local_files_only=True)
+        model = AutoModelForSequenceClassification.from_pretrained(model_dir, local_files_only=True).to(_device).eval()
         members.append((config, tokenizer, model))
     _members = members
 
 
 def classify_probs(items: list[dict], batch_size: int = 32) -> np.ndarray:
+    if batch_size < 1:
+        raise ValueError("batch_size must be positive")
+    if not items:
+        return np.zeros((0, len(LABELS)))
     _load()
     out = []
     for start in range(0, len(items), batch_size):
@@ -70,7 +74,7 @@ def classify_probs(items: list[dict], batch_size: int = 32) -> np.ndarray:
                 for item in batch
             ]
             enc = tokenizer(
-                [item["text"] for item in batch],
+                [item["text"][:config.get("text_max_chars", 600)] for item in batch],
                 contexts,
                 truncation=True,
                 max_length=config.get("max_len", 192),
@@ -79,8 +83,13 @@ def classify_probs(items: list[dict], batch_size: int = 32) -> np.ndarray:
             ).to(_device)
             with torch.no_grad():
                 logits = model(**enc).logits.float().cpu().numpy()
+            if logits.shape != (len(batch), len(LABELS)) or not np.isfinite(logits).all():
+                raise FloatingPointError('Classifier returned invalid or nonfinite logits')
+            logits[:, LABELS.index("OTHER")] += config.get("other_bias", 0.0)
             probabilities = np.exp(logits - logits.max(axis=1, keepdims=True))
             probabilities /= probabilities.sum(axis=1, keepdims=True)
+            if not np.isfinite(probabilities).all():
+                raise FloatingPointError('Classifier probabilities are nonfinite')
             acc = probabilities if acc is None else acc + probabilities
         out.append(acc / len(_members))
     return np.vstack(out) if out else np.zeros((0, len(LABELS)))

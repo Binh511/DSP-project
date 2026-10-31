@@ -1,0 +1,38 @@
+{
+  "model_dir": "D:\\DSP_PROJECT\\DSP_PROJECT\\models\\controlled_study\\classifier_stability_v1\\seed_123",
+  "model_sha256": "f952ca33c953705fc154b7d15fa2fd73596459a4eac543c872447e716b6825f0",
+  "inference_config_sha256": "9ba0ccc0f11f6ae63b0210a55207176c9c1c0c248820e7024074ddcc765a5c58",
+  "validation_metrics_sha256": "ba9db6ff9f18e441906d6cbfaad60de679e976cae5b102522abec3df226740ef",
+  "training_provenance_sha256": "b224ccb5830e5da4a1e69c664bece9fce985f9f5a7926a4a0d9124f9588d0309",
+  "validation_metrics_path": "D:\\DSP_PROJECT\\DSP_PROJECT\\reports\\research_review\\studies\\classifier_validation_replay_v1\\seed_123\\validation_metrics.json",
+  "inference_manifest": {
+    "model_files": {
+      "model.safetensors": "f952ca33c953705fc154b7d15fa2fd73596459a4eac543c872447e716b6825f0",
+      "config.json": "21ac39be93d51bcfbb692301e41c8b6d5c01fc2eab20e6ff275d356c112c9e3b",
+      "tokenizer.json": "f1fc0fc3d7f208e8d9fd9c9a4e5ebf62075b0603f9ae58b34df09e7eb5991e88",
+      "tokenizer_config.json": "eb84e53d9b80fcc75c4016533ddf500f522be440ca30cf4a83b2ab1f876eecf8",
+      "inference_config.json": "9ba0ccc0f11f6ae63b0210a55207176c9c1c0c248820e7024074ddcc765a5c58",
+      "training_provenance.json": "b224ccb5830e5da4a1e69c664bece9fce985f9f5a7926a4a0d9124f9588d0309"
+    },
+    "implementation": {
+      "study_evaluation.py": "4bbce3da6d935b4945abe48a6ac5a0ee9bec2a76bfd13fadaef473362aaf640b",
+      "study_inputs.py": "5d631de18f473955dc1b9a1720a6b644d281392cf472a7d93a1067c3706dcfd3",
+      "train_human_cv.py": "6f0eb0ace4716742f79ecaaeceb5430fc8296079209df589afe76b8ba5760b24",
+      "study_final_test.py": "0a62145571d5ae72cc4dc22efd80c513c1f2af94249414c1ce5de29e7723551b",
+      "final_test_integrity.py": "2cc0d1c268f64853aff3a09c325099bd164f50168d0d30eb8c54d758a8379f63",
+      "replay_validation.py": "bde1d26b5d8a37b6974fa8e1b804c83a0dbe6441bc4714f5cf62271e0d7ddd8e"
+    },
+    "runtime": {
+      "torch": "2.14.1+cu126",
+      "cuda": "12.6",
+      "device": "cuda",
+      "device_name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+      "cudnn": 91002,
+      "cuda_tf32": false,
+      "cudnn_tf32": true,
+      "float32_matmul_precision": "highest",
+      "deterministic_algorithms": false
+    }
+  },
+  "criterion": "validation macro-F1; selected before opening final labels"
+}

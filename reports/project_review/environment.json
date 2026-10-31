@@ -1,0 +1,47 @@
+{
+  "python": "3.13.5 (tags/v3.13.5:6cb20a2, Jun 11 2025, 16:15:46) [MSC v.1943 64 bit (AMD64)]",
+  "executable": "C:\\Users\\Admin\\AppData\\Local\\Programs\\Python\\Python313\\python.exe",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "dependencies": {
+    "core": {
+      "numpy": "2.3.4",
+      "pandas": "2.3.3",
+      "scikit-learn": "1.7.2",
+      "torch": "2.14.1+cu126",
+      "transformers": "5.18.0",
+      "sentencepiece": "0.2.2"
+    },
+    "research": {
+      "datasets": "5.1.0",
+      "accelerate": "1.15.0"
+    },
+    "pdf": {
+      "pypdf": null
+    },
+    "retrieval": {
+      "sentence-transformers": "6.1.0",
+      "chromadb": "1.5.9"
+    }
+  },
+  "production_ensemble": {
+    "final_s11": {
+      "model.safetensors": true,
+      "config.json": true,
+      "tokenizer.json": true,
+      "inference_config.json": true
+    },
+    "final_s22": {
+      "model.safetensors": true,
+      "config.json": true,
+      "tokenizer.json": true,
+      "inference_config.json": true
+    },
+    "final_s33": {
+      "model.safetensors": true,
+      "config.json": true,
+      "tokenizer.json": true,
+      "inference_config.json": true
+    }
+  },
+  "note": "Package metadata and file checks only; no model loaded or network access. Missing optional packages do not disable Markdown analysis."
+}

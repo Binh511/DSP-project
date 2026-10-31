@@ -1,0 +1,1251 @@
+{
+  "schema_version": 2,
+  "document_id": "source",
+  "source": {
+    "source_path": "D:\\DSP_PROJECT\\DSP_PROJECT\\outputs\\extension\\verify_20261031T063046_870226ce\\jobs\\acd8963665784729bc4b33e3e65d7614\\source.md",
+    "method": "local_text",
+    "pdf_visual_review_complete": false,
+    "ocr_applied": false
+  },
+  "extraction": {
+    "document_id": "source",
+    "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+    "extraction_method": "source_cue_rules",
+    "extraction_config": {
+      "sentence_context_version": "source-context-v2-heading-stack-fences",
+      "min_score_by_label": {},
+      "threshold_status": "not_applicable"
+    },
+    "fields": {
+      "objectives": [
+        {
+          "value": "The goal of this project is to improve visibility into miner performance.",
+          "quote": "The goal of this project is to improve visibility into miner performance.",
+          "evidence_id": "source:S00000",
+          "section": "Example proposal: miner monitoring > Objective",
+          "char_start": 51,
+          "char_end": 124,
+          "verified": true,
+          "verification": "offset_match",
+          "evidence_method": "cue_rule"
+        }
+      ],
+      "requirements": [
+        {
+          "value": "The system must support Python and must protect API credentials.",
+          "quote": "The system must support Python and must protect API credentials.",
+          "evidence_id": "source:S00001",
+          "section": "Example proposal: miner monitoring > Requirements",
+          "char_start": 142,
+          "char_end": 206,
+          "verified": true,
+          "verification": "offset_match",
+          "evidence_method": "cue_rule"
+        }
+      ],
+      "activities": [
+        {
+          "value": "We will implement a Python collector for miner metrics.",
+          "quote": "We will implement a Python collector for miner metrics.",
+          "evidence_id": "source:S00002",
+          "section": "Example proposal: miner monitoring > Activities",
+          "char_start": 222,
+          "char_end": 277,
+          "verified": true,
+          "verification": "offset_match",
+          "evidence_method": "cue_rule"
+        }
+      ],
+      "deliverables": [
+        {
+          "value": "The final deliverable is a monitoring dashboard and a user guide.",
+          "quote": "The final deliverable is a monitoring dashboard and a user guide.",
+          "evidence_id": "source:S00005",
+          "section": "Example proposal: miner monitoring > Deliverables",
+          "char_start": 393,
+          "char_end": 458,
+          "verified": true,
+          "verification": "offset_match",
+          "evidence_method": "cue_rule"
+        },
+        {
+          "value": "The dashboard will enable operators to inspect node status.",
+          "quote": "The dashboard will enable operators to inspect node status.",
+          "evidence_id": "source:S00006",
+          "section": "Example proposal: miner monitoring > Expected results",
+          "char_start": 480,
+          "char_end": 539,
+          "verified": true,
+          "verification": "offset_match",
+          "evidence_method": "cue_rule"
+        }
+      ],
+      "expected_results": [
+        {
+          "value": "The goal of this project is to improve visibility into miner performance.",
+          "quote": "The goal of this project is to improve visibility into miner performance.",
+          "evidence_id": "source:S00000",
+          "section": "Example proposal: miner monitoring > Objective",
+          "char_start": 51,
+          "char_end": 124,
+          "verified": true,
+          "verification": "offset_match",
+          "evidence_method": "cue_rule"
+        },
+        {
+          "value": "The dashboard will enable operators to inspect node status.",
+          "quote": "The dashboard will enable operators to inspect node status.",
+          "evidence_id": "source:S00006",
+          "section": "Example proposal: miner monitoring > Expected results",
+          "char_start": 480,
+          "char_end": 539,
+          "verified": true,
+          "verification": "offset_match",
+          "evidence_method": "cue_rule"
+        }
+      ],
+      "technologies": [
+        {
+          "value": "The system must support Python and must protect API credentials.",
+          "quote": "The system must support Python and must protect API credentials.",
+          "evidence_id": "source:S00001",
+          "section": "Example proposal: miner monitoring > Requirements",
+          "char_start": 142,
+          "char_end": 206,
+          "verified": true,
+          "verification": "offset_match",
+          "evidence_method": "cue_rule"
+        },
+        {
+          "value": "We will implement a Python collector for miner metrics.",
+          "quote": "We will implement a Python collector for miner metrics.",
+          "evidence_id": "source:S00002",
+          "section": "Example proposal: miner monitoring > Activities",
+          "char_start": 222,
+          "char_end": 277,
+          "verified": true,
+          "verification": "offset_match",
+          "evidence_method": "cue_rule"
+        },
+        {
+          "value": "We will document the API and deployment steps.",
+          "quote": "We will document the API and deployment steps.",
+          "evidence_id": "source:S00004",
+          "section": "Example proposal: miner monitoring > Activities",
+          "char_start": 329,
+          "char_end": 375,
+          "verified": true,
+          "verification": "offset_match",
+          "evidence_method": "cue_rule"
+        }
+      ],
+      "resources": []
+    },
+    "related_context": [
+      {
+        "chunk_id": "source:R00000:460bafba7be0",
+        "evidence_id": "source:R00000:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The goal of this project is to improve visibility into miner performance.",
+        "text": "The goal of this project is to improve visibility into miner performance.",
+        "char_start": 51,
+        "char_end": 124,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "9ec11e507f691b63ab030d88bb905eb4b01814a7ef56827a84c68172db500c32",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Objective"
+        ],
+        "block_type": "section",
+        "source_start_line": 4,
+        "source_end_line": 4,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 4.777696085644353,
+            "bm25_score": 4.777696085644353,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "project objective goal expected results mục tiêu kết quả",
+            "query_index": 0,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00001:460bafba7be0",
+        "evidence_id": "source:R00001:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The system must support Python and must protect API credentials.",
+        "text": "The system must support Python and must protect API credentials.",
+        "char_start": 142,
+        "char_end": 206,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "da3a2235513a48773e603bba5087a8073d07898972a5e425a0966b58a8cfc38f",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Requirements"
+        ],
+        "block_type": "section",
+        "source_start_line": 7,
+        "source_end_line": 7,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 5.69265180034549,
+            "bm25_score": 5.69265180034549,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "requirements constraints technologies must support yêu cầu công nghệ",
+            "query_index": 1,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00003:460bafba7be0",
+        "evidence_id": "source:R00003:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The final deliverable is a monitoring dashboard and a user guide.",
+        "text": "The final deliverable is a monitoring dashboard and a user guide.",
+        "char_start": 393,
+        "char_end": 458,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "c490534003422feb457261ece7abe440bbfcc3ce7e0bb68d8f1814dbcc5df404",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Deliverables"
+        ],
+        "block_type": "section",
+        "source_start_line": 15,
+        "source_end_line": 15,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 1.6340304195196371,
+            "bm25_score": 1.6340304195196371,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "activities implementation deliverables hoạt động sản phẩm",
+            "query_index": 2,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00002:460bafba7be0",
+        "evidence_id": "source:R00002:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "We will implement a Python collector for miner metrics.\nWe will test the collector with local sample data.\nWe will document the API and deployment steps.",
+        "text": "We will implement a Python collector for miner metrics.\nWe will test the collector with local sample data.\nWe will document the API and deployment steps.",
+        "char_start": 222,
+        "char_end": 375,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "73df7c28ca27d94694dce7f94c21e09e4dda7f76c71b0f3964fedb56d59f3100",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Activities"
+        ],
+        "block_type": "section",
+        "source_start_line": 10,
+        "source_end_line": 12,
+        "score": 0.016129032258064516,
+        "query_matches": [
+          {
+            "score": 1.175096771873692,
+            "bm25_score": 1.175096771873692,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "activities implementation deliverables hoạt động sản phẩm",
+            "query_index": 2,
+            "rank": 2
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00004:460bafba7be0",
+        "evidence_id": "source:R00004:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The dashboard will enable operators to inspect node status.",
+        "text": "The dashboard will enable operators to inspect node status.",
+        "char_start": 480,
+        "char_end": 539,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "96d6f336fed0b497a9648381232dfca50e4bea3efe3e18f85de83690a94c9e5a",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Expected results"
+        ],
+        "block_type": "section",
+        "source_start_line": 18,
+        "source_end_line": 18,
+        "score": 0.016129032258064516,
+        "query_matches": [
+          {
+            "score": 3.355424841667057,
+            "bm25_score": 3.355424841667057,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "project objective goal expected results mục tiêu kết quả",
+            "query_index": 0,
+            "rank": 2
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      }
+    ]
+  },
+  "retrieval": {
+    "mode": "bm25",
+    "queries": [
+      "project objective goal expected results mục tiêu kết quả",
+      "requirements constraints technologies must support yêu cầu công nghệ",
+      "activities implementation deliverables hoạt động sản phẩm",
+      "budget funding timeline team resources kinh phí thời gian nhân lực"
+    ],
+    "hits": [
+      {
+        "chunk_id": "source:R00000:460bafba7be0",
+        "evidence_id": "source:R00000:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The goal of this project is to improve visibility into miner performance.",
+        "text": "The goal of this project is to improve visibility into miner performance.",
+        "char_start": 51,
+        "char_end": 124,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "9ec11e507f691b63ab030d88bb905eb4b01814a7ef56827a84c68172db500c32",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Objective"
+        ],
+        "block_type": "section",
+        "source_start_line": 4,
+        "source_end_line": 4,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 4.777696085644353,
+            "bm25_score": 4.777696085644353,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "project objective goal expected results mục tiêu kết quả",
+            "query_index": 0,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00001:460bafba7be0",
+        "evidence_id": "source:R00001:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The system must support Python and must protect API credentials.",
+        "text": "The system must support Python and must protect API credentials.",
+        "char_start": 142,
+        "char_end": 206,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "da3a2235513a48773e603bba5087a8073d07898972a5e425a0966b58a8cfc38f",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Requirements"
+        ],
+        "block_type": "section",
+        "source_start_line": 7,
+        "source_end_line": 7,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 5.69265180034549,
+            "bm25_score": 5.69265180034549,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "requirements constraints technologies must support yêu cầu công nghệ",
+            "query_index": 1,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00003:460bafba7be0",
+        "evidence_id": "source:R00003:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The final deliverable is a monitoring dashboard and a user guide.",
+        "text": "The final deliverable is a monitoring dashboard and a user guide.",
+        "char_start": 393,
+        "char_end": 458,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "c490534003422feb457261ece7abe440bbfcc3ce7e0bb68d8f1814dbcc5df404",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Deliverables"
+        ],
+        "block_type": "section",
+        "source_start_line": 15,
+        "source_end_line": 15,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 1.6340304195196371,
+            "bm25_score": 1.6340304195196371,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "activities implementation deliverables hoạt động sản phẩm",
+            "query_index": 2,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00002:460bafba7be0",
+        "evidence_id": "source:R00002:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "We will implement a Python collector for miner metrics.\nWe will test the collector with local sample data.\nWe will document the API and deployment steps.",
+        "text": "We will implement a Python collector for miner metrics.\nWe will test the collector with local sample data.\nWe will document the API and deployment steps.",
+        "char_start": 222,
+        "char_end": 375,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "73df7c28ca27d94694dce7f94c21e09e4dda7f76c71b0f3964fedb56d59f3100",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Activities"
+        ],
+        "block_type": "section",
+        "source_start_line": 10,
+        "source_end_line": 12,
+        "score": 0.016129032258064516,
+        "query_matches": [
+          {
+            "score": 1.175096771873692,
+            "bm25_score": 1.175096771873692,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "activities implementation deliverables hoạt động sản phẩm",
+            "query_index": 2,
+            "rank": 2
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00004:460bafba7be0",
+        "evidence_id": "source:R00004:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The dashboard will enable operators to inspect node status.",
+        "text": "The dashboard will enable operators to inspect node status.",
+        "char_start": 480,
+        "char_end": 539,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "96d6f336fed0b497a9648381232dfca50e4bea3efe3e18f85de83690a94c9e5a",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Expected results"
+        ],
+        "block_type": "section",
+        "source_start_line": 18,
+        "source_end_line": 18,
+        "score": 0.016129032258064516,
+        "query_matches": [
+          {
+            "score": 3.355424841667057,
+            "bm25_score": 3.355424841667057,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "project objective goal expected results mục tiêu kết quả",
+            "query_index": 0,
+            "rank": 2
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      }
+    ],
+    "scope": {
+      "document_ids": [
+        "source"
+      ],
+      "include_resources": false,
+      "candidate_count": 6
+    },
+    "provenance": {
+      "version": "psai-retrieval-runtime-v2",
+      "index_sha256": "ba8cea932e28650ef40d71297c5eefd0adf6d4f6fe1812d579e2b5fb6d630ecc",
+      "corpus_sha256": "4b8975feca61818b265bb345a1916ef040906015b94f8715f9db3db15b2f6030",
+      "encoder": null,
+      "index_encoding_runtime": null,
+      "encoding_runtime": null,
+      "reranker": null,
+      "query_fusion": "RRF_k60",
+      "note": "verified proves exact source grounding; relevance is an unverified retrieval estimate."
+    },
+    "sources": {
+      "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8": {
+        "artifact": "source.txt",
+        "origin_path": "D:\\DSP_PROJECT\\DSP_PROJECT\\outputs\\extension\\verify_20261031T063046_870226ce\\jobs\\acd8963665784729bc4b33e3e65d7614\\source.md",
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_file_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "role": "document"
+      }
+    },
+    "grounding_validation": "source_hash_and_spans"
+  },
+  "plan": {
+    "document_id": "source",
+    "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+    "planning_method": "evidence_ordered_source_items",
+    "grounding_validation": "source_hash_and_spans",
+    "steps": [
+      {
+        "step": 1,
+        "description": "We will implement a Python collector for miner metrics.",
+        "evidence_ids": [
+          "source:S00002"
+        ],
+        "status": "proposed"
+      },
+      {
+        "step": 2,
+        "description": "The final deliverable is a monitoring dashboard and a user guide.",
+        "evidence_ids": [
+          "source:S00005"
+        ],
+        "status": "proposed"
+      },
+      {
+        "step": 3,
+        "description": "The dashboard will enable operators to inspect node status.",
+        "evidence_ids": [
+          "source:S00006"
+        ],
+        "status": "proposed"
+      }
+    ],
+    "related_context": [
+      {
+        "chunk_id": "source:R00000:460bafba7be0",
+        "evidence_id": "source:R00000:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The goal of this project is to improve visibility into miner performance.",
+        "text": "The goal of this project is to improve visibility into miner performance.",
+        "char_start": 51,
+        "char_end": 124,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "9ec11e507f691b63ab030d88bb905eb4b01814a7ef56827a84c68172db500c32",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Objective"
+        ],
+        "block_type": "section",
+        "source_start_line": 4,
+        "source_end_line": 4,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 4.777696085644353,
+            "bm25_score": 4.777696085644353,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "project objective goal expected results mục tiêu kết quả",
+            "query_index": 0,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00001:460bafba7be0",
+        "evidence_id": "source:R00001:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The system must support Python and must protect API credentials.",
+        "text": "The system must support Python and must protect API credentials.",
+        "char_start": 142,
+        "char_end": 206,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "da3a2235513a48773e603bba5087a8073d07898972a5e425a0966b58a8cfc38f",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Requirements"
+        ],
+        "block_type": "section",
+        "source_start_line": 7,
+        "source_end_line": 7,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 5.69265180034549,
+            "bm25_score": 5.69265180034549,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "requirements constraints technologies must support yêu cầu công nghệ",
+            "query_index": 1,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00003:460bafba7be0",
+        "evidence_id": "source:R00003:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The final deliverable is a monitoring dashboard and a user guide.",
+        "text": "The final deliverable is a monitoring dashboard and a user guide.",
+        "char_start": 393,
+        "char_end": 458,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "c490534003422feb457261ece7abe440bbfcc3ce7e0bb68d8f1814dbcc5df404",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Deliverables"
+        ],
+        "block_type": "section",
+        "source_start_line": 15,
+        "source_end_line": 15,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 1.6340304195196371,
+            "bm25_score": 1.6340304195196371,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "activities implementation deliverables hoạt động sản phẩm",
+            "query_index": 2,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00002:460bafba7be0",
+        "evidence_id": "source:R00002:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "We will implement a Python collector for miner metrics.\nWe will test the collector with local sample data.\nWe will document the API and deployment steps.",
+        "text": "We will implement a Python collector for miner metrics.\nWe will test the collector with local sample data.\nWe will document the API and deployment steps.",
+        "char_start": 222,
+        "char_end": 375,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "73df7c28ca27d94694dce7f94c21e09e4dda7f76c71b0f3964fedb56d59f3100",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Activities"
+        ],
+        "block_type": "section",
+        "source_start_line": 10,
+        "source_end_line": 12,
+        "score": 0.016129032258064516,
+        "query_matches": [
+          {
+            "score": 1.175096771873692,
+            "bm25_score": 1.175096771873692,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "activities implementation deliverables hoạt động sản phẩm",
+            "query_index": 2,
+            "rank": 2
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00004:460bafba7be0",
+        "evidence_id": "source:R00004:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The dashboard will enable operators to inspect node status.",
+        "text": "The dashboard will enable operators to inspect node status.",
+        "char_start": 480,
+        "char_end": 539,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "96d6f336fed0b497a9648381232dfca50e4bea3efe3e18f85de83690a94c9e5a",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Expected results"
+        ],
+        "block_type": "section",
+        "source_start_line": 18,
+        "source_end_line": 18,
+        "score": 0.016129032258064516,
+        "query_matches": [
+          {
+            "score": 3.355424841667057,
+            "bm25_score": 3.355424841667057,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "project objective goal expected results mục tiêu kết quả",
+            "query_index": 0,
+            "rank": 2
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      }
+    ]
+  },
+  "source_plan": {
+    "document_id": "source",
+    "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+    "planning_method": "evidence_ordered_source_items",
+    "grounding_validation": "source_hash_and_spans",
+    "steps": [
+      {
+        "step": 1,
+        "description": "We will implement a Python collector for miner metrics.",
+        "evidence_ids": [
+          "source:S00002"
+        ],
+        "status": "proposed"
+      },
+      {
+        "step": 2,
+        "description": "The final deliverable is a monitoring dashboard and a user guide.",
+        "evidence_ids": [
+          "source:S00005"
+        ],
+        "status": "proposed"
+      },
+      {
+        "step": 3,
+        "description": "The dashboard will enable operators to inspect node status.",
+        "evidence_ids": [
+          "source:S00006"
+        ],
+        "status": "proposed"
+      }
+    ],
+    "related_context": [
+      {
+        "chunk_id": "source:R00000:460bafba7be0",
+        "evidence_id": "source:R00000:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The goal of this project is to improve visibility into miner performance.",
+        "text": "The goal of this project is to improve visibility into miner performance.",
+        "char_start": 51,
+        "char_end": 124,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "9ec11e507f691b63ab030d88bb905eb4b01814a7ef56827a84c68172db500c32",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Objective"
+        ],
+        "block_type": "section",
+        "source_start_line": 4,
+        "source_end_line": 4,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 4.777696085644353,
+            "bm25_score": 4.777696085644353,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "project objective goal expected results mục tiêu kết quả",
+            "query_index": 0,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00001:460bafba7be0",
+        "evidence_id": "source:R00001:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The system must support Python and must protect API credentials.",
+        "text": "The system must support Python and must protect API credentials.",
+        "char_start": 142,
+        "char_end": 206,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "da3a2235513a48773e603bba5087a8073d07898972a5e425a0966b58a8cfc38f",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Requirements"
+        ],
+        "block_type": "section",
+        "source_start_line": 7,
+        "source_end_line": 7,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 5.69265180034549,
+            "bm25_score": 5.69265180034549,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "requirements constraints technologies must support yêu cầu công nghệ",
+            "query_index": 1,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00003:460bafba7be0",
+        "evidence_id": "source:R00003:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The final deliverable is a monitoring dashboard and a user guide.",
+        "text": "The final deliverable is a monitoring dashboard and a user guide.",
+        "char_start": 393,
+        "char_end": 458,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "c490534003422feb457261ece7abe440bbfcc3ce7e0bb68d8f1814dbcc5df404",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Deliverables"
+        ],
+        "block_type": "section",
+        "source_start_line": 15,
+        "source_end_line": 15,
+        "score": 0.01639344262295082,
+        "query_matches": [
+          {
+            "score": 1.6340304195196371,
+            "bm25_score": 1.6340304195196371,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "activities implementation deliverables hoạt động sản phẩm",
+            "query_index": 2,
+            "rank": 1
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00002:460bafba7be0",
+        "evidence_id": "source:R00002:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "We will implement a Python collector for miner metrics.\nWe will test the collector with local sample data.\nWe will document the API and deployment steps.",
+        "text": "We will implement a Python collector for miner metrics.\nWe will test the collector with local sample data.\nWe will document the API and deployment steps.",
+        "char_start": 222,
+        "char_end": 375,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "73df7c28ca27d94694dce7f94c21e09e4dda7f76c71b0f3964fedb56d59f3100",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Activities"
+        ],
+        "block_type": "section",
+        "source_start_line": 10,
+        "source_end_line": 12,
+        "score": 0.016129032258064516,
+        "query_matches": [
+          {
+            "score": 1.175096771873692,
+            "bm25_score": 1.175096771873692,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "activities implementation deliverables hoạt động sản phẩm",
+            "query_index": 2,
+            "rank": 2
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      },
+      {
+        "chunk_id": "source:R00004:460bafba7be0",
+        "evidence_id": "source:R00004:460bafba7be0",
+        "doc_id": "source",
+        "role": "document",
+        "quote": "The dashboard will enable operators to inspect node status.",
+        "text": "The dashboard will enable operators to inspect node status.",
+        "char_start": 480,
+        "char_end": 539,
+        "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "quote_sha256": "96d6f336fed0b497a9648381232dfca50e4bea3efe3e18f85de83690a94c9e5a",
+        "heading_path": [
+          "Example proposal: miner monitoring",
+          "Expected results"
+        ],
+        "block_type": "section",
+        "source_start_line": 18,
+        "source_end_line": 18,
+        "score": 0.016129032258064516,
+        "query_matches": [
+          {
+            "score": 3.355424841667057,
+            "bm25_score": 3.355424841667057,
+            "dense_score": null,
+            "rerank_score": null,
+            "query": "project objective goal expected results mục tiêu kết quả",
+            "query_index": 0,
+            "rank": 2
+          }
+        ],
+        "source_file": null,
+        "source_file_sha256": null,
+        "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "source_encoding": "utf-8-sig",
+        "source_newlines": "universal",
+        "verified": true,
+        "source_grounding_verified": true,
+        "relevance_verified": false,
+        "snapshot_id": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+        "citation_source": "source.txt"
+      }
+    ]
+  },
+  "rule_facts": {
+    "document_id": "source",
+    "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+    "method": "deterministic_source_patterns_v1",
+    "offset_unit": "unicode_codepoint",
+    "fields": {
+      "dates": [],
+      "identifiers": [],
+      "milestones": [],
+      "durations": [],
+      "budgets": [],
+      "technologies": [
+        {
+          "evidence_id": "source:Rae2f8819e3112eccbd8c",
+          "quote": "Python",
+          "char_start": 166,
+          "char_end": 172,
+          "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+          "value": "Python",
+          "normalization_policy": "case_insensitive_fixed_technology_lexicon_not_requirement_or_compatibility",
+          "match_type": "technologies",
+          "confidence_kind": "rule_pattern_not_semantic_validation",
+          "verified": true,
+          "needs_review": true
+        },
+        {
+          "evidence_id": "source:Rdcbd1ac607fced6ebcdf",
+          "quote": "Python",
+          "char_start": 242,
+          "char_end": 248,
+          "source_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+          "value": "Python",
+          "normalization_policy": "case_insensitive_fixed_technology_lexicon_not_requirement_or_compatibility",
+          "match_type": "technologies",
+          "confidence_kind": "rule_pattern_not_semantic_validation",
+          "verified": true,
+          "needs_review": true
+        }
+      ],
+      "personnel": []
+    },
+    "human_review_complete": false,
+    "warnings": [
+      {
+        "code": "pattern_coverage_limited",
+        "status": "needs_review",
+        "severity": "review",
+        "message": "Rules detect literal patterns only; undetected facts may still occur in the source.",
+        "evidence_ids": []
+      }
+    ]
+  },
+  "resource_matching": {
+    "method": "source_mentions_and_review_warnings",
+    "warnings": [
+      {
+        "code": "budgets_not_detected",
+        "severity": "review",
+        "status": "not_detected",
+        "message": "No explicit budget/currency mention was detected by the configured rules; this is not proof the document lacks it. Request human confirmation before planning.",
+        "evidence_ids": []
+      },
+      {
+        "code": "dates_not_detected",
+        "severity": "review",
+        "status": "not_detected",
+        "message": "No explicit calendar date mention was detected by the configured rules; this is not proof the document lacks it. Request human confirmation before planning.",
+        "evidence_ids": []
+      },
+      {
+        "code": "personnel_not_detected",
+        "severity": "review",
+        "status": "not_detected",
+        "message": "No explicit numeric personnel mention was detected by the configured rules; this is not proof the document lacks it. Request human confirmation before planning.",
+        "evidence_ids": []
+      },
+      {
+        "code": "technologies_mentions_need_review",
+        "severity": "review",
+        "status": "needs_review",
+        "message": "Literal known technology mentions were detected; allocation, applicability and completeness have not been confirmed by a person.",
+        "evidence_ids": [
+          "source:Rae2f8819e3112eccbd8c",
+          "source:Rdcbd1ac607fced6ebcdf"
+        ]
+      }
+    ]
+  },
+  "metadata": {
+    "created_utc": "2026-10-31T06:30:46.393929+00:00",
+    "input_path": "D:\\DSP_PROJECT\\DSP_PROJECT\\outputs\\extension\\verify_20261031T063046_870226ce\\jobs\\acd8963665784729bc4b33e3e65d7614\\source.md",
+    "input_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+    "classifier": "rules",
+    "retrieval_mode": "bm25",
+    "planner_mode": "evidence",
+    "ocr_mode": "auto",
+    "stages": [
+      {
+        "stage": "extract",
+        "returncode": 0,
+        "elapsed_seconds": 0.263968,
+        "request": "jobs/extract.request.json",
+        "response": "jobs/extract.response.json",
+        "stdout": "jobs/extract.stdout.log",
+        "stderr": "jobs/extract.stderr.log",
+        "local_only": true,
+        "gpu_lifecycle": "worker_process_exited_before_next_stage"
+      },
+      {
+        "stage": "retrieve",
+        "returncode": 0,
+        "elapsed_seconds": 0.239617,
+        "request": "jobs/retrieve.request.json",
+        "response": "jobs/retrieve.response.json",
+        "stdout": "jobs/retrieve.stdout.log",
+        "stderr": "jobs/retrieve.stderr.log",
+        "local_only": true,
+        "gpu_lifecycle": "worker_process_exited_before_next_stage"
+      },
+      {
+        "stage": "plan",
+        "returncode": 0,
+        "elapsed_seconds": 0.232109,
+        "request": "jobs/plan.request.json",
+        "response": "jobs/plan.response.json",
+        "stdout": "jobs/plan.stdout.log",
+        "stderr": "jobs/plan.stderr.log",
+        "local_only": true,
+        "gpu_lifecycle": "worker_process_exited_before_next_stage"
+      }
+    ],
+    "production_model_changed": false,
+    "human_content_review_complete": false,
+    "pipeline_quality_score": null,
+    "final_test_evaluated": false,
+    "worker_policy": "serial_processes_no_concurrent_model_allocations",
+    "source_text_sha256": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8",
+    "source": {
+      "source_path": "D:\\DSP_PROJECT\\DSP_PROJECT\\outputs\\extension\\verify_20261031T063046_870226ce\\jobs\\acd8963665784729bc4b33e3e65d7614\\source.md",
+      "method": "local_text",
+      "pdf_visual_review_complete": false,
+      "ocr_applied": false
+    },
+    "input_unchanged": true,
+    "source_snapshot_unchanged": true,
+    "completed_utc": "2026-10-31T06:30:47.134281+00:00",
+    "source_line_starts": [
+      0,
+      37,
+      38,
+      51,
+      125,
+      126,
+      142,
+      207,
+      208,
+      222,
+      278,
+      329,
+      376,
+      377,
+      393,
+      459,
+      460,
+      480,
+      540,
+      541,
+      555,
+      631
+    ],
+    "planner": {
+      "method": "evidence_ordered_source_items",
+      "status": "source_items",
+      "human_review_complete": false,
+      "provenance": null
+    }
+  }
+}

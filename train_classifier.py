@@ -115,6 +115,10 @@ counts = np.maximum(np.bincount(y, minlength=len(LABELS)), 1)
 weights = torch.tensor(len(y) / (len(LABELS) * counts), dtype=torch.float)
 
 class WeightedTrainer(Trainer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.model_accepts_loss_kwargs = False
+
     def compute_loss(self, model, inputs, return_outputs=False, **kw):
         labels = inputs.pop("labels")
         out = model(**inputs)

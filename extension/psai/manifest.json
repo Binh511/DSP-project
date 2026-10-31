@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "PSAI · Phân tích đề xuất dự án",
+  "description": "Phân tích tài liệu và mở báo cáo, kế hoạch có trích dẫn qua PSAI chạy trên máy của bạn.",
+  "version": "0.1.0",
+  "permissions": ["storage"],
+  "host_permissions": ["http://127.0.0.1/*"],
+  "background": { "service_worker": "service_worker.js" },
+  "action": { "default_title": "Mở PSAI" },
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src http://127.0.0.1:*; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+  }
+}

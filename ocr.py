@@ -13,6 +13,7 @@ CÁCH CHẠY TRONG VS CODE:
 """
 
 import base64
+import hashlib
 import json
 import os
 import re
@@ -22,11 +23,6 @@ import traceback
 from pathlib import Path
 from typing import Optional, Tuple
 
-from marker.converters.pdf import PdfConverter
-from marker.models import create_model_dict
-from marker.output import text_from_rendered
-from marker.config.parser import ConfigParser
-from openai import OpenAI
 from tqdm import tqdm
 
 # ============================================================
@@ -37,11 +33,12 @@ from tqdm import tqdm
 GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 
 # 📁 Thư mục input / output
-INPUT_DIR = r"D:\fall26\DSP_PROJECT\data_unprocessing"
-OUTPUT_DIR = r"D:\fall26\DSP_PROJECT\data_processed"
+BASE_DIR = Path(__file__).resolve().parent
+INPUT_DIR = str(BASE_DIR / "data_unprocessing")
+OUTPUT_DIR = str(BASE_DIR / "data_processed")
 
 # 🤖 Có dùng VLM để phân tích ảnh không?
-USE_VLM = True
+USE_VLM = False
 
 # Model Gemini (từ danh sách bạn liệt kê)
 VLM_MODEL = "gemini-3.5-flash"
@@ -53,7 +50,7 @@ GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
 MIN_IMAGE_SIZE = 150
 
 # Bỏ qua file đã xử lý
-SKIP_IF_EXISTS = False
+SKIP_IF_EXISTS = True
 
 # Retry khi gặp rate limit
 MAX_RETRIES = 3
@@ -67,7 +64,7 @@ RETRY_DELAY = 5  # giây
 class PDFBatchExtractor:
     """Lớp xử lý hàng loạt PDF."""
 
-    def __init__(self, input_dir: str, output_dir: str, use_vlm: bool = True):
+    def __init__(self, input_dir: str, output_dir: str, use_vlm: bool = False):
         self.input_dir = Path(input_dir)
         self.output_dir = Path(output_dir)
         self.use_vlm = use_vlm
@@ -84,6 +81,7 @@ class PDFBatchExtractor:
                 print("⚠️  GEMINI_API_KEY chưa được đặt hoặc không hợp lệ → tắt VLM.")
                 self.use_vlm = False
             else:
+                from openai import OpenAI
                 self.client = OpenAI(
                     api_key=GEMINI_API_KEY,
                     base_url=GEMINI_BASE_URL,
@@ -95,6 +93,9 @@ class PDFBatchExtractor:
         # Khởi tạo Marker converter (đã tắt OCR)
         print("🔧 Đang khởi tạo Marker converter (đã tắt OCR)...")
         try:
+            from marker.converters.pdf import PdfConverter
+            from marker.models import create_model_dict
+            from marker.config.parser import ConfigParser
             config_parser = ConfigParser({
                 'disable_ocr': True,
                 'output_format': 'markdown',
@@ -110,7 +111,7 @@ class PDFBatchExtractor:
         except Exception as e:
             print(f"❌ Lỗi khởi tạo Marker: {e}")
             traceback.print_exc()
-            sys.exit(1)
+            raise RuntimeError('Marker PDF backend is unavailable or could not initialize') from e
 
     # ----------------------------------------------------------
     # Vòng lặp chính
@@ -166,8 +167,18 @@ class PDFBatchExtractor:
 
         # Skip nếu đã có .md
         if SKIP_IF_EXISTS and md_file_path.exists():
-            print(f"⏭️  Bỏ qua {pdf_path.name} (đã có .md)")
-            return "skipped"
+            manifest_path = file_output_dir / 'source_manifest.json'
+            try:
+                completed = json.loads(manifest_path.read_text(encoding='utf-8'))
+            except (FileNotFoundError, ValueError):
+                completed = {}
+            if (completed.get('complete') is True
+                    and completed.get('pdf_sha256') == hashlib.sha256(pdf_path.read_bytes()).hexdigest()
+                    and completed.get('markdown_sha256') == hashlib.sha256(md_file_path.read_bytes()).hexdigest()):
+                return "skipped"
+            raise FileExistsError('Existing PDF output is incomplete, legacy or changed. Review it and choose a new output directory.')
+
+        from marker.output import text_from_rendered
 
         file_output_dir.mkdir(parents=True, exist_ok=True)
         print(f"\n📄 [{pdf_path.name}]")
@@ -193,6 +204,7 @@ class PDFBatchExtractor:
                     # Chuẩn hóa định dạng
                     if img_path.suffix.lower() not in [".png", ".jpg", ".jpeg"]:
                         img_path = img_path.with_suffix(".png")
+                    safe_filename = img_path.name
                     img_format = "PNG"
                     if img_path.suffix.lower() in [".jpg", ".jpeg"]:
                         img_format = "JPEG"
@@ -223,7 +235,11 @@ class PDFBatchExtractor:
             print(f"   ✅ Đã lưu {len(images)} ảnh vào images/")
 
         # --- Bước 3: Chèn ảnh + mô tả + OCR vào markdown ---
-        markdown_final = self._inject_image_info(markdown_text, image_analyses)
+        # Generative image descriptions and OCR hypotheses stay in the sidecar.
+        # They must not silently become source text for classifier/report evidence.
+        source_images = {name: {**info, 'description': '', 'ocr': ''}
+                         for name, info in image_analyses.items()}
+        markdown_final = self._inject_image_info(markdown_text, source_images)
 
         # --- Bước 4: Lưu markdown ---
         with open(md_file_path, "w", encoding="utf-8") as f:
@@ -246,6 +262,14 @@ class PDFBatchExtractor:
             except Exception:
                 pass
 
+        # Publish completion last. A prior .md alone never proves a complete job.
+        (file_output_dir / 'source_manifest.json').write_text(json.dumps(dict(
+            complete=True,
+            pdf_sha256=hashlib.sha256(pdf_path.read_bytes()).hexdigest(),
+            markdown_sha256=hashlib.sha256(md_file_path.read_bytes()).hexdigest(),
+            method='marker_ocr_disabled', generative_image_analysis_in_source=False,
+            image_analysis_human_verified=False, pdf_visual_review_complete=False,
+        ), ensure_ascii=False, indent=2), encoding='utf-8')
         return "success"
 
     # ----------------------------------------------------------
@@ -419,6 +443,8 @@ class PDFBatchExtractor:
 
 
 def main():
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding='utf-8')
     print("=" * 60)
     print("🚀 BATCH PDF EXTRACTOR (OCR OFF + GEMINI VLM)")
     print("=" * 60)

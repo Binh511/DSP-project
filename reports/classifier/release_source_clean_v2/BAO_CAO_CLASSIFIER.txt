@@ -1,0 +1,483 @@
+﻿BÁO CÁO XÂY DỰNG VÀ THỰC NGHIỆM CLASSIFIER PSAI
+
+Phiên bản bàn giao: 2.0-source-clean. Ngày tổng hợp: 28/10/2026 12:02 (UTC+7).
+
+1. Kết quả và sản phẩm của nhánh classifier
+
+Nhánh classifier đã hoàn tất quy trình chuẩn bị dữ liệu, tạo ngữ cảnh, fine-tune, đánh giá validation, lưu checkpoint/tokenizer và suy luận. Đã hoàn thành sáu lượt đối chứng trên train được loại trùng toàn nguồn; mỗi cấu hình có đủ ba seed 123, 42 và 2026. Mô hình được chọn cho bản bàn giao này là baseline seed 2026 với Validation Macro-F1 0.632077, Accuracy 0.760061 trên 1.317 câu.
+
+Việc chọn tuân theo quy tắc: so sánh Macro-F1 trung bình của đủ ba seed để chọn cấu hình, sau đó chọn checkpoint xuất ra có điểm validation cao nhất trong cấu hình đó. Baseline đạt trung bình 0,615912 và độ lệch chuẩn mẫu 0,014231; context khôi phục Section đạt 0,388637 và 0,213019. Kết quả quan sát không ủng hộ sử dụng context mới cho bản bàn giao này.
+
+Bản v2 có manifest đóng băng trọng số, tokenizer, cấu hình, encoder, phiên bản dữ liệu và bằng chứng validation. Bản v1 được giữ để truy vết; ensemble final_s11 + final_s22 + final_s33 của ứng dụng không bị thay thế. Các điểm trong báo cáo là validation đã dùng trong phát triển, không phải kết quả trên final test độc lập.
+
+2. Bài toán và phạm vi chức năng
+
+Classifier phân loại mỗi câu thành một trong năm vai trò:
+
+| Nhãn | Ý nghĩa |
+| --- | --- |
+| OBJECTIVE | Mục tiêu muốn đạt của dự án |
+| REQUIREMENT | Yêu cầu, ràng buộc hoặc khả năng cần đáp ứng |
+| ACTIVITY | Công việc hoặc hoạt động dự kiến thực hiện |
+| EXPECTED_RESULT | Kết quả, sản phẩm hoặc trạng thái kỳ vọng |
+| OTHER | Nội dung còn lại |
+
+Luồng xử lý của nhánh:
+
+Câu + Section + vị trí + câu trước/sau
+    -> tạo context -> tokenizer -> mDeBERTa
+    -> logits năm lớp -> softmax -> argmax
+    -> nhãn, confidence và xác suất năm lớp trong JSON
+
+Mô hình nền microsoft/mdeberta-v3-base được pretrain sẵn; công việc thực hiện là fine-tune cho năm nhãn cùng quy trình dữ liệu, đánh giá và suy luận. Classifier không trực tiếp sinh báo cáo. Các chỉ số phân loại câu không chứng nhận chất lượng trích xuất PDF, OCR, RAG hoặc toàn bộ luồng sinh báo cáo.
+
+3. Dữ liệu và kiểm soát trùng nguồn
+
+Khi rà soát nguồn Markdown, phát hiện ba ID train PSAI069, PSAI086, PSAI100 có toàn văn trùng với validation PSAI035. Nhóm train chứa 202 câu; tài liệu validation liên quan chứa hai câu. Khác ID tài liệu chưa bảo đảm khác nguồn. Phát hiện này xác định hạn chế của split ban đầu, không tự đo được mức độ làm tăng hoặc giảm F1.
+
+Đã loại nguyên các tài liệu train thuộc nhóm trùng, giữ nguyên nhãn và thứ tự validation. Train giảm từ 4.144 xuống 3.942 câu, từ 150 xuống 147 ID tài liệu; validation giữ 1.317 câu thuộc 29 ID. Hash toàn nguồn thô và sau chuẩn hóa của 179 nguồn đã được đối chiếu, không còn nhóm trùng xuyên hai tập theo các phép kiểm tra này. Chưa chứng nhận hết mọi near-duplicate hoặc ảnh hưởng từ lịch sử phát triển.
+
+| Nhãn | Train ban đầu | Train sau loại nguồn trùng | Validation |
+| --- | --- | --- | --- |
+| OBJECTIVE | 329 | 310 | 86 |
+| REQUIREMENT | 213 | 213 | 89 |
+| ACTIVITY | 1190 | 1072 | 202 |
+| EXPECTED_RESULT | 324 | 316 | 97 |
+| OTHER | 2088 | 2031 | 843 |
+
+Hai cấu hình mới dùng đúng cùng câu, nhãn, vị trí, câu lân cận và thứ tự dữ liệu; chỉ Section khác nhau. Nhãn tham chiếu gốc được giữ nguyên. Có 57 thay đổi nhãn AI có hiệu lực trong thí nghiệm lịch sử, nhưng không có thay đổi nào được áp dụng vào sáu lượt của nghiên cứu mới; các đề xuất đó không được xem là ground truth.
+
+4. Thiết kế đầu vào và huấn luyện
+
+Context full gồm Section, Pos, dấu Bullet, ba Cue từ câu và Previous/Next. Cue là đặc trưng đầu vào; quyết định nhãn đến từ model. Text lấy tối đa 600 ký tự; Section lấy 120 ký tự cuối; Previous lấy 150 ký tự cuối, Next lấy 150 ký tự đầu. Tokenizer nhận cặp text/context với truncation longest_first và giới hạn 256 tokens cho toàn cặp.
+
+Phương án context mới khôi phục Section từ heading Markdown, nhận biết vùng code fence; trường hợp không xác định giữ Section cũ và ghi để kiểm tra. Trong dữ liệu chuẩn bị trước purge, validation thiếu Section giảm 1.045 xuống 26; train từ 2.151 xuống 33. Đó là số đo độ đầy đủ metadata, chưa phải tỷ lệ đúng được người/PDF xác nhận và không tự chứng minh F1 tăng.
+
+| Tham số | Giá trị |
+| --- | --- |
+| Model | microsoft/mdeberta-v3-base; đầu phân loại năm nhãn |
+| Train / validation | 3.942 / 1.317 câu |
+| Epochs / optimizer updates | 5 / 1.235 |
+| Learning rate | 3e-5 |
+| Microbatch / accumulation / batch hiệu dụng | 1 / 16 / 16 |
+| Optimizer / scheduler | AdamW torch / linear |
+| Warmup / weight decay / max grad norm | 124 bước / 0,01 / 1,0 |
+| Max length / text limit | 256 tokens cho cặp / 600 ký tự câu |
+| Label smoothing | 0,1 |
+| Tham số model / train autocast | FP32 / BF16; gradient checkpointing |
+| Seeds | 123, 42, 2026 |
+| Chọn checkpoint trong một lượt | Validation Macro-F1 mỗi epoch trong Trainer BF16 |
+| So sánh các lượt export | Cùng giao thức FP32, batch evaluation 8; OTHER bias 0 |
+
+Loss được tính theo mẫu: cross-entropy có label smoothing 0,1, nhân trọng số lớp tham chiếu rồi lấy trung bình microbatch. Trọng số w[c] = N_train / (5 × số mẫu lớp c). Custom Trainer đặt model_accepts_loss_kwargs=False để giữ cơ chế chia loss theo accumulation.
+
+per_sample = cross_entropy(logits, labels,
+    label_smoothing=0.1, reduction='none')
+loss = (per_sample * class_weights[labels]).mean()
+
+Macro-F1 là trung bình F1 của năm lớp; mỗi lớp có trọng số ngang nhau khi báo cáo. Accuracy đo tỷ lệ đúng trên toàn bộ câu. Do OTHER chiếm 843/1.317 câu validation, accuracy riêng không thể hiện đầy đủ chất lượng ở các lớp ít mẫu.
+
+Điểm Trainer BF16 và điểm đánh giá export FP32 được ghi riêng. Với checkpoint được chọn, Trainer best Macro-F1 là 0.633120, còn FP32 từ dự đoán đã lưu là 0.632077. Toàn bộ bảng so sánh dưới đây dùng điểm FP32; không trộn hai giao thức để xếp hạng.
+
+5. Kết quả sáu lượt đối chứng hoàn tất
+
+| Lượt | Seed | Cấu hình | Macro-F1 | Accuracy | Train runtime (phút) |
+| --- | --- | --- | --- | --- | --- |
+| baseline_seed_123 | 123 | baseline | 0.610384 | 0.735004 | 75.1 |
+| context_seed_123 | 123 | context | 0.308909 | 0.596811 | 82.5 |
+| baseline_seed_42 | 42 | baseline | 0.605275 | 0.735763 | 68.8 |
+| context_seed_42 | 42 | context | 0.630019 | 0.749431 | 64.8 |
+| baseline_seed_2026 | 2026 | baseline | 0.632077 | 0.760061 | 47.5 |
+| context_seed_2026 | 2026 | context | 0.226982 | 0.528474 | 58.2 |
+
+Train runtime là số Trainer ghi, không phải tổng thời gian từ lúc mở chương trình đến hoàn tất mọi bước nạp model/export. Không suy ra thời gian PDF/OCR hoặc toàn hệ thống từ số này.
+
+| Cấu hình | Số seed | Mean Macro-F1 | SD mẫu |
+| --- | --- | --- | --- |
+| baseline | 3 | 0.615912 | 0.014231 |
+| context | 3 | 0.388637 | 0.213019 |
+
+| Seed | Baseline | Context mới | Context − baseline |
+| --- | --- | --- | --- |
+| 123 | 0.610384 | 0.308909 | -0.301475 |
+| 42 | 0.605275 | 0.630019 | +0.024744 |
+| 2026 | 0.632077 | 0.226982 | -0.405095 |
+
+Context mới có lợi ở seed 42 nhưng giảm mạnh ở seed 123 và 2026. Không bỏ hai lượt thấp khỏi thống kê và không chọn cấu hình chỉ vì một lượt đạt điểm cao. Nghiên cứu này gồm ba seed trên một validation cố định, không phải ba tập validation độc lập. SD phản ánh độ biến động theo seed trong điều kiện đã đo, không phải khoảng tin cậy cho mọi tài liệu mới.
+
+6. Precision, recall và F1 của cả năm lớp
+
+| Lượt | Nhãn | Precision | Recall | F1 | Support |
+| --- | --- | --- | --- | --- | --- |
+| baseline_seed_123 | OBJECTIVE | 0.437908 | 0.779070 | 0.560669 | 86 |
+| baseline_seed_123 | REQUIREMENT | 0.518072 | 0.483146 | 0.500000 | 89 |
+| baseline_seed_123 | ACTIVITY | 0.538760 | 0.688119 | 0.604348 | 202 |
+| baseline_seed_123 | EXPECTED_RESULT | 0.504587 | 0.567010 | 0.533981 | 97 |
+| baseline_seed_123 | OTHER | 0.929972 | 0.787663 | 0.852922 | 843 |
+| context_seed_123 | OBJECTIVE | 0.113402 | 0.255814 | 0.157143 | 86 |
+| context_seed_123 | REQUIREMENT | 0.000000 | 0.000000 | 0.000000 | 89 |
+| context_seed_123 | ACTIVITY | 0.410448 | 0.544554 | 0.468085 | 202 |
+| context_seed_123 | EXPECTED_RESULT | 0.139241 | 0.113402 | 0.125000 | 97 |
+| context_seed_123 | OTHER | 0.828608 | 0.762752 | 0.794317 | 843 |
+| baseline_seed_42 | OBJECTIVE | 0.496296 | 0.779070 | 0.606335 | 86 |
+| baseline_seed_42 | REQUIREMENT | 0.476744 | 0.460674 | 0.468571 | 89 |
+| baseline_seed_42 | ACTIVITY | 0.540070 | 0.767327 | 0.633947 | 202 |
+| baseline_seed_42 | EXPECTED_RESULT | 0.460000 | 0.474227 | 0.467005 | 97 |
+| baseline_seed_42 | OTHER | 0.930889 | 0.782918 | 0.850515 | 843 |
+| context_seed_42 | OBJECTIVE | 0.637255 | 0.755814 | 0.691489 | 86 |
+| context_seed_42 | REQUIREMENT | 0.500000 | 0.415730 | 0.453988 | 89 |
+| context_seed_42 | ACTIVITY | 0.568627 | 0.717822 | 0.634573 | 202 |
+| context_seed_42 | EXPECTED_RESULT | 0.430556 | 0.639175 | 0.514523 | 97 |
+| context_seed_42 | OTHER | 0.913747 | 0.804270 | 0.855521 | 843 |
+| baseline_seed_2026 | OBJECTIVE | 0.566372 | 0.744186 | 0.643216 | 86 |
+| baseline_seed_2026 | REQUIREMENT | 0.536842 | 0.573034 | 0.554348 | 89 |
+| baseline_seed_2026 | ACTIVITY | 0.560284 | 0.782178 | 0.652893 | 202 |
+| baseline_seed_2026 | EXPECTED_RESULT | 0.460674 | 0.422680 | 0.440860 | 97 |
+| baseline_seed_2026 | OTHER | 0.930894 | 0.814947 | 0.869070 | 843 |
+| context_seed_2026 | OBJECTIVE | 0.140575 | 0.511628 | 0.220551 | 86 |
+| context_seed_2026 | REQUIREMENT | 0.000000 | 0.000000 | 0.000000 | 89 |
+| context_seed_2026 | ACTIVITY | 0.367089 | 0.143564 | 0.206406 | 202 |
+| context_seed_2026 | EXPECTED_RESULT | 0.000000 | 0.000000 | 0.000000 | 97 |
+| context_seed_2026 | OTHER | 0.679389 | 0.739027 | 0.707955 | 843 |
+
+7. Phân tích lỗi có bằng chứng
+
+Context seed 123 và 2026 không dự đoán câu nào là REQUIREMENT. Context seed 2026 nhận đúng 0/97 câu EXPECTED_RESULT và chỉ đưa tám câu vào lớp này. Đây là hiện tượng quan sát từ dự đoán và confusion đã lưu, chưa phải kết luận về cơ chế gây lỗi.
+
+Số câu baseline đúng/context sai lần lượt là 313, 81 và 410 cho seed 123, 42 và 2026; chiều ngược lại là 131, 99 và 105. Có 263 câu giữ nguyên Section ở hai cấu hình, nhưng trong nhóm đó vẫn có lỗi hồi quy 79, 14 và 96 câu. Vì trọng số model được huấn luyện trên toàn tập khác context, không thể quy mọi lỗi ở validation trực tiếp cho Section riêng của câu đó.
+
+Điểm thấp đã xuất hiện trong validation theo epoch của Trainer ở hai seed yếu; chưa có bằng chứng cho rằng suy giảm chỉ do export hoặc độ chính xác số. Lỗi mô hình, tác động của context trong huấn luyện, chất lượng extraction và nhãn tham chiếu là các khả năng cần phân biệt; report không tự xác nhận lỗi PDF hay đổi nhãn khi chưa kiểm tra nguồn/người.
+
+Các ví dụ dưới đây dùng nhãn tham chiếu frozen hiện có. B là baseline, C là context mới:
+
+
+E01 — PSAI017, validation row 60
+
+Câu: User can mint Dataset to NFT with permitted number of keys
+
+Section cũ: (trống)
+
+Section mới: Project Description > Value
+
+Câu trước: User annotated the dataset
+
+Câu sau: User can share the NFT via IPFS and backup to Filecoin network.
+
+Nhãn tham chiếu: REQUIREMENT
+
+| Seed | B dự đoán | C dự đoán |
+| --- | --- | --- |
+| 123 | REQUIREMENT | ACTIVITY |
+| 42 | REQUIREMENT | REQUIREMENT |
+| 2026 | REQUIREMENT | OTHER |
+
+C123 chuyển REQUIREMENT thành ACTIVITY; C2026 chuyển thành OTHER; C42 giữ đúng. Text và hai câu lân cận giống nhau ở cả sáu run. Section từ trống sang Value là thay đổi quan sát được, chưa chứng minh đây là nguyên nhân.
+
+Lỗi extraction/PDF, nguyên nhân trực tiếp từ context và khả năng nhãn tham chiếu sai đều chưa được xác minh cho ví dụ này; cần người kiểm tra trước khi sửa nhãn.
+
+
+E03 — PSAI137, validation row 1202
+
+Câu: Synchronizing the communication using MPI\_Wait or MPI\_Test functions is required to ensure data consistency.
+
+Section cũ: PROPOSAL FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Inter-GPU Communication:
+
+Section mới: PROPOSAL FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Inter-GPU Communication:
+
+Câu trước: This can be done using non-blocking communication functions like MPI\_Isend and MPI\_Irecv, which allows to perform other computations while data is being exchanged.
+
+Câu sau: After the simulation is complete, aggregate the results from all GPUs.
+
+Nhãn tham chiếu: REQUIREMENT
+
+| Seed | B dự đoán | C dự đoán |
+| --- | --- | --- |
+| 123 | REQUIREMENT | ACTIVITY |
+| 42 | ACTIVITY | REQUIREMENT |
+| 2026 | REQUIREMENT | ACTIVITY |
+
+Section, text và neighbors không đổi; C42 sửa ACTIVITY của B42 thành REQUIREMENT, trong khi C123/C2026 ra ACTIVITY. Đây là bằng chứng khác biệt đầu ra giữa model/run ngay cả khi input của câu này giữ nguyên, không phải bằng chứng Section mới gán sai cho câu.
+
+Lỗi extraction/PDF, nguyên nhân trực tiếp từ context và khả năng nhãn tham chiếu sai đều chưa được xác minh cho ví dụ này; cần người kiểm tra trước khi sửa nhãn.
+
+
+E05 — PSAI028, validation row 125
+
+Câu: If Filecoin can interpolate with Ethereum, it can provide Ethereum layer-2 with lower cost, and it can also increase the demands of storage in the Filecoin network, which benefits the coins, miners, and the ecosystem in general.
+
+Section cũ: (trống)
+
+Section mới: Project Description > Examples of technical challenges:
+
+Câu trước: Needs to examine whether Starkware's FRI is better suit for this purpose.
+
+Câu sau: This research is better done sooner than later, as if any protocol change is indeed necessary for this purpose, it is better to be known soon.
+
+Nhãn tham chiếu: EXPECTED_RESULT
+
+| Seed | B dự đoán | C dự đoán |
+| --- | --- | --- |
+| 123 | EXPECTED_RESULT | OTHER |
+| 42 | EXPECTED_RESULT | EXPECTED_RESULT |
+| 2026 | EXPECTED_RESULT | OBJECTIVE |
+
+Ba baseline và C42 đúng EXPECTED_RESULT; C123 chuyển sang OTHER, C2026 sang OBJECTIVE. Tương quan với Section mới về technical challenges chưa chứng minh Section sai hoặc gây lỗi.
+
+Lỗi extraction/PDF, nguyên nhân trực tiếp từ context và khả năng nhãn tham chiếu sai đều chưa được xác minh cho ví dụ này; cần người kiểm tra trước khi sửa nhãn.
+
+
+E09 — PSAI028, validation row 135
+
+Câu: The deliverables would sufficiently cover the state-of-the-arts techniques regarding zk-Rollup and zkSNARK, so it can serve as a good systematization of knowledge.
+
+Section cũ: (trống)
+
+Section mới: Project Description > Deliverables > Development Roadmap
+
+Câu trước: In total 14 weeks, slightly exceeding 3 months.
+
+Câu sau: Specifically:
+
+Nhãn tham chiếu: EXPECTED_RESULT
+
+| Seed | B dự đoán | C dự đoán |
+| --- | --- | --- |
+| 123 | EXPECTED_RESULT | OTHER |
+| 42 | OTHER | EXPECTED_RESULT |
+| 2026 | OTHER | OTHER |
+
+C42 sửa OTHER của B42 thành EXPECTED_RESULT; C123 chuyển dự đoán đúng của B123 sang OTHER, B2026/C2026 cùng OTHER. Cùng Section mới có cả kết quả cải thiện lẫn suy giảm giữa các seed.
+
+Lỗi extraction/PDF, nguyên nhân trực tiếp từ context và khả năng nhãn tham chiếu sai đều chưa được xác minh cho ví dụ này; cần người kiểm tra trước khi sửa nhãn.
+
+
+E14 — PSAI102, validation row 903
+
+Câu: RQ3: What is the impact of diverse raters on the amount of data needed for reproducibility?
+
+Section cũ: (trống)
+
+Section mới: (trống)
+
+Câu trước: RQ2: How do we optimize the allocation of a fixed human annotation budget for reproducible evaluation?
+
+Câu sau: In the case of LLMs, humans continue to play a vital role in all stages of their development.
+
+Nhãn tham chiếu: OBJECTIVE
+
+| Seed | B dự đoán | C dự đoán |
+| --- | --- | --- |
+| 123 | OBJECTIVE | OTHER |
+| 42 | OBJECTIVE | OBJECTIVE |
+| 2026 | OBJECTIVE | EXPECTED_RESULT |
+
+Section vẫn trống trong cả hai biến thể. Ba baseline và C42 đúng OBJECTIVE; C123 ra OTHER, C2026 ra EXPECTED_RESULT. Loại trừ phát biểu rằng lỗi của riêng câu này đến từ Section validation bị thay; khác biệt model sau huấn luyện vẫn chưa được phân rã.
+
+Lỗi extraction/PDF, nguyên nhân trực tiếp từ context và khả năng nhãn tham chiếu sai đều chưa được xác minh cho ví dụ này; cần người kiểm tra trước khi sửa nhãn.
+
+
+E15 — PSAI137, validation row 1190
+
+Câu: This approach allows to distribute the model across multiple GPUs, enabling large-scale simulations without being limited by the memory of a single GPU.
+
+Section cũ: PROPOSAL FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Implementation:
+
+Section mới: PROPOSAL FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Implementation:
+
+Câu trước: One of the ways of implementing this is to use a hybrid approach that combines MPI (Message Passing Interface) with CUDA-aware MPI for domain decomposition and memory sharing.
+
+Câu sau: Here's a general flowchart of the process:
+
+Nhãn tham chiếu: EXPECTED_RESULT
+
+| Seed | B dự đoán | C dự đoán |
+| --- | --- | --- |
+| 123 | EXPECTED_RESULT | ACTIVITY |
+| 42 | EXPECTED_RESULT | EXPECTED_RESULT |
+| 2026 | EXPECTED_RESULT | OTHER |
+
+Section dài và không đổi; ba baseline/C42 đúng EXPECTED_RESULT, C123 ra ACTIVITY, C2026 ra OTHER. Đây là lỗi trên input không đổi, nhất quán với khác biệt model giữa hai biến thể, chưa xác định cơ chế huấn luyện.
+
+Lỗi extraction/PDF, nguyên nhân trực tiếp từ context và khả năng nhãn tham chiếu sai đều chưa được xác minh cho ví dụ này; cần người kiểm tra trước khi sửa nhãn.
+
+
+8. Model được đóng băng cho bản bàn giao
+
+Cấu hình được chọn là baseline context cũ trên train đã loại nguồn trùng, seed 2026. Model giữ đúng encoder study-v1/full, ctx_version=3; không thay sang Section v2.1. Đầu ra dùng argmax của năm xác suất, OTHER bias 0; không áp dụng một ngưỡng lọc confidence trong CLI classifier. Confidence softmax chưa được hiệu chuẩn nên không gọi nó là xác suất đúng đã được chứng nhận.
+
+| Trường | Giá trị |
+| --- | --- |
+| Release | 2.0-source-clean |
+| Selected run | baseline_seed_2026 |
+| Checkpoint | models/controlled_study/classifier_source_clean_context_study_v1/baseline_seed_2026 |
+| Macro-F1 validation | 0.632077 |
+| Accuracy validation | 0.760061 |
+| Weight SHA256 | bf36171708f69d6e7b4d07de95351d8ac8f9ee886f951898ff2801c0c28c3f4a |
+| Train fingerprint | 124f8e42e8644c2c8d0de0e7c13d3435a8daf424fb22ed74e36810f36b85d02f |
+| Validation fingerprint | 85cce8739a97b64aafa2b47c5e7a8ec5fea52d09f44c0928f5308fca5c1bf683 |
+| Điểm chốt | Model export sau checkpoint tốt nhất theo giao thức Trainer; step 1235 |
+| Production ensemble | Giữ nguyên final_s11 + final_s22 + final_s33 |
+
+Checkpoint export có model.safetensors, tokenizer.json, tokenizer_config.json, config.json, inference_config.json và training_provenance.json. Manifest đối chiếu hash các file này, mã inference/encoder và dữ liệu/validation đã dùng. Công cụ verify từ chối file bị thay đổi hoặc đường dẫn vượt khỏi project.
+
+9. Demo và code đã thực hiện
+
+Chạy tại thư mục project:
+
+python tools/demo_classifier_final.py
+
+Lệnh kiểm tra manifest v2 rồi chạy suy luận thật bằng CPU với checkpoint baseline seed 2026. Trên máy này, lệnh dùng môi trường CPU riêng trên ổ D; log ghi tên model, đường dẫn đầu vào và file JSON đầu ra. Để đổi câu, sửa examples/classifier_teacher_live.json, lưu và chạy lại.
+
+Demo đã chạy thành công với câu: The system must allow users to upload PDF files.
+
+Section: System Requirements. Nhãn dự đoán: REQUIREMENT; confidence 0.937519. Xác suất năm lớp:
+
+| Nhãn | Xác suất demo |
+| --- | --- |
+| OBJECTIVE | 0.014428 |
+| REQUIREMENT | 0.937519 |
+| ACTIVITY | 0.016357 |
+| EXPECTED_RESULT | 0.019486 |
+| OTHER | 0.012209 |
+
+Đây là suy luận thật trên câu minh họa, không phải kết quả benchmark. Confidence của một câu không phải accuracy toàn mô hình. Dữ liệu đầu vào/đầu ra của demo và hash được lưu cùng gói bàn giao để đối chiếu.
+
+| Chức năng | Code để giải thích |
+| --- | --- |
+| Tách nguồn và loại trùng train | classifier_source_split.py: prepare |
+| Khôi phục Section đối chứng | classifier_context_v2.py: parse_source, revise_rows |
+| Tạo input | study_inputs.py: context_for, encode_items |
+| Loss | classifier_training.py: WeightedClassificationTrainer.compute_loss |
+| Train và metric | classifier_context_experiment.py: run, compute_metrics, summarize |
+| Suy luận | classifier_predict.py: predict |
+| Demo bản đã chốt | tools/demo_classifier_final.py |
+| Đóng băng/kiểm tra release | tools/finalize_classifier_release.py |
+
+Các file train được mở để giải thích khi bảo vệ; demo không khởi động train lại. Demo là kiểm tra chức năng suy luận, không phải tập đánh giá chất lượng.
+
+10. Kết quả lịch sử được giữ để đối chiếu
+
+Năm lượt dưới đây thuộc điều kiện train ban đầu 4.144 câu, trước khi phát hiện trùng toàn nguồn. Chúng được giữ làm bằng chứng quá trình, không trộn vào bảng sáu lượt mới hoặc dùng điểm cao nhất để thay model v2.
+
+| Lượt lịch sử | Điều kiện | Validation Macro-F1 | Accuracy |
+| --- | --- | --- | --- |
+| baseline_original_labels | Nhãn gốc; full context; seed 42 | 0.643892 | 0.764617 |
+| baseline | Nhãn AI đề xuất; full context; seed 42 | 0.642605 | 0.766894 |
+| A0_text | Nhãn AI đề xuất; text-only; seed 42 | 0.629482 | 0.747153 |
+| seed_123 | Nhãn gốc; full context; seed 123 | 0.654426 | 0.763857 |
+| seed_2026 | Nhãn gốc; full context; seed 2026 | 0.603661 | 0.726651 |
+
+Ba seed nhãn gốc/full context ban đầu đạt mean 0.633993, SD mẫu 0.026792; seed 123 được chọn cho v1 với Macro-F1 0,654426. Điểm v1 và điểm v2 có điều kiện train khác nhau; chênh lệch không đo riêng tác động của việc loại nguồn trùng. Các đề xuất sửa nhãn AI trong giai đoạn trước không chứng minh nhãn chuẩn hơn và không được tự coi là ground truth.
+
+11. Kiểm chứng và giới hạn kết luận
+
+Kiểm tra độc lập các artifact đã lưu đạt 26/26 nhóm kiểm tra và toàn bộ kiểm tra từng run: metrics/confusion tính lại khớp predictions, nhãn/text/document/order được ghép đúng, dữ liệu khớp phiên bản chuẩn bị, source hash và code snapshot khớp, model được chọn khớp hash đã ghi. Việc xuất báo cáo chỉ đọc lại bằng chứng, không train thêm hoặc chấm test.
+
+Đã chạy 19/19 kiểm tra phần mềm liên quan đến chọn release, toàn vẹn file, demo, ghép cặp thí nghiệm và loại nguồn trùng. Đây là nhóm kiểm tra có phạm vi cụ thể, không phải toàn bộ test suite của dự án. Demo CPU của đúng checkpoint v2 hoàn tất thành công và xuất xác suất hợp lệ.
+
+Tập final test chưa được chấm: các gate xác minh nguồn và nhãn người hiện chưa đạt. Tám tài liệu ứng viên cũ có dấu vết phát triển; gói nguồn mới một tài liệu/80 câu vẫn chưa có nhãn người trong phiếu tham chiếu. Vì vậy không có điểm final test hoặc Cohen's Kappa đủ điều kiện để báo cáo. Những giới hạn này không được thay bằng số F1 validation.
+
+Không có phép so sánh độc lập đủ điều kiện với ensemble production, và chưa đánh giá toàn luồng PDF đến báo cáo trong phạm vi classifier. Nhãn gốc còn trường hợp mơ hồ; phần lỗi trình bày theo nhãn tham chiếu hiện có. Kết luận của bản bàn giao là cấu hình baseline ổn định hơn trong nghiên cứu đã thực hiện, không phải chứng nhận tổng quát cho mọi nguồn tài liệu.
+
+12. Toàn bộ quá trình thực hiện và hoàn thiện
+
+Quá trình dưới đây tổng hợp theo thứ tự công việc và các hồ sơ có thể đối chiếu. Hai giai đoạn được báo cáo có 11 lượt controlled hoàn tất: năm lượt theo dữ liệu ban đầu và sáu lượt sau loại trùng toàn nguồn. Con số này không đại diện cho mọi lần train trong toàn bộ lịch sử project; các export lịch sử thiếu provenance đầy đủ không được tự cộng thành thí nghiệm độc lập đã kiểm chứng.
+
+| Giai đoạn | Công việc đã thực hiện | Kết quả và giới hạn |
+| --- | --- | --- |
+| 1. Xác định bài toán và kiểm kê | Giới hạn phần thực hiện ở classifier năm nhãn; rà soát code, checkpoint và kết quả đã lưu. | Kiểm kê ban đầu có 27 thư mục export chứa weights: 19 lịch sử, 5 controlled và 3 smoke. Số thư mục không phải số lần train độc lập; smoke không tham gia chọn model. |
+| 2. Chuẩn bị dữ liệu ban đầu | Chuẩn bị câu, nhãn, document_id, Section, vị trí và câu lân cận; cố định train/validation cho các đối chứng. | Train 4.144 câu, validation 1.317 câu. Có kiểm tra trùng câu/ngữ cảnh đã biết, nhưng về sau phát hiện vẫn còn trùng toàn nguồn. |
+| 3. Xây dựng đầu vào và loss | Tạo context full, tokenize text/context; cấu hình fine-tune mDeBERTa với class weights, label smoothing và gradient accumulation. | Lưu quy ước microbatch mean và kiểm tra normalization; không quy mọi khác biệt F1 lịch sử cho một lỗi loss. |
+| 4. Chạy năm đối chứng ban đầu | So sánh nhãn gốc/nhãn AI đề xuất, full context/text-only và ba seed cho nhãn gốc/full context. | Điểm và điều kiện ở mục10. V1 seed123 đạt validation0,654426; đây là kết quả trước khi xử lý trùng toàn nguồn. |
+| 5. Phân tích độ ổn định và nhãn | Đối chiếu predictions, P/R/F1 và confusion của ba seed ban đầu; lập danh sách câu cần kiểm tra. | Có165 câu seed2026 sai trong khi ít nhất một seed khác đúng;73 câu hai seed kia cùng đúng.68 đề xuất nhãn AI tạo57 thay đổi train có hiệu lực; chưa phải ground truth độc lập. |
+| 6. Kiểm tra và khôi phục Section | Phát hiện nhiều trường Section trống; xây parser heading Markdown có nhận biết code fence, ghi các trường hợp chưa xác định. | Validation trống1.045→26, train2.151→33 trong dữ liệu chuẩn bị trước purge; còn110 trường hợp cần xác nhận. Metadata đầy đủ hơn chưa chứng minh tăng F1. |
+| 7. Rà soát trùng toàn nguồn | So raw/normalized SHA256, phát hiện ba ID train cùng nguồn với PSAI035 validation; ưu tiên giữ validation. | Loại202 câu, còn3.942 train; giữ1.317 validation. Kiểm tra179 nguồn và lưu manifest, snapshot/hash. Không tuyên bố loại hết mọi near-duplicate. |
+| 8. Chạy sáu đối chứng mới | Train lại cả context cũ và Section khôi phục trên đúng cùng dữ liệu/nhãn, mỗi cấu hình ba seed. | Đủ6/6 lượt, năm epoch/lượt. Mean và SD, điểm từng lớp và sáu confusion được công bố cả khi kết quả suy giảm. Không mở thêm thí nghiệm để săn điểm cao. |
+| 9. Thống nhất cách so sánh | Giữ riêng Trainer BF16 và đánh giá export FP32; đối chiếu lại predictions với metrics/confusion và provenance. | Baseline mean0,615912±0,014231; context mới0,388637±0,213019. Dấu ± là SD mẫu theo seed, không phải khoảng tin cậy trên nguồn mới. |
+| 10. Chọn và đóng băng v2 | Chọn cấu hình theo mean ba seed rồi chọn checkpoint export tốt nhất trong cấu hình; lưu model/tokenizer/config/data/code hashes. | Chọn baseline seed2026: Macro-F1 0,632077, accuracy0,760061. Bảo toàn v1 và ensemble production; không dùng final test để chọn tham số. |
+| 11. Hoàn thiện demo suy luận | Tạo CLI đọc JSON/JSONL, kiểm tra input/nhãn, trả probabilities; thêm tiến trình hiển thị, log và bắt lỗi tiến trình con. | Khi gặp lỗi native liên quan thư viện NVIDIA, dùng môi trường torch2.14.1+cpu và torchvision0.29.1+cpu riêng trên D. Đây là cách tránh lỗi runtime, không phải sửa driver GPU. |
+| 12. Kiểm thử và bàn giao | Kiểm tra19 test phần mềm có phạm vi,26 nhóm kiểm tra artifact; chạy demo thật; đóng ZIP với hash/CRC và kiểm tra sau giải nén. | Demo v2 trả REQUIREMENT/confidence0,937519 cho ví dụ đã lưu. ZIP chứa code và bằng chứng; weights cần chuyển riêng. Demo minh họa không phải benchmark. |
+| 13. Dọn và tổ chức project | Dọn cache tải gói pip, xóa ba checkpoint trung gian dư của các lượt đã xong và lưu trữ15 script cũ. | Xóa khoảng8,60GiB cache pip trên C; dung lượng trống đo được tăng1,90→10,51GiB. Ba checkpoint giải phóng9,39GiB trên D. Giữ export, checkpoint tốt nhất/cuối, dữ liệu, nhãn và báo cáo. |
+
+Nội dung hoàn tất gồm phần mềm classifier, đối chứng và lựa chọn bằng validation, toàn vẹn artifact, demo và hồ sơ bàn giao. Những việc không được xem là đã hoàn tất gồm phán xử nhãn độc lập, Cohen's Kappa đủ điều kiện và đánh giá final test có nguồn/nhãn người được xác nhận. Vì vậy báo cáo mô tả sản phẩm và kết quả đã thực hiện, không tự chuyển các giới hạn đó thành chứng nhận chất lượng cuối cùng.
+
+Phụ lục: Ma trận nhầm lẫn của sáu lượt
+
+Hàng là nhãn tham chiếu, cột là nhãn dự đoán. Các bảng dưới đây được tính lại từ validation predictions đã lưu.
+
+
+baseline_seed_123
+
+| Gold / Pred | OBJECTIVE | REQUIREMENT | ACTIVITY | EXPECTED_RESULT | OTHER |
+| --- | --- | --- | --- | --- | --- |
+| OBJECTIVE | 67 | 2 | 3 | 5 | 9 |
+| REQUIREMENT | 2 | 43 | 24 | 4 | 16 |
+| ACTIVITY | 34 | 8 | 139 | 5 | 16 |
+| EXPECTED_RESULT | 14 | 3 | 16 | 55 | 9 |
+| OTHER | 36 | 27 | 76 | 40 | 664 |
+
+
+context_seed_123
+
+| Gold / Pred | OBJECTIVE | REQUIREMENT | ACTIVITY | EXPECTED_RESULT | OTHER |
+| --- | --- | --- | --- | --- | --- |
+| OBJECTIVE | 22 | 0 | 11 | 11 | 42 |
+| REQUIREMENT | 5 | 0 | 48 | 7 | 29 |
+| ACTIVITY | 33 | 0 | 110 | 19 | 40 |
+| EXPECTED_RESULT | 23 | 0 | 41 | 11 | 22 |
+| OTHER | 111 | 0 | 58 | 31 | 643 |
+
+
+baseline_seed_42
+
+| Gold / Pred | OBJECTIVE | REQUIREMENT | ACTIVITY | EXPECTED_RESULT | OTHER |
+| --- | --- | --- | --- | --- | --- |
+| OBJECTIVE | 67 | 1 | 3 | 7 | 8 |
+| REQUIREMENT | 2 | 41 | 32 | 1 | 13 |
+| ACTIVITY | 18 | 11 | 155 | 2 | 16 |
+| EXPECTED_RESULT | 16 | 4 | 19 | 46 | 12 |
+| OTHER | 32 | 29 | 78 | 44 | 660 |
+
+
+context_seed_42
+
+| Gold / Pred | OBJECTIVE | REQUIREMENT | ACTIVITY | EXPECTED_RESULT | OTHER |
+| --- | --- | --- | --- | --- | --- |
+| OBJECTIVE | 65 | 0 | 6 | 8 | 7 |
+| REQUIREMENT | 0 | 37 | 29 | 6 | 17 |
+| ACTIVITY | 15 | 10 | 145 | 9 | 23 |
+| EXPECTED_RESULT | 3 | 3 | 12 | 62 | 17 |
+| OTHER | 19 | 24 | 63 | 59 | 678 |
+
+
+baseline_seed_2026
+
+| Gold / Pred | OBJECTIVE | REQUIREMENT | ACTIVITY | EXPECTED_RESULT | OTHER |
+| --- | --- | --- | --- | --- | --- |
+| OBJECTIVE | 64 | 1 | 5 | 8 | 8 |
+| REQUIREMENT | 2 | 51 | 25 | 4 | 7 |
+| ACTIVITY | 14 | 9 | 158 | 2 | 19 |
+| EXPECTED_RESULT | 10 | 3 | 26 | 41 | 17 |
+| OTHER | 23 | 31 | 68 | 34 | 687 |
+
+
+context_seed_2026
+
+| Gold / Pred | OBJECTIVE | REQUIREMENT | ACTIVITY | EXPECTED_RESULT | OTHER |
+| --- | --- | --- | --- | --- | --- |
+| OBJECTIVE | 44 | 0 | 1 | 1 | 40 |
+| REQUIREMENT | 17 | 0 | 6 | 0 | 66 |
+| ACTIVITY | 41 | 0 | 29 | 1 | 131 |
+| EXPECTED_RESULT | 34 | 0 | 6 | 0 | 57 |
+| OTHER | 177 | 0 | 37 | 6 | 623 |
+
+
+Nguồn bằng chứng trong gói bàn giao
+
+- FINAL_MODEL_MANIFEST.json và final_selection.json: danh tính model, dữ liệu, cấu hình và hash.
+- audit_results.json: kiểm tra độc lập sáu lượt.
+- PHAN_TICH_LOI.md và error_analysis.json: 15 câu đối chiếu đủ sáu dự đoán.
+- Nghiên cứu classifier_source_clean_context_study_v1: plan, metrics, predictions, confusion và provenance.
+- Dữ liệu classifier_source_clean_v1: train/validation đã chuẩn bị, các dòng bị loại và manifest nguồn.
+
+Các đường dẫn/tên file phục vụ đối chiếu khi có mã nguồn. Toàn bộ số liệu chính, ma trận, cấu hình và ví dụ lỗi đã nằm trực tiếp trong báo cáo để giảng viên đọc độc lập.

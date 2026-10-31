@@ -1,0 +1,2 @@
+# Selectable-text PDFs for the psai.py entry point. Scanned PDFs require OCR.
+pypdf

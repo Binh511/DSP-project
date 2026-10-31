@@ -1,0 +1,8 @@
+# Optional CPU OCR environment, independent of classifier training dependencies.
+# The installed versions and bundled model SHA256 values are recorded per result.
+# rapidocr-onnxruntime 1.4.4 excludes Python 3.13; use the merged package below.
+pypdf>=6,<7
+pypdfium2>=4.30,<6
+Pillow>=11,<13
+rapidocr>=3,<4
+onnxruntime>=1.20,<2

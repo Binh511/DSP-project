@@ -1,0 +1,16 @@
+{
+  "verified_local": "2026-10-28T11:10:15.204821+07:00",
+  "mode": "LIVE INFERENCE (CPU)",
+  "exit_code": 0,
+  "selected_run": "baseline_seed_2026",
+  "model_path": "models/controlled_study/classifier_source_clean_context_study_v1/baseline_seed_2026",
+  "model_sha256": "bf36171708f69d6e7b4d07de95351d8ac8f9ee886f951898ff2801c0c28c3f4a",
+  "input_sha256": "b6e4661451fc2a75f2ca624114b66e100747e1b45f7aca097d3e072534a49f2a",
+  "output_sha256": "12e5659969c1fc3227e0b9f06c21d17dc5ba3c504a1f2debf46009bb2852dc25",
+  "source_output": "outputs/classifier_demo_20261028_110326_434824.json",
+  "prediction_count": 1,
+  "prediction": "REQUIREMENT",
+  "confidence": 0.9375191330909729,
+  "accuracy_benchmark": false,
+  "final_test_used": false
+}

@@ -1,0 +1,54 @@
+{
+  "status": "passed",
+  "archive_sha256": "6c8785b933d4608c8a09a83b149758e35eac6eb5384efaa0d64e7890cd02a550",
+  "all_inventory_hashes_verified": true,
+  "demo_paths_shortened_for_windows": true,
+  "full_models_absent": true,
+  "focused_bundle_tests": 172,
+  "isolated_fast_workspace_passed": true,
+  "checks": [
+    {
+      "args": [
+        "tools/finalize_project_release.py",
+        "--verify-only"
+      ],
+      "exit_code": 0,
+      "log": "handoff_check_1.log"
+    },
+    {
+      "args": [
+        "-m",
+        "unittest",
+        "psai_retrieval.test_runtime",
+        "psai_rag_quality.test_quality",
+        "tests.test_psai_completion",
+        "tests.test_rag_review_regressions",
+        "test_psai_reports",
+        "psai_rag.test_data",
+        "psai_rag.test_train",
+        "psai_rag.test_evaluate",
+        "psai_rag.test_generate_queries",
+        "psai_planner.test_planner",
+        "psai_ocr.test_extract",
+        "psai_rules.test_facts",
+        "tests.test_project_orchestrator",
+        "tests.test_project_worker_report",
+        "tests.test_project_workspace",
+        "tests.test_project_ensemble_bridge"
+      ],
+      "exit_code": 0,
+      "log": "handoff_check_2.log"
+    },
+    {
+      "args": [
+        "tools/demo_project.py",
+        "--fast",
+        "--output",
+        "outputs/handoff_fast"
+      ],
+      "exit_code": 0,
+      "log": "handoff_check_3.log"
+    }
+  ],
+  "new_machine_environment_certified": false
+}

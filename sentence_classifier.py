@@ -38,8 +38,8 @@ def _load():
             + ", ".join(str(path) for path in (MODEL_DIR, *FALLBACK_MODEL_DIRS))
         )
     _config = json.loads((model_dir / "inference_config.json").read_text(encoding="utf-8"))
-    _tokenizer = AutoTokenizer.from_pretrained(model_dir)
-    _model = AutoModelForSequenceClassification.from_pretrained(model_dir)
+    _tokenizer = AutoTokenizer.from_pretrained(model_dir, local_files_only=True)
+    _model = AutoModelForSequenceClassification.from_pretrained(model_dir, local_files_only=True)
     _model.to(_device).eval()
 
 
@@ -69,6 +69,10 @@ def _context(section, prev_text, pos=0.0, text="", nxt=""):
 def classify(items: list[dict], batch_size: int = 32) -> list[dict]:
     """items: [{"text": ..., "section": ..., "prev_text": ...}, ...]
     section và prev_text có thể bỏ trống."""
+    if batch_size < 1:
+        raise ValueError("batch_size must be positive")
+    if not items:
+        return []
     _load()
     labels = _config["labels"]
     other_id = labels.index("OTHER")
@@ -79,7 +83,7 @@ def classify(items: list[dict], batch_size: int = 32) -> list[dict]:
     for start in range(0, len(items), batch_size):
         batch = items[start:start + batch_size]
         enc = _tokenizer(
-            [b["text"] for b in batch],
+            [b["text"][:_config.get("text_max_chars", 600)] for b in batch],
             [_context(b.get("section", ""), b.get("prev_text", ""), b.get("pos", 0.0),
                       b["text"], b.get("next_text", "")) for b in batch],
             truncation=True,
@@ -88,10 +92,14 @@ def classify(items: list[dict], batch_size: int = 32) -> list[dict]:
             return_tensors="pt",
         ).to(_device)
         with torch.no_grad():
-            logits = _model(**enc).logits.cpu().numpy()
+            logits = _model(**enc).logits.float().cpu().numpy()
+        if logits.shape != (len(batch), len(labels)) or not np.isfinite(logits).all():
+            raise FloatingPointError('Classifier returned invalid or nonfinite logits')
         logits[:, other_id] += bias
         probs = np.exp(logits - logits.max(axis=1, keepdims=True))
         probs /= probs.sum(axis=1, keepdims=True)
+        if not np.isfinite(probs).all():
+            raise FloatingPointError('Classifier probabilities are nonfinite')
         for row in probs:
             idx = int(row.argmax())
             results.append({"label": labels[idx], "score": round(float(row[idx]), 3)})

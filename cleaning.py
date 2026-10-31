@@ -1,20 +1,23 @@
 from pathlib import Path
 from collections import Counter
 import csv
+import argparse
 import hashlib
+import json
 import re
 import shutil
 
 
 # ============================================================
-# PSAI CLEANING PIPELINE v6
+# PSAI CLEANING PIPELINE v7
 #
 # Input:
-#   D:\fall26\DSP_PROJECT\data_processed\PSAI001\PSAI001.md
+#   <repository>/data_processed/<doc_id>/<doc_id>.md
 #
 # Output:
-#   D:\fall26\DSP_PROJECT\data_cleaned\PSAI001\PSAI001.md
-#   D:\fall26\DSP_PROJECT\data_cleaned\PSAI001\images\...
+#   <repository>/data_cleaned/<doc_id>/<doc_id>.md
+#   <repository>/data_cleaned/<doc_id>/images/...
+#   <repository>/data_cleaned/<doc_id>/<doc_id>.provenance.json
 #
 # v6 changes vs v5:
 #   1. NEW: _has_diagram_content() — loose diagram continuation check.
@@ -43,7 +46,7 @@ OUTPUT_DIR = BASE_DIR / "data_cleaned"
 
 REPORT_FILE = BASE_DIR / "cleaning_report.csv"
 
-RESET_OUTPUT = True
+RESET_OUTPUT = False  # Kept for old callers; bulk deletion is no longer supported.
 COPY_IMAGES = True
 
 
@@ -1113,17 +1116,16 @@ def clean_document(raw_text: str):
 # 14. COPY IMAGES
 # ============================================================
 
-def copy_images(source_folder: Path, target_folder: Path) -> int:
+def copy_images(source_folder: Path, target_folder: Path, *, overwrite=False) -> int:
     source_images = source_folder / "images"
     if not source_images.exists():
         return 0
 
     target_images = target_folder / "images"
 
-    if target_images.exists():
-        shutil.rmtree(target_images)
-
-    shutil.copytree(source_images, target_images)
+    if target_images.exists() and not overwrite:
+        raise FileExistsError(f"Image output already exists: {target_images}")
+    shutil.copytree(source_images, target_images, dirs_exist_ok=overwrite)
 
     return sum(1 for p in target_images.rglob("*") if p.is_file())
 
@@ -1191,22 +1193,35 @@ def quality_check(raw: str, clean: str, stats: dict) -> str:
 # 16. PROCESS ONE DOCUMENT
 # ============================================================
 
-def process_document(md_file: Path):
+def process_document(md_file: Path, *, output_dir=None, overwrite=False):
+    md_file = Path(md_file)
     doc_id = md_file.parent.name
-
-    raw = md_file.read_text(encoding="utf-8", errors="replace")
+    output_folder = Path(output_dir or OUTPUT_DIR) / doc_id
+    output_file = output_folder / md_file.name
+    if output_folder.resolve() == md_file.parent.resolve():
+        raise ValueError("Cleaned output must be separate from the source document.")
+    if output_folder.exists() and any(output_folder.iterdir()) and not overwrite:
+        raise FileExistsError(f"Output already exists: {output_folder}. Use --overwrite explicitly.")
+    source_bytes = md_file.read_bytes()
+    raw = source_bytes.decode("utf-8")
 
     (clean, stats, table_count, table_pass, table_review) = clean_document(raw)
 
-    output_folder = OUTPUT_DIR / doc_id
     output_folder.mkdir(parents=True, exist_ok=True)
-
-    output_file = output_folder / md_file.name
     output_file.write_text(clean, encoding="utf-8")
 
     image_count = 0
     if COPY_IMAGES:
-        image_count = copy_images(md_file.parent, output_folder)
+        image_count = copy_images(md_file.parent, output_folder, overwrite=overwrite)
+
+    (output_folder / f"{md_file.stem}.provenance.json").write_text(
+        json.dumps({
+            "pipeline": "psai-cleaning-v7", "source_file": str(md_file.resolve()),
+            "source_sha256": hashlib.sha256(source_bytes).hexdigest(),
+            "output_sha256": hashlib.sha256(clean.encode("utf-8")).hexdigest(),
+            "note": "Cleaning rules are heuristic; source fidelity still requires review.",
+        }, ensure_ascii=False, indent=2), encoding="utf-8",
+    )
 
     raw_chars = len(raw)
     clean_chars = len(clean)
@@ -1302,7 +1317,7 @@ def find_duplicate_documents(results):
 # 18. REPORT
 # ============================================================
 
-def save_report(results, duplicates):
+def save_report(results, duplicates, report_file=None):
     fields = [
         "ID",
         "raw_chars", "clean_chars", "removed_chars", "removed_percent",
@@ -1314,7 +1329,9 @@ def save_report(results, duplicates):
         "images", "quality", "output_file", "status",
     ]
 
-    with REPORT_FILE.open("w", newline="", encoding="utf-8-sig") as f:
+    report_file = Path(report_file or REPORT_FILE)
+    report_file.parent.mkdir(parents=True, exist_ok=True)
+    with report_file.open("w", newline="", encoding="utf-8-sig") as f:
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
 
@@ -1333,30 +1350,33 @@ def save_report(results, duplicates):
 # 19. MAIN
 # ============================================================
 
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Clean Markdown without deleting existing output trees.")
+    parser.add_argument("--input-dir", type=Path, default=INPUT_DIR)
+    parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
+    parser.add_argument("--report-file", type=Path, default=REPORT_FILE)
+    parser.add_argument("--overwrite", action="store_true", help="Replace only outputs for input documents.")
+    args = parser.parse_args(argv)
     print("=" * 75)
-    print("PSAI CLEANING PIPELINE v6")
+    print("PSAI CLEANING PIPELINE v7")
     print("=" * 75)
 
-    print(f"INPUT : {INPUT_DIR}")
-    print(f"OUTPUT: {OUTPUT_DIR}")
+    print(f"INPUT : {args.input_dir}")
+    print(f"OUTPUT: {args.output_dir}")
     print()
 
-    if not INPUT_DIR.exists():
-        print("ERROR: input folder does not exist.")
-        return
-
-    if RESET_OUTPUT and OUTPUT_DIR.exists():
-        print("Removing previous cleaned output...")
-        shutil.rmtree(OUTPUT_DIR)
-
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    files = sorted(INPUT_DIR.rglob("*.md"))
-
+    if not args.input_dir.is_dir():
+        raise FileNotFoundError(f"Input folder does not exist: {args.input_dir}")
+    if args.output_dir.resolve() == args.input_dir.resolve() or args.output_dir.resolve() in args.input_dir.resolve().parents or args.input_dir.resolve() in args.output_dir.resolve().parents:
+        raise ValueError("Input and output trees must be separate and non-overlapping.")
+    files = sorted(args.input_dir.rglob("*.md"))
     if not files:
-        print("ERROR: no .md files found.")
-        return
+        raise ValueError("No .md files found; no output was changed.")
+    doc_ids = [path.parent.name for path in files]
+    if len(doc_ids) != len(set(doc_ids)):
+        raise ValueError("Multiple Markdown files map to the same document ID; select canonical inputs first.")
+    if args.report_file.exists() and not args.overwrite:
+        raise FileExistsError(f"Report already exists: {args.report_file}. Use --report-file or --overwrite.")
 
     print(f"Found {len(files)} Markdown documents.")
     print()
@@ -1365,7 +1385,7 @@ def main():
 
     for md_file in files:
         try:
-            result = process_document(md_file)
+            result = process_document(md_file, output_dir=args.output_dir, overwrite=args.overwrite)
             results.append(result)
         except Exception as e:
             print(f"[ERROR] {md_file}: {e}")
@@ -1377,7 +1397,7 @@ def main():
             })
 
     duplicates = find_duplicate_documents(results)
-    save_report(results, duplicates)
+    save_report(results, duplicates, args.report_file)
 
     print()
     print("=" * 75)
@@ -1386,11 +1406,13 @@ def main():
 
     print(f"Documents : {len(results)}")
     print(f"Duplicates: {len(duplicates)}")
-    print(f"Output    : {OUTPUT_DIR}")
-    print(f"Report    : {REPORT_FILE}")
+    print(f"Output    : {args.output_dir}")
+    print(f"Report    : {args.report_file}")
 
     print()
     print("IMPORTANT: Review rows with QUALITY=REVIEW before chunking/tokenization.")
+    if any(result.get("status") == "ERROR" for result in results):
+        raise RuntimeError("Cleaning completed with errors; see the report before continuing.")
 
 
 if __name__ == "__main__":

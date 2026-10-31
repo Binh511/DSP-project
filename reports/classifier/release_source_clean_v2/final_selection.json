@@ -1,0 +1,64 @@
+{
+  "release_version": "2.0-source-clean",
+  "frozen_utc": "2026-10-28T04:02:57.395393+00:00",
+  "model_dir": "models/controlled_study/classifier_source_clean_context_study_v1/baseline_seed_2026",
+  "model_sha256": "bf36171708f69d6e7b4d07de95351d8ac8f9ee886f951898ff2801c0c28c3f4a",
+  "validation_metrics_path": "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_2026/validation_metrics.json",
+  "validation_metrics_sha256": "73ee8fed03c0a2c49422635839d19d89d823515691de6f53bf22b4de95f75bf7",
+  "inference_manifest": {
+    "model_files": {
+      "model.safetensors": "bf36171708f69d6e7b4d07de95351d8ac8f9ee886f951898ff2801c0c28c3f4a",
+      "config.json": "21ac39be93d51bcfbb692301e41c8b6d5c01fc2eab20e6ff275d356c112c9e3b",
+      "tokenizer.json": "f1fc0fc3d7f208e8d9fd9c9a4e5ebf62075b0603f9ae58b34df09e7eb5991e88",
+      "tokenizer_config.json": "eb84e53d9b80fcc75c4016533ddf500f522be440ca30cf4a83b2ab1f876eecf8",
+      "inference_config.json": "9d1edad1b81bb6adc3bcbbd97fa8f02bb1e5d53154cf2c2eb892a71bf61f9d05",
+      "training_provenance.json": "d7cf98450d5b3e853ff8997f56b1d89e50926e37915b30911fbb66f2b8879653"
+    },
+    "implementation": {
+      "study_evaluation.py": "4bbce3da6d935b4945abe48a6ac5a0ee9bec2a76bfd13fadaef473362aaf640b",
+      "study_inputs.py": "5d631de18f473955dc1b9a1720a6b644d281392cf472a7d93a1067c3706dcfd3",
+      "train_human_cv.py": "6f0eb0ace4716742f79ecaaeceb5430fc8296079209df589afe76b8ba5760b24",
+      "study_final_test.py": "0a62145571d5ae72cc4dc22efd80c513c1f2af94249414c1ce5de29e7723551b",
+      "final_test_integrity.py": "2cc0d1c268f64853aff3a09c325099bd164f50168d0d30eb8c54d758a8379f63",
+      "replay_validation.py": "bde1d26b5d8a37b6974fa8e1b804c83a0dbe6441bc4714f5cf62271e0d7ddd8e"
+    },
+    "runtime": {
+      "torch": "2.14.1+cu126",
+      "cuda": "12.6",
+      "device": "cuda",
+      "device_name": "NVIDIA GeForce RTX 4050 Laptop GPU",
+      "cudnn": 91002,
+      "cuda_tf32": false,
+      "cudnn_tf32": true,
+      "float32_matmul_precision": "highest",
+      "deterministic_algorithms": false
+    }
+  },
+  "train_sha256": "124f8e42e8644c2c8d0de0e7c13d3435a8daf424fb22ed74e36810f36b85d02f",
+  "validation_sha256": "85cce8739a97b64aafa2b47c5e7a8ec5fea52d09f44c0928f5308fca5c1bf683",
+  "criterion": "configuration mean validation Macro-F1 over three seeds, then best exported checkpoint within that configuration",
+  "checkpoint_selection": "Trainer BF16 epoch validation; exported runs compared using saved FP32 predictions",
+  "selected_run": {
+    "run": "baseline_seed_2026",
+    "variant": "baseline",
+    "seed": 2026,
+    "macro_f1": 0.6320773784509708,
+    "accuracy": 0.7600607441154138
+  },
+  "configuration_statistics": [
+    {
+      "variant": "baseline",
+      "n": 3,
+      "mean": 0.6159120455938146,
+      "sample_std": 0.014230767084934091
+    },
+    {
+      "variant": "context",
+      "n": 3,
+      "mean": 0.38863671890214707,
+      "sample_std": 0.213018685571193
+    }
+  ],
+  "final_test_used": false,
+  "production_replaced": false
+}

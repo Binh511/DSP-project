@@ -1,0 +1,2569 @@
+{
+  "schema": "psai-source-clean-six-run-error-analysis-v1",
+  "generated_utc": "2026-10-28T04:00:10.105643+00:00",
+  "scope": {
+    "analysis_only": true,
+    "existing_saved_validation_artifacts_only": true,
+    "training_performed": false,
+    "model_inference_performed": false,
+    "torch_imported": false,
+    "gpu_used": false,
+    "test_or_final_test_read_or_scored": false,
+    "production_changed": false,
+    "written_files": [
+      "reports/classifier/release_source_clean_v2/PHAN_TICH_LOI.md",
+      "reports/classifier/release_source_clean_v2/error_analysis.json"
+    ]
+  },
+  "study": "reports/research_review/studies/classifier_source_clean_context_study_v1",
+  "pairing_checks": {
+    "all_six_rows_order_text_gold_neighbors_position_identical": true,
+    "only_input_field_changed_between_variants": "section",
+    "validation_rows": 1317,
+    "validation_documents": 29,
+    "training_rows": 3942,
+    "training_nonsection_fields_identical": true,
+    "training_section_changes": 2736,
+    "validation_section_changes": 1054,
+    "validation_old_section_blank": 1045,
+    "validation_new_section_blank": 26,
+    "validation_new_section_over120_chars": 138,
+    "saved_confusions_and_metrics_match_prediction_csv": true
+  },
+  "label_order": [
+    "OBJECTIVE",
+    "REQUIREMENT",
+    "ACTIVITY",
+    "EXPECTED_RESULT",
+    "OTHER"
+  ],
+  "gold_counts": {
+    "OBJECTIVE": 86,
+    "REQUIREMENT": 89,
+    "ACTIVITY": 202,
+    "EXPECTED_RESULT": 97,
+    "OTHER": 843
+  },
+  "runs": {
+    "baseline_seed_123": {
+      "seed": 123,
+      "variant": "baseline",
+      "n": 1317,
+      "macro_f1": 0.6103840302252943,
+      "accuracy": 0.7350037965072134,
+      "predicted_counts": {
+        "OBJECTIVE": 153,
+        "REQUIREMENT": 83,
+        "ACTIVITY": 258,
+        "EXPECTED_RESULT": 109,
+        "OTHER": 714
+      },
+      "per_class": {
+        "OBJECTIVE": {
+          "precision": 0.43790849673202614,
+          "recall": 0.7790697674418605,
+          "f1-score": 0.5606694560669456,
+          "support": 86.0
+        },
+        "REQUIREMENT": {
+          "precision": 0.5180722891566265,
+          "recall": 0.48314606741573035,
+          "f1-score": 0.5,
+          "support": 89.0
+        },
+        "ACTIVITY": {
+          "precision": 0.5387596899224806,
+          "recall": 0.6881188118811881,
+          "f1-score": 0.6043478260869565,
+          "support": 202.0
+        },
+        "EXPECTED_RESULT": {
+          "precision": 0.5045871559633027,
+          "recall": 0.5670103092783505,
+          "f1-score": 0.5339805825242718,
+          "support": 97.0
+        },
+        "OTHER": {
+          "precision": 0.9299719887955182,
+          "recall": 0.7876631079478055,
+          "f1-score": 0.852922286448298,
+          "support": 843.0
+        }
+      },
+      "confusion_true_rows_predicted_columns": {
+        "OBJECTIVE": {
+          "OBJECTIVE": 67,
+          "REQUIREMENT": 2,
+          "ACTIVITY": 3,
+          "EXPECTED_RESULT": 5,
+          "OTHER": 9
+        },
+        "REQUIREMENT": {
+          "OBJECTIVE": 2,
+          "REQUIREMENT": 43,
+          "ACTIVITY": 24,
+          "EXPECTED_RESULT": 4,
+          "OTHER": 16
+        },
+        "ACTIVITY": {
+          "OBJECTIVE": 34,
+          "REQUIREMENT": 8,
+          "ACTIVITY": 139,
+          "EXPECTED_RESULT": 5,
+          "OTHER": 16
+        },
+        "EXPECTED_RESULT": {
+          "OBJECTIVE": 14,
+          "REQUIREMENT": 3,
+          "ACTIVITY": 16,
+          "EXPECTED_RESULT": 55,
+          "OTHER": 9
+        },
+        "OTHER": {
+          "OBJECTIVE": 36,
+          "REQUIREMENT": 27,
+          "ACTIVITY": 76,
+          "EXPECTED_RESULT": 40,
+          "OTHER": 664
+        }
+      },
+      "trainer_best_metric": 0.6044163770649238,
+      "trainer_best_checkpoint": "checkpoint-1235",
+      "recorded_epoch_evaluations": [
+        {
+          "epoch": 1.0,
+          "eval_macro_f1": 0.04226626130690988,
+          "eval_loss": 1.568745732307434
+        },
+        {
+          "epoch": 2.0,
+          "eval_macro_f1": 0.39660016477332255,
+          "eval_loss": 1.3759968280792236
+        },
+        {
+          "epoch": 3.0,
+          "eval_macro_f1": 0.6025951788141225,
+          "eval_loss": 1.0867751836776733
+        },
+        {
+          "epoch": 4.0,
+          "eval_macro_f1": 0.581568196865718,
+          "eval_loss": 1.1511383056640625
+        },
+        {
+          "epoch": 5.0,
+          "eval_macro_f1": 0.6044163770649238,
+          "eval_loss": 1.1852326393127441
+        }
+      ],
+      "use_label_overlay": false,
+      "label_origin": "original frozen labels; no proposed AI changes applied"
+    },
+    "context_seed_123": {
+      "seed": 123,
+      "variant": "context",
+      "n": 1317,
+      "macro_f1": 0.3089090886903432,
+      "accuracy": 0.5968109339407744,
+      "predicted_counts": {
+        "OBJECTIVE": 194,
+        "REQUIREMENT": 0,
+        "ACTIVITY": 268,
+        "EXPECTED_RESULT": 79,
+        "OTHER": 776
+      },
+      "per_class": {
+        "OBJECTIVE": {
+          "precision": 0.1134020618556701,
+          "recall": 0.2558139534883721,
+          "f1-score": 0.15714285714285714,
+          "support": 86.0
+        },
+        "REQUIREMENT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 89.0
+        },
+        "ACTIVITY": {
+          "precision": 0.41044776119402987,
+          "recall": 0.5445544554455446,
+          "f1-score": 0.46808510638297873,
+          "support": 202.0
+        },
+        "EXPECTED_RESULT": {
+          "precision": 0.13924050632911392,
+          "recall": 0.1134020618556701,
+          "f1-score": 0.125,
+          "support": 97.0
+        },
+        "OTHER": {
+          "precision": 0.8286082474226805,
+          "recall": 0.7627520759193357,
+          "f1-score": 0.7943174799258802,
+          "support": 843.0
+        }
+      },
+      "confusion_true_rows_predicted_columns": {
+        "OBJECTIVE": {
+          "OBJECTIVE": 22,
+          "REQUIREMENT": 0,
+          "ACTIVITY": 11,
+          "EXPECTED_RESULT": 11,
+          "OTHER": 42
+        },
+        "REQUIREMENT": {
+          "OBJECTIVE": 5,
+          "REQUIREMENT": 0,
+          "ACTIVITY": 48,
+          "EXPECTED_RESULT": 7,
+          "OTHER": 29
+        },
+        "ACTIVITY": {
+          "OBJECTIVE": 33,
+          "REQUIREMENT": 0,
+          "ACTIVITY": 110,
+          "EXPECTED_RESULT": 19,
+          "OTHER": 40
+        },
+        "EXPECTED_RESULT": {
+          "OBJECTIVE": 23,
+          "REQUIREMENT": 0,
+          "ACTIVITY": 41,
+          "EXPECTED_RESULT": 11,
+          "OTHER": 22
+        },
+        "OTHER": {
+          "OBJECTIVE": 111,
+          "REQUIREMENT": 0,
+          "ACTIVITY": 58,
+          "EXPECTED_RESULT": 31,
+          "OTHER": 643
+        }
+      },
+      "trainer_best_metric": 0.3089660039097866,
+      "trainer_best_checkpoint": "checkpoint-1235",
+      "recorded_epoch_evaluations": [
+        {
+          "epoch": 1.0,
+          "eval_macro_f1": 0.05319289005924951,
+          "eval_loss": 1.5857069492340088
+        },
+        {
+          "epoch": 2.0,
+          "eval_macro_f1": 0.025320056899004267,
+          "eval_loss": 1.5397472381591797
+        },
+        {
+          "epoch": 3.0,
+          "eval_macro_f1": 0.21517134251644565,
+          "eval_loss": 1.5592540502548218
+        },
+        {
+          "epoch": 4.0,
+          "eval_macro_f1": 0.22714140974536817,
+          "eval_loss": 1.5725529193878174
+        },
+        {
+          "epoch": 5.0,
+          "eval_macro_f1": 0.3089660039097866,
+          "eval_loss": 1.4970182180404663
+        }
+      ],
+      "use_label_overlay": false,
+      "label_origin": "original frozen labels; no proposed AI changes applied"
+    },
+    "baseline_seed_42": {
+      "seed": 42,
+      "variant": "baseline",
+      "n": 1317,
+      "macro_f1": 0.6052747281051788,
+      "accuracy": 0.7357630979498861,
+      "predicted_counts": {
+        "OBJECTIVE": 135,
+        "REQUIREMENT": 86,
+        "ACTIVITY": 287,
+        "EXPECTED_RESULT": 100,
+        "OTHER": 709
+      },
+      "per_class": {
+        "OBJECTIVE": {
+          "precision": 0.4962962962962963,
+          "recall": 0.7790697674418605,
+          "f1-score": 0.6063348416289592,
+          "support": 86.0
+        },
+        "REQUIREMENT": {
+          "precision": 0.47674418604651164,
+          "recall": 0.4606741573033708,
+          "f1-score": 0.4685714285714286,
+          "support": 89.0
+        },
+        "ACTIVITY": {
+          "precision": 0.5400696864111498,
+          "recall": 0.7673267326732673,
+          "f1-score": 0.6339468302658486,
+          "support": 202.0
+        },
+        "EXPECTED_RESULT": {
+          "precision": 0.46,
+          "recall": 0.4742268041237113,
+          "f1-score": 0.467005076142132,
+          "support": 97.0
+        },
+        "OTHER": {
+          "precision": 0.9308885754583921,
+          "recall": 0.7829181494661922,
+          "f1-score": 0.8505154639175257,
+          "support": 843.0
+        }
+      },
+      "confusion_true_rows_predicted_columns": {
+        "OBJECTIVE": {
+          "OBJECTIVE": 67,
+          "REQUIREMENT": 1,
+          "ACTIVITY": 3,
+          "EXPECTED_RESULT": 7,
+          "OTHER": 8
+        },
+        "REQUIREMENT": {
+          "OBJECTIVE": 2,
+          "REQUIREMENT": 41,
+          "ACTIVITY": 32,
+          "EXPECTED_RESULT": 1,
+          "OTHER": 13
+        },
+        "ACTIVITY": {
+          "OBJECTIVE": 18,
+          "REQUIREMENT": 11,
+          "ACTIVITY": 155,
+          "EXPECTED_RESULT": 2,
+          "OTHER": 16
+        },
+        "EXPECTED_RESULT": {
+          "OBJECTIVE": 16,
+          "REQUIREMENT": 4,
+          "ACTIVITY": 19,
+          "EXPECTED_RESULT": 46,
+          "OTHER": 12
+        },
+        "OTHER": {
+          "OBJECTIVE": 32,
+          "REQUIREMENT": 29,
+          "ACTIVITY": 78,
+          "EXPECTED_RESULT": 44,
+          "OTHER": 660
+        }
+      },
+      "trainer_best_metric": 0.6076308277054869,
+      "trainer_best_checkpoint": "checkpoint-1235",
+      "recorded_epoch_evaluations": [
+        {
+          "epoch": 1.0,
+          "eval_macro_f1": 0.15968391564858767,
+          "eval_loss": 1.4583792686462402
+        },
+        {
+          "epoch": 2.0,
+          "eval_macro_f1": 0.5471168959822929,
+          "eval_loss": 1.1280938386917114
+        },
+        {
+          "epoch": 3.0,
+          "eval_macro_f1": 0.5992816108640171,
+          "eval_loss": 1.078855037689209
+        },
+        {
+          "epoch": 4.0,
+          "eval_macro_f1": 0.6042903928271073,
+          "eval_loss": 1.2370067834854126
+        },
+        {
+          "epoch": 5.0,
+          "eval_macro_f1": 0.6076308277054869,
+          "eval_loss": 1.2515512704849243
+        }
+      ],
+      "use_label_overlay": false,
+      "label_origin": "original frozen labels; no proposed AI changes applied"
+    },
+    "context_seed_42": {
+      "seed": 42,
+      "variant": "context",
+      "n": 1317,
+      "macro_f1": 0.6300187444459302,
+      "accuracy": 0.7494305239179955,
+      "predicted_counts": {
+        "OBJECTIVE": 102,
+        "REQUIREMENT": 74,
+        "ACTIVITY": 255,
+        "EXPECTED_RESULT": 144,
+        "OTHER": 742
+      },
+      "per_class": {
+        "OBJECTIVE": {
+          "precision": 0.6372549019607843,
+          "recall": 0.7558139534883721,
+          "f1-score": 0.6914893617021277,
+          "support": 86.0
+        },
+        "REQUIREMENT": {
+          "precision": 0.5,
+          "recall": 0.4157303370786517,
+          "f1-score": 0.4539877300613497,
+          "support": 89.0
+        },
+        "ACTIVITY": {
+          "precision": 0.5686274509803921,
+          "recall": 0.7178217821782178,
+          "f1-score": 0.6345733041575492,
+          "support": 202.0
+        },
+        "EXPECTED_RESULT": {
+          "precision": 0.4305555555555556,
+          "recall": 0.6391752577319587,
+          "f1-score": 0.5145228215767634,
+          "support": 97.0
+        },
+        "OTHER": {
+          "precision": 0.9137466307277629,
+          "recall": 0.8042704626334519,
+          "f1-score": 0.8555205047318613,
+          "support": 843.0
+        }
+      },
+      "confusion_true_rows_predicted_columns": {
+        "OBJECTIVE": {
+          "OBJECTIVE": 65,
+          "REQUIREMENT": 0,
+          "ACTIVITY": 6,
+          "EXPECTED_RESULT": 8,
+          "OTHER": 7
+        },
+        "REQUIREMENT": {
+          "OBJECTIVE": 0,
+          "REQUIREMENT": 37,
+          "ACTIVITY": 29,
+          "EXPECTED_RESULT": 6,
+          "OTHER": 17
+        },
+        "ACTIVITY": {
+          "OBJECTIVE": 15,
+          "REQUIREMENT": 10,
+          "ACTIVITY": 145,
+          "EXPECTED_RESULT": 9,
+          "OTHER": 23
+        },
+        "EXPECTED_RESULT": {
+          "OBJECTIVE": 3,
+          "REQUIREMENT": 3,
+          "ACTIVITY": 12,
+          "EXPECTED_RESULT": 62,
+          "OTHER": 17
+        },
+        "OTHER": {
+          "OBJECTIVE": 19,
+          "REQUIREMENT": 24,
+          "ACTIVITY": 63,
+          "EXPECTED_RESULT": 59,
+          "OTHER": 678
+        }
+      },
+      "trainer_best_metric": 0.6391753325162772,
+      "trainer_best_checkpoint": "checkpoint-988",
+      "recorded_epoch_evaluations": [
+        {
+          "epoch": 1.0,
+          "eval_macro_f1": 0.15611111111111112,
+          "eval_loss": 1.5653806924819946
+        },
+        {
+          "epoch": 2.0,
+          "eval_macro_f1": 0.3139965425341436,
+          "eval_loss": 1.3477587699890137
+        },
+        {
+          "epoch": 3.0,
+          "eval_macro_f1": 0.5512938368025123,
+          "eval_loss": 1.1445879936218262
+        },
+        {
+          "epoch": 4.0,
+          "eval_macro_f1": 0.6391753325162772,
+          "eval_loss": 1.111635446548462
+        },
+        {
+          "epoch": 5.0,
+          "eval_macro_f1": 0.6298847486967486,
+          "eval_loss": 1.093738079071045
+        }
+      ],
+      "use_label_overlay": false,
+      "label_origin": "original frozen labels; no proposed AI changes applied"
+    },
+    "baseline_seed_2026": {
+      "seed": 2026,
+      "variant": "baseline",
+      "n": 1317,
+      "macro_f1": 0.6320773784509708,
+      "accuracy": 0.7600607441154138,
+      "predicted_counts": {
+        "OBJECTIVE": 113,
+        "REQUIREMENT": 95,
+        "ACTIVITY": 282,
+        "EXPECTED_RESULT": 89,
+        "OTHER": 738
+      },
+      "per_class": {
+        "OBJECTIVE": {
+          "precision": 0.5663716814159292,
+          "recall": 0.7441860465116279,
+          "f1-score": 0.6432160804020101,
+          "support": 86.0
+        },
+        "REQUIREMENT": {
+          "precision": 0.5368421052631579,
+          "recall": 0.5730337078651685,
+          "f1-score": 0.5543478260869565,
+          "support": 89.0
+        },
+        "ACTIVITY": {
+          "precision": 0.5602836879432624,
+          "recall": 0.7821782178217822,
+          "f1-score": 0.6528925619834711,
+          "support": 202.0
+        },
+        "EXPECTED_RESULT": {
+          "precision": 0.4606741573033708,
+          "recall": 0.422680412371134,
+          "f1-score": 0.44086021505376344,
+          "support": 97.0
+        },
+        "OTHER": {
+          "precision": 0.9308943089430894,
+          "recall": 0.8149466192170819,
+          "f1-score": 0.8690702087286527,
+          "support": 843.0
+        }
+      },
+      "confusion_true_rows_predicted_columns": {
+        "OBJECTIVE": {
+          "OBJECTIVE": 64,
+          "REQUIREMENT": 1,
+          "ACTIVITY": 5,
+          "EXPECTED_RESULT": 8,
+          "OTHER": 8
+        },
+        "REQUIREMENT": {
+          "OBJECTIVE": 2,
+          "REQUIREMENT": 51,
+          "ACTIVITY": 25,
+          "EXPECTED_RESULT": 4,
+          "OTHER": 7
+        },
+        "ACTIVITY": {
+          "OBJECTIVE": 14,
+          "REQUIREMENT": 9,
+          "ACTIVITY": 158,
+          "EXPECTED_RESULT": 2,
+          "OTHER": 19
+        },
+        "EXPECTED_RESULT": {
+          "OBJECTIVE": 10,
+          "REQUIREMENT": 3,
+          "ACTIVITY": 26,
+          "EXPECTED_RESULT": 41,
+          "OTHER": 17
+        },
+        "OTHER": {
+          "OBJECTIVE": 23,
+          "REQUIREMENT": 31,
+          "ACTIVITY": 68,
+          "EXPECTED_RESULT": 34,
+          "OTHER": 687
+        }
+      },
+      "trainer_best_metric": 0.6331196558908103,
+      "trainer_best_checkpoint": "checkpoint-1235",
+      "recorded_epoch_evaluations": [
+        {
+          "epoch": 1.0,
+          "eval_macro_f1": 0.15730170187956355,
+          "eval_loss": 1.58590567111969
+        },
+        {
+          "epoch": 2.0,
+          "eval_macro_f1": 0.49723982321643884,
+          "eval_loss": 1.1421304941177368
+        },
+        {
+          "epoch": 3.0,
+          "eval_macro_f1": 0.564435484842359,
+          "eval_loss": 1.335938811302185
+        },
+        {
+          "epoch": 4.0,
+          "eval_macro_f1": 0.5970855778123723,
+          "eval_loss": 1.3102333545684814
+        },
+        {
+          "epoch": 5.0,
+          "eval_macro_f1": 0.6331196558908103,
+          "eval_loss": 1.2035962343215942
+        }
+      ],
+      "use_label_overlay": false,
+      "label_origin": "original frozen labels; no proposed AI changes applied"
+    },
+    "context_seed_2026": {
+      "seed": 2026,
+      "variant": "context",
+      "n": 1317,
+      "macro_f1": 0.22698232357016773,
+      "accuracy": 0.5284738041002278,
+      "predicted_counts": {
+        "OBJECTIVE": 313,
+        "REQUIREMENT": 0,
+        "ACTIVITY": 79,
+        "EXPECTED_RESULT": 8,
+        "OTHER": 917
+      },
+      "per_class": {
+        "OBJECTIVE": {
+          "precision": 0.14057507987220447,
+          "recall": 0.5116279069767442,
+          "f1-score": 0.22055137844611528,
+          "support": 86.0
+        },
+        "REQUIREMENT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 89.0
+        },
+        "ACTIVITY": {
+          "precision": 0.3670886075949367,
+          "recall": 0.14356435643564355,
+          "f1-score": 0.20640569395017794,
+          "support": 202.0
+        },
+        "EXPECTED_RESULT": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1-score": 0.0,
+          "support": 97.0
+        },
+        "OTHER": {
+          "precision": 0.6793893129770993,
+          "recall": 0.7390272835112692,
+          "f1-score": 0.7079545454545455,
+          "support": 843.0
+        }
+      },
+      "confusion_true_rows_predicted_columns": {
+        "OBJECTIVE": {
+          "OBJECTIVE": 44,
+          "REQUIREMENT": 0,
+          "ACTIVITY": 1,
+          "EXPECTED_RESULT": 1,
+          "OTHER": 40
+        },
+        "REQUIREMENT": {
+          "OBJECTIVE": 17,
+          "REQUIREMENT": 0,
+          "ACTIVITY": 6,
+          "EXPECTED_RESULT": 0,
+          "OTHER": 66
+        },
+        "ACTIVITY": {
+          "OBJECTIVE": 41,
+          "REQUIREMENT": 0,
+          "ACTIVITY": 29,
+          "EXPECTED_RESULT": 1,
+          "OTHER": 131
+        },
+        "EXPECTED_RESULT": {
+          "OBJECTIVE": 34,
+          "REQUIREMENT": 0,
+          "ACTIVITY": 6,
+          "EXPECTED_RESULT": 0,
+          "OTHER": 57
+        },
+        "OTHER": {
+          "OBJECTIVE": 177,
+          "REQUIREMENT": 0,
+          "ACTIVITY": 37,
+          "EXPECTED_RESULT": 6,
+          "OTHER": 623
+        }
+      },
+      "trainer_best_metric": 0.22105413808319746,
+      "trainer_best_checkpoint": "checkpoint-1235",
+      "recorded_epoch_evaluations": [
+        {
+          "epoch": 1.0,
+          "eval_macro_f1": 0.14714273083885138,
+          "eval_loss": 1.5586110353469849
+        },
+        {
+          "epoch": 2.0,
+          "eval_macro_f1": 0.02451888809693514,
+          "eval_loss": 1.5551072359085083
+        },
+        {
+          "epoch": 3.0,
+          "eval_macro_f1": 0.15611111111111112,
+          "eval_loss": 1.5679823160171509
+        },
+        {
+          "epoch": 4.0,
+          "eval_macro_f1": 0.15577190542420027,
+          "eval_loss": 1.5400817394256592
+        },
+        {
+          "epoch": 5.0,
+          "eval_macro_f1": 0.22105413808319746,
+          "eval_loss": 1.533511996269226
+        }
+      ],
+      "use_label_overlay": false,
+      "label_origin": "original frozen labels; no proposed AI changes applied"
+    }
+  },
+  "paired": {
+    "123": {
+      "n": 1317,
+      "macro_f1_delta_context_minus_baseline": -0.3014749415349511,
+      "outcomes": {
+        "baseline_right__context_right": 655,
+        "baseline_wrong__context_right": 131,
+        "baseline_right__context_wrong": 313,
+        "baseline_wrong__context_wrong": 218
+      },
+      "section_strata": {
+        "changed": {
+          "n": 1054,
+          "outcomes": {
+            "baseline_right__context_right": 527,
+            "baseline_wrong__context_right": 101,
+            "baseline_right__context_wrong": 234,
+            "baseline_wrong__context_wrong": 192
+          }
+        },
+        "unchanged": {
+          "n": 263,
+          "outcomes": {
+            "baseline_right__context_right": 128,
+            "baseline_wrong__context_right": 30,
+            "baseline_right__context_wrong": 79,
+            "baseline_wrong__context_wrong": 26
+          }
+        }
+      },
+      "regressions_by_gold": {
+        "OBJECTIVE": 50,
+        "REQUIREMENT": 43,
+        "ACTIVITY": 57,
+        "EXPECTED_RESULT": 46,
+        "OTHER": 117
+      },
+      "rescues_by_gold": {
+        "OBJECTIVE": 5,
+        "REQUIREMENT": 0,
+        "ACTIVITY": 28,
+        "EXPECTED_RESULT": 2,
+        "OTHER": 96
+      },
+      "largest_regression_document_counts": {
+        "PSAI077": 63,
+        "PSAI137": 38,
+        "PSAI033": 25,
+        "PSAI064": 24,
+        "PSAI102": 24,
+        "PSAI138": 24,
+        "PSAI028": 16,
+        "PSAI052": 16
+      }
+    },
+    "42": {
+      "n": 1317,
+      "macro_f1_delta_context_minus_baseline": 0.024744016340751407,
+      "outcomes": {
+        "baseline_right__context_right": 888,
+        "baseline_right__context_wrong": 81,
+        "baseline_wrong__context_wrong": 249,
+        "baseline_wrong__context_right": 99
+      },
+      "section_strata": {
+        "changed": {
+          "n": 1054,
+          "outcomes": {
+            "baseline_right__context_right": 687,
+            "baseline_right__context_wrong": 67,
+            "baseline_wrong__context_wrong": 221,
+            "baseline_wrong__context_right": 79
+          }
+        },
+        "unchanged": {
+          "n": 263,
+          "outcomes": {
+            "baseline_right__context_right": 201,
+            "baseline_wrong__context_right": 20,
+            "baseline_right__context_wrong": 14,
+            "baseline_wrong__context_wrong": 28
+          }
+        }
+      },
+      "regressions_by_gold": {
+        "OBJECTIVE": 3,
+        "REQUIREMENT": 12,
+        "ACTIVITY": 18,
+        "EXPECTED_RESULT": 3,
+        "OTHER": 45
+      },
+      "rescues_by_gold": {
+        "OBJECTIVE": 1,
+        "REQUIREMENT": 8,
+        "ACTIVITY": 8,
+        "EXPECTED_RESULT": 19,
+        "OTHER": 63
+      },
+      "largest_regression_document_counts": {
+        "PSAI064": 15,
+        "PSAI052": 9,
+        "PSAI137": 9,
+        "PSAI033": 8,
+        "PSAI077": 7,
+        "PSAI133": 5,
+        "PSAI017": 4,
+        "PSAI108": 4
+      }
+    },
+    "2026": {
+      "n": 1317,
+      "macro_f1_delta_context_minus_baseline": -0.40509505488080305,
+      "outcomes": {
+        "baseline_right__context_right": 591,
+        "baseline_wrong__context_right": 105,
+        "baseline_wrong__context_wrong": 211,
+        "baseline_right__context_wrong": 410
+      },
+      "section_strata": {
+        "changed": {
+          "n": 1054,
+          "outcomes": {
+            "baseline_right__context_right": 470,
+            "baseline_wrong__context_right": 88,
+            "baseline_wrong__context_wrong": 182,
+            "baseline_right__context_wrong": 314
+          }
+        },
+        "unchanged": {
+          "n": 263,
+          "outcomes": {
+            "baseline_right__context_right": 121,
+            "baseline_right__context_wrong": 96,
+            "baseline_wrong__context_wrong": 29,
+            "baseline_wrong__context_right": 17
+          }
+        }
+      },
+      "regressions_by_gold": {
+        "OBJECTIVE": 31,
+        "REQUIREMENT": 51,
+        "ACTIVITY": 134,
+        "EXPECTED_RESULT": 41,
+        "OTHER": 153
+      },
+      "rescues_by_gold": {
+        "OBJECTIVE": 11,
+        "REQUIREMENT": 0,
+        "ACTIVITY": 5,
+        "EXPECTED_RESULT": 0,
+        "OTHER": 89
+      },
+      "largest_regression_document_counts": {
+        "PSAI077": 69,
+        "PSAI137": 50,
+        "PSAI064": 40,
+        "PSAI052": 39,
+        "PSAI033": 34,
+        "PSAI102": 31,
+        "PSAI138": 28,
+        "PSAI133": 20
+      }
+    }
+  },
+  "label_proposals": {
+    "historical_total_proposals": 68,
+    "historical_effective_training_changes": 57,
+    "historical_label_origin": "user_supplied; independence_not_verified; not_expert_ground_truth",
+    "ground_truth_status": "not_independent_expert_ground_truth",
+    "applied_in_this_six_run_study": false,
+    "all_six_use_label_overlay_false": true,
+    "evidence": "All six provenance.json files record original frozen labels; no proposed AI changes applied."
+  },
+  "case_selection": {
+    "method": "purposive descriptive selection, not a random or frequency-weighted error sample",
+    "count": 15,
+    "covers": [
+      "REQUIREMENT versus ACTIVITY",
+      "EXPECTED_RESULT versus OTHER",
+      "OBJECTIVE loss",
+      "OTHER false positives",
+      "seed42 rescues and regressions",
+      "unchanged empty and nonempty sections",
+      "formula-like Section for source review"
+    ]
+  },
+  "causal_limits_vi": [
+    "Các ma trận và case chứng minh model dự đoán gì so với nhãn tham chiếu đóng băng; không tự chứng minh nhãn tham chiếu đúng.",
+    "Section khác ở cả train và validation. Không có counterfactual giữ nguyên model rồi chỉ thay Section; không tách được tác động input inference khỏi quá trình huấn luyện/chọn checkpoint.",
+    "Neighbors và target text không đổi giữa các biến thể. Điều này không đo đóng góp riêng của neighbors trong model; không có phép loại bỏ neighbors ở đây.",
+    "Các lỗi trên 263 câu Section không đổi cho thấy không thể gán mọi lỗi trực tiếp cho Section mới ở câu validation.",
+    "Hai context run yếu đã có điểm validation theo epoch thấp trong trainer_state. Không có bằng chứng lỗi chỉ xuất hiện khi export hoặc do precision/runtime.",
+    "Chưa đối chiếu PDF gốc hay phán xử nhãn độc lập; lỗi PDF/OCR, segmentation, Section sai và nhãn sai đều chưa xác minh."
+  ],
+  "cases": [
+    {
+      "case_id": "E01",
+      "validation_row_1based": 60,
+      "csv_line_1based": 61,
+      "document_id": "PSAI017",
+      "full_text": "User can mint Dataset to NFT with permitted number of keys",
+      "old_section": "",
+      "new_section": "Project Description > Value",
+      "gold_frozen_reference_label": "REQUIREMENT",
+      "prev_text": "User annotated the dataset",
+      "next_text": "User can share the NFT via IPFS and backup to Filecoin network.",
+      "pos": "0.5862068965517241",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "User can mint Dataset to NFT with permitted number of keys",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "Project Description > Value",
+      "encoder_previous_tail150": "User annotated the dataset",
+      "encoder_next_head150": "User can share the NFT via IPFS and backup to Filecoin network.",
+      "observed_pattern": "requirement_to_activity_or_other",
+      "evidence_note_vi": "C123 chuyển REQUIREMENT thành ACTIVITY; C2026 chuyển thành OTHER; C42 giữ đúng. Text và hai câu lân cận giống nhau ở cả sáu run. Section từ trống sang Value là thay đổi quan sát được, chưa chứng minh đây là nguyên nhân.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "REQUIREMENT",
+            "confidence": 0.8737405,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.010172598,
+              "REQUIREMENT": 0.8737405,
+              "ACTIVITY": 0.044994183,
+              "EXPECTED_RESULT": 0.045421213,
+              "OTHER": 0.025671516
+            }
+          },
+          "context": {
+            "label": "ACTIVITY",
+            "confidence": 0.25790805,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.22376536,
+              "REQUIREMENT": 0.15780303,
+              "ACTIVITY": 0.25790805,
+              "EXPECTED_RESULT": 0.25562495,
+              "OTHER": 0.10489862
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "REQUIREMENT",
+            "confidence": 0.9403248,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.011347777,
+              "REQUIREMENT": 0.9403248,
+              "ACTIVITY": 0.01779401,
+              "EXPECTED_RESULT": 0.019343743,
+              "OTHER": 0.011189723
+            }
+          },
+          "context": {
+            "label": "REQUIREMENT",
+            "confidence": 0.849058,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.01940632,
+              "REQUIREMENT": 0.849058,
+              "ACTIVITY": 0.058251575,
+              "EXPECTED_RESULT": 0.03535743,
+              "OTHER": 0.037926666
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "REQUIREMENT",
+            "confidence": 0.6359341,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.03908057,
+              "REQUIREMENT": 0.6359341,
+              "ACTIVITY": 0.109213926,
+              "EXPECTED_RESULT": 0.18176025,
+              "OTHER": 0.03401116
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.3088207,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.07770945,
+              "REQUIREMENT": 0.23247676,
+              "ACTIVITY": 0.2841269,
+              "EXPECTED_RESULT": 0.0968661,
+              "OTHER": 0.3088207
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E02",
+      "validation_row_1based": 137,
+      "csv_line_1based": 138,
+      "document_id": "PSAI028",
+      "full_text": "the file hash should cover how to extend the current CID/multihash to support zkSNARK-friendly hash functions if needed",
+      "old_section": "",
+      "new_section": "Project Description > Deliverables > Development Roadmap",
+      "gold_frozen_reference_label": "REQUIREMENT",
+      "prev_text": "Specifically:",
+      "next_text": "the state retrieval protocol should work with today's Filecoin protocol",
+      "pos": "0.6666666666666666",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "the file hash should cover how to extend the current CID/multihash to support zkSNARK-friendly hash functions if needed",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "Project Description > Deliverables > Development Roadmap",
+      "encoder_previous_tail150": "Specifically:",
+      "encoder_next_head150": "the state retrieval protocol should work with today's Filecoin protocol",
+      "observed_pattern": "requirement_to_activity_or_other",
+      "evidence_note_vi": "Cụm should và mô tả ràng buộc nằm trong text; B123/B42/B2026 và C42 đều dự đoán REQUIREMENT. C123 ra ACTIVITY, C2026 ra OTHER. Không suy ra nhãn tham chiếu sai chỉ từ hai run thất bại.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "REQUIREMENT",
+            "confidence": 0.67454445,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.016068837,
+              "REQUIREMENT": 0.67454445,
+              "ACTIVITY": 0.2426967,
+              "EXPECTED_RESULT": 0.036445085,
+              "OTHER": 0.030244833
+            }
+          },
+          "context": {
+            "label": "ACTIVITY",
+            "confidence": 0.38080984,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.15294662,
+              "REQUIREMENT": 0.107225455,
+              "ACTIVITY": 0.38080984,
+              "EXPECTED_RESULT": 0.274893,
+              "OTHER": 0.0841251
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "REQUIREMENT",
+            "confidence": 0.9169539,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.015562274,
+              "REQUIREMENT": 0.9169539,
+              "ACTIVITY": 0.033164248,
+              "EXPECTED_RESULT": 0.023484005,
+              "OTHER": 0.01083553
+            }
+          },
+          "context": {
+            "label": "REQUIREMENT",
+            "confidence": 0.7739372,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.025928538,
+              "REQUIREMENT": 0.7739372,
+              "ACTIVITY": 0.123426914,
+              "EXPECTED_RESULT": 0.040351413,
+              "OTHER": 0.03635595
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "REQUIREMENT",
+            "confidence": 0.9419408,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.010239717,
+              "REQUIREMENT": 0.9419408,
+              "ACTIVITY": 0.018691067,
+              "EXPECTED_RESULT": 0.018044604,
+              "OTHER": 0.011083913
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.31345767,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.07752158,
+              "REQUIREMENT": 0.2106594,
+              "ACTIVITY": 0.3009923,
+              "EXPECTED_RESULT": 0.09736908,
+              "OTHER": 0.31345767
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E03",
+      "validation_row_1based": 1202,
+      "csv_line_1based": 1203,
+      "document_id": "PSAI137",
+      "full_text": "Synchronizing the communication using MPI\\_Wait or MPI\\_Test functions is required to ensure data consistency.",
+      "old_section": "PROPOSAL FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Inter-GPU Communication:",
+      "new_section": "PROPOSAL FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Inter-GPU Communication:",
+      "gold_frozen_reference_label": "REQUIREMENT",
+      "prev_text": "This can be done using non-blocking communication functions like MPI\\_Isend and MPI\\_Irecv, which allows to perform other computations while data is being exchanged.",
+      "next_text": "After the simulation is complete, aggregate the results from all GPUs.",
+      "pos": "0.7248322147651006",
+      "section_changed": false,
+      "encoder_text_before_token_truncation": "Synchronizing the communication using MPI\\_Wait or MPI\\_Test functions is required to ensure data consistency.",
+      "encoder_old_section_tail120": "FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Inter-GPU Communication:",
+      "encoder_new_section_tail120": "FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Inter-GPU Communication:",
+      "encoder_previous_tail150": "e using non-blocking communication functions like MPI\\_Isend and MPI\\_Irecv, which allows to perform other computations while data is being exchanged.",
+      "encoder_next_head150": "After the simulation is complete, aggregate the results from all GPUs.",
+      "observed_pattern": "requirement_activity_confusion_with_unchanged_section",
+      "evidence_note_vi": "Section, text và neighbors không đổi; C42 sửa ACTIVITY của B42 thành REQUIREMENT, trong khi C123/C2026 ra ACTIVITY. Đây là bằng chứng khác biệt đầu ra giữa model/run ngay cả khi input của câu này giữ nguyên, không phải bằng chứng Section mới gán sai cho câu.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "REQUIREMENT",
+            "confidence": 0.40476263,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.02675732,
+              "REQUIREMENT": 0.40476263,
+              "ACTIVITY": 0.33503544,
+              "EXPECTED_RESULT": 0.036211178,
+              "OTHER": 0.19723342
+            }
+          },
+          "context": {
+            "label": "ACTIVITY",
+            "confidence": 0.3325868,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.1803389,
+              "REQUIREMENT": 0.11226423,
+              "ACTIVITY": 0.3325868,
+              "EXPECTED_RESULT": 0.29177636,
+              "OTHER": 0.08303371
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "ACTIVITY",
+            "confidence": 0.60588825,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.04662413,
+              "REQUIREMENT": 0.2380168,
+              "ACTIVITY": 0.60588825,
+              "EXPECTED_RESULT": 0.079234265,
+              "OTHER": 0.030236565
+            }
+          },
+          "context": {
+            "label": "REQUIREMENT",
+            "confidence": 0.810001,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.0156138325,
+              "REQUIREMENT": 0.810001,
+              "ACTIVITY": 0.09257737,
+              "EXPECTED_RESULT": 0.031711906,
+              "OTHER": 0.050095808
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "REQUIREMENT",
+            "confidence": 0.59022945,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.024426809,
+              "REQUIREMENT": 0.59022945,
+              "ACTIVITY": 0.26458156,
+              "EXPECTED_RESULT": 0.058778945,
+              "OTHER": 0.061983243
+            }
+          },
+          "context": {
+            "label": "ACTIVITY",
+            "confidence": 0.2926336,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.10177991,
+              "REQUIREMENT": 0.19532144,
+              "ACTIVITY": 0.2926336,
+              "EXPECTED_RESULT": 0.11954697,
+              "OTHER": 0.29071805
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E04",
+      "validation_row_1based": 829,
+      "csv_line_1based": 830,
+      "document_id": "PSAI077",
+      "full_text": "Because the proposal studies adaptation from Chinesestrong backbones, Chinese retention must be a first-class target rather than an afterthought.",
+      "old_section": "",
+      "new_section": "2 Theoretical Framing and Related Work > 5 Evaluation Plan",
+      "gold_frozen_reference_label": "REQUIREMENT",
+      "prev_text": "Efficiency metrics such as token fertility, sequence length, vocabulary growth and training or inference cost will be included whenever tokenizer or vocabulary choices are varied.",
+      "next_text": "Related work on multilingual MT robustness shows that robustness can transfer across translation directions but depends on perturbation type, motivating direction-specific stress tests rather than a single aggregate retention score (Pan et al., 2023).",
+      "pos": "0.7796610169491526",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "Because the proposal studies adaptation from Chinesestrong backbones, Chinese retention must be a first-class target rather than an afterthought.",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "2 Theoretical Framing and Related Work > 5 Evaluation Plan",
+      "encoder_previous_tail150": "ken fertility, sequence length, vocabulary growth and training or inference cost will be included whenever tokenizer or vocabulary choices are varied.",
+      "encoder_next_head150": "Related work on multilingual MT robustness shows that robustness can transfer across translation directions but depends on perturbation type, motivati",
+      "observed_pattern": "requirement_rescue_seed42_and_failures_other_seeds",
+      "evidence_note_vi": "C42 sửa lỗi OTHER của B42; C123 vẫn ra OTHER và C2026 ra OBJECTIVE. Text có must nhưng một tín hiệu từ vựng không bảo đảm model chọn REQUIREMENT. Cần người rà nhãn nếu muốn thay nhãn; chưa có phán xử ở đây.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "REQUIREMENT",
+            "confidence": 0.5309376,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.04193012,
+              "REQUIREMENT": 0.5309376,
+              "ACTIVITY": 0.06871612,
+              "EXPECTED_RESULT": 0.10675317,
+              "OTHER": 0.25166303
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.32241753,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.18892805,
+              "REQUIREMENT": 0.21601447,
+              "ACTIVITY": 0.14863546,
+              "EXPECTED_RESULT": 0.1240045,
+              "OTHER": 0.32241753
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "OTHER",
+            "confidence": 0.48904127,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.03385626,
+              "REQUIREMENT": 0.41089094,
+              "ACTIVITY": 0.030095847,
+              "EXPECTED_RESULT": 0.03611573,
+              "OTHER": 0.48904127
+            }
+          },
+          "context": {
+            "label": "REQUIREMENT",
+            "confidence": 0.75665486,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.016597595,
+              "REQUIREMENT": 0.75665486,
+              "ACTIVITY": 0.039850518,
+              "EXPECTED_RESULT": 0.04346929,
+              "OTHER": 0.14342773
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "REQUIREMENT",
+            "confidence": 0.8011578,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.019266276,
+              "REQUIREMENT": 0.8011578,
+              "ACTIVITY": 0.01592067,
+              "EXPECTED_RESULT": 0.040849596,
+              "OTHER": 0.12280574
+            }
+          },
+          "context": {
+            "label": "OBJECTIVE",
+            "confidence": 0.21372406,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.21372406,
+              "REQUIREMENT": 0.17969267,
+              "ACTIVITY": 0.19579393,
+              "EXPECTED_RESULT": 0.2110915,
+              "OTHER": 0.1996978
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E05",
+      "validation_row_1based": 125,
+      "csv_line_1based": 126,
+      "document_id": "PSAI028",
+      "full_text": "If Filecoin can interpolate with Ethereum, it can provide Ethereum layer-2 with lower cost, and it can also increase the demands of storage in the Filecoin network, which benefits the coins, miners, and the ecosystem in general.",
+      "old_section": "",
+      "new_section": "Project Description > Examples of technical challenges:",
+      "gold_frozen_reference_label": "EXPECTED_RESULT",
+      "prev_text": "Needs to examine whether Starkware's FRI is better suit for this purpose.",
+      "next_text": "This research is better done sooner than later, as if any protocol change is indeed necessary for this purpose, it is better to be known soon.",
+      "pos": "0.4",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "If Filecoin can interpolate with Ethereum, it can provide Ethereum layer-2 with lower cost, and it can also increase the demands of storage in the Filecoin network, which benefits the coins, miners, and the ecosystem in general.",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "Project Description > Examples of technical challenges:",
+      "encoder_previous_tail150": "Needs to examine whether Starkware's FRI is better suit for this purpose.",
+      "encoder_next_head150": "This research is better done sooner than later, as if any protocol change is indeed necessary for this purpose, it is better to be known soon.",
+      "observed_pattern": "expected_result_to_other_or_objective",
+      "evidence_note_vi": "Ba baseline và C42 đúng EXPECTED_RESULT; C123 chuyển sang OTHER, C2026 sang OBJECTIVE. Tương quan với Section mới về technical challenges chưa chứng minh Section sai hoặc gây lỗi.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.9072915,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.03183283,
+              "REQUIREMENT": 0.03167473,
+              "ACTIVITY": 0.014675206,
+              "EXPECTED_RESULT": 0.9072915,
+              "OTHER": 0.014525774
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.23597226,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.22231844,
+              "REQUIREMENT": 0.20612893,
+              "ACTIVITY": 0.17620574,
+              "EXPECTED_RESULT": 0.1593746,
+              "OTHER": 0.23597226
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.9472213,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.013982984,
+              "REQUIREMENT": 0.011470132,
+              "ACTIVITY": 0.014737655,
+              "EXPECTED_RESULT": 0.9472213,
+              "OTHER": 0.012587886
+            }
+          },
+          "context": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.8877684,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.029440964,
+              "REQUIREMENT": 0.018660244,
+              "ACTIVITY": 0.025555355,
+              "EXPECTED_RESULT": 0.8877684,
+              "OTHER": 0.038575083
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.9413434,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.015268463,
+              "REQUIREMENT": 0.00924068,
+              "ACTIVITY": 0.014574278,
+              "EXPECTED_RESULT": 0.9413434,
+              "OTHER": 0.01957313
+            }
+          },
+          "context": {
+            "label": "OBJECTIVE",
+            "confidence": 0.2099256,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.2099256,
+              "REQUIREMENT": 0.18356667,
+              "ACTIVITY": 0.19745557,
+              "EXPECTED_RESULT": 0.20606713,
+              "OTHER": 0.202985
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E06",
+      "validation_row_1based": 569,
+      "csv_line_1based": 570,
+      "document_id": "PSAI064",
+      "full_text": "Fortunately, this affects the development almost not at all, and ultimately we will prove that the value relation can be ignored (Lemma 4.5).",
+      "old_section": "",
+      "new_section": "Γ `<sup>I</sup> M : σ e > 4 Contextual Equivalence",
+      "gold_frozen_reference_label": "EXPECTED_RESULT",
+      "prev_text": "This comes into play in the compatibility rule for polymorphic functions because of the value restriction.",
+      "next_text": "Although we define consistency in terms of module termination, it is easy to show that a consistent, compatible relation also preserves term termination.",
+      "pos": "0.5658914728682171",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "Fortunately, this affects the development almost not at all, and ultimately we will prove that the value relation can be ignored (Lemma 4.5).",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "Γ `<sup>I</sup> M : σ e > 4 Contextual Equivalence",
+      "encoder_previous_tail150": "This comes into play in the compatibility rule for polymorphic functions because of the value restriction.",
+      "encoder_next_head150": "Although we define consistency in terms of module termination, it is easy to show that a consistent, compatible relation also preserves term terminati",
+      "observed_pattern": "expected_result_to_other_with_formula_in_section",
+      "evidence_note_vi": "C123/C2026 ra OTHER còn C42 và ba baseline đúng. Section mới chứa ký hiệu công thức và tiêu đề Contextual Equivalence; đây là bất thường văn bản có thể đưa vào hàng chờ rà nguồn, chưa xác minh lỗi PDF/OCR hay lỗi gán heading.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.47140363,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.11325435,
+              "REQUIREMENT": 0.063967414,
+              "ACTIVITY": 0.023568273,
+              "EXPECTED_RESULT": 0.47140363,
+              "OTHER": 0.32780632
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.24487773,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.21840793,
+              "REQUIREMENT": 0.20935917,
+              "ACTIVITY": 0.17291684,
+              "EXPECTED_RESULT": 0.15443839,
+              "OTHER": 0.24487773
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.93819934,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.013248748,
+              "REQUIREMENT": 0.011017116,
+              "ACTIVITY": 0.012965671,
+              "EXPECTED_RESULT": 0.93819934,
+              "OTHER": 0.024569126
+            }
+          },
+          "context": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.57027197,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.029111952,
+              "REQUIREMENT": 0.029106615,
+              "ACTIVITY": 0.03629148,
+              "EXPECTED_RESULT": 0.57027197,
+              "OTHER": 0.33521795
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.90689087,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.0152036045,
+              "REQUIREMENT": 0.014135246,
+              "ACTIVITY": 0.017368957,
+              "EXPECTED_RESULT": 0.90689087,
+              "OTHER": 0.046401285
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.2234473,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.18755811,
+              "REQUIREMENT": 0.19306137,
+              "ACTIVITY": 0.2077829,
+              "EXPECTED_RESULT": 0.18815035,
+              "OTHER": 0.2234473
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E07",
+      "validation_row_1based": 198,
+      "csv_line_1based": 199,
+      "document_id": "PSAI033",
+      "full_text": "This feature-set allows any software to be distributed with NEAR + IPFS/Filecoin, not just the core protocol tooling, so any developer in the ecosystem can leverage this for their packages.",
+      "old_section": "",
+      "new_section": "Project Description",
+      "gold_frozen_reference_label": "EXPECTED_RESULT",
+      "prev_text": "This further decentralizes the process for Nearcore Planned Updates.",
+      "next_text": "A NEAR-native, AssemblyScript package registry smart contract that provides role-based access control, package namespacing, and versioning.",
+      "pos": "0.1566265060240964",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "This feature-set allows any software to be distributed with NEAR + IPFS/Filecoin, not just the core protocol tooling, so any developer in the ecosystem can leverage this for their packages.",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "Project Description",
+      "encoder_previous_tail150": "This further decentralizes the process for Nearcore Planned Updates.",
+      "encoder_next_head150": "A NEAR-native, AssemblyScript package registry smart contract that provides role-based access control, package namespacing, and versioning.",
+      "observed_pattern": "expected_result_activity_other_confusion",
+      "evidence_note_vi": "Ba baseline và C42 đúng; C123 ra ACTIVITY, C2026 ra OTHER. Text mô tả khả năng/phạm vi sử dụng trong khi câu kế tiếp bắt đầu một sản phẩm bàn giao. Chưa xác định phần ngữ cảnh nào chi phối model.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.90841955,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.035023443,
+              "REQUIREMENT": 0.027761409,
+              "ACTIVITY": 0.012067657,
+              "EXPECTED_RESULT": 0.90841955,
+              "OTHER": 0.0167279
+            }
+          },
+          "context": {
+            "label": "ACTIVITY",
+            "confidence": 0.33638933,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.17893998,
+              "REQUIREMENT": 0.10842196,
+              "ACTIVITY": 0.33638933,
+              "EXPECTED_RESULT": 0.29366946,
+              "OTHER": 0.082579285
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.947891,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.013154655,
+              "REQUIREMENT": 0.0102595305,
+              "ACTIVITY": 0.01147851,
+              "EXPECTED_RESULT": 0.947891,
+              "OTHER": 0.017216276
+            }
+          },
+          "context": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.8054626,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.029614575,
+              "REQUIREMENT": 0.02048547,
+              "ACTIVITY": 0.024515074,
+              "EXPECTED_RESULT": 0.8054626,
+              "OTHER": 0.11992228
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.8501611,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.031629927,
+              "REQUIREMENT": 0.012364981,
+              "ACTIVITY": 0.018306417,
+              "EXPECTED_RESULT": 0.8501611,
+              "OTHER": 0.087537676
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.29031116,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.11480217,
+              "REQUIREMENT": 0.20465252,
+              "ACTIVITY": 0.25179648,
+              "EXPECTED_RESULT": 0.13843767,
+              "OTHER": 0.29031116
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E08",
+      "validation_row_1based": 200,
+      "csv_line_1based": 201,
+      "document_id": "PSAI033",
+      "full_text": "A Golang SDK for the RPC APIs will be developed to enable Valist to support the protocol.",
+      "old_section": "",
+      "new_section": "Project Description > Deliverables",
+      "gold_frozen_reference_label": "EXPECTED_RESULT",
+      "prev_text": "A NEAR-native, AssemblyScript package registry smart contract that provides role-based access control, package namespacing, and versioning.",
+      "next_text": "This can become a near-api-go implementation, and has the potential to bring many Go developers into the NEAR ecosystem.",
+      "pos": "0.18072289156626506",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "A Golang SDK for the RPC APIs will be developed to enable Valist to support the protocol.",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "Project Description > Deliverables",
+      "encoder_previous_tail150": "A NEAR-native, AssemblyScript package registry smart contract that provides role-based access control, package namespacing, and versioning.",
+      "encoder_next_head150": "This can become a near-api-go implementation, and has the potential to bring many Go developers into the NEAR ecosystem.",
+      "observed_pattern": "seed42_expected_result_rescue",
+      "evidence_note_vi": "Ba baseline ra ACTIVITY, C42 ra EXPECTED_RESULT theo nhãn đóng băng; C123 giữ ACTIVITY, C2026 ra OTHER. Cấu trúc will be developed có thể khiến người đọc cân nhắc hai loại nhãn, nhưng đây là yêu cầu rà nhãn có thể có, không phải kết luận nhãn gold sai.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "ACTIVITY",
+            "confidence": 0.8461224,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.07642174,
+              "REQUIREMENT": 0.029024538,
+              "ACTIVITY": 0.8461224,
+              "EXPECTED_RESULT": 0.030479291,
+              "OTHER": 0.017952008
+            }
+          },
+          "context": {
+            "label": "ACTIVITY",
+            "confidence": 0.37313336,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.15899408,
+              "REQUIREMENT": 0.10497459,
+              "ACTIVITY": 0.37313336,
+              "EXPECTED_RESULT": 0.28483486,
+              "OTHER": 0.078063145
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "ACTIVITY",
+            "confidence": 0.6953009,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.18343374,
+              "REQUIREMENT": 0.02529189,
+              "ACTIVITY": 0.6953009,
+              "EXPECTED_RESULT": 0.05804696,
+              "OTHER": 0.037926536
+            }
+          },
+          "context": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.37501234,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.20863254,
+              "REQUIREMENT": 0.021344014,
+              "ACTIVITY": 0.36585042,
+              "EXPECTED_RESULT": 0.37501234,
+              "OTHER": 0.029160706
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "ACTIVITY",
+            "confidence": 0.9308432,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.016494375,
+              "REQUIREMENT": 0.011767521,
+              "ACTIVITY": 0.9308432,
+              "EXPECTED_RESULT": 0.019823497,
+              "OTHER": 0.0210714
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.30245897,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.09898481,
+              "REQUIREMENT": 0.20424385,
+              "ACTIVITY": 0.27565584,
+              "EXPECTED_RESULT": 0.11865659,
+              "OTHER": 0.30245897
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E09",
+      "validation_row_1based": 135,
+      "csv_line_1based": 136,
+      "document_id": "PSAI028",
+      "full_text": "The deliverables would sufficiently cover the state-of-the-arts techniques regarding zk-Rollup and zkSNARK, so it can serve as a good systematization of knowledge.",
+      "old_section": "",
+      "new_section": "Project Description > Deliverables > Development Roadmap",
+      "gold_frozen_reference_label": "EXPECTED_RESULT",
+      "prev_text": "In total 14 weeks, slightly exceeding 3 months.",
+      "next_text": "Specifically:",
+      "pos": "0.6222222222222222",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "The deliverables would sufficiently cover the state-of-the-arts techniques regarding zk-Rollup and zkSNARK, so it can serve as a good systematization of knowledge.",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "Project Description > Deliverables > Development Roadmap",
+      "encoder_previous_tail150": "In total 14 weeks, slightly exceeding 3 months.",
+      "encoder_next_head150": "Specifically:",
+      "observed_pattern": "expected_result_other_and_seed42_rescue",
+      "evidence_note_vi": "C42 sửa OTHER của B42 thành EXPECTED_RESULT; C123 chuyển dự đoán đúng của B123 sang OTHER, B2026/C2026 cùng OTHER. Cùng Section mới có cả kết quả cải thiện lẫn suy giảm giữa các seed.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.8178991,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.01952954,
+              "REQUIREMENT": 0.12275647,
+              "ACTIVITY": 0.019054892,
+              "EXPECTED_RESULT": 0.8178991,
+              "OTHER": 0.020759974
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.41293994,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.14260109,
+              "REQUIREMENT": 0.22709975,
+              "ACTIVITY": 0.122840576,
+              "EXPECTED_RESULT": 0.09451866,
+              "OTHER": 0.41293994
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "OTHER",
+            "confidence": 0.6678949,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.040277913,
+              "REQUIREMENT": 0.04000856,
+              "ACTIVITY": 0.15580212,
+              "EXPECTED_RESULT": 0.09601653,
+              "OTHER": 0.6678949
+            }
+          },
+          "context": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.53652775,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.02424662,
+              "REQUIREMENT": 0.032173496,
+              "ACTIVITY": 0.03234467,
+              "EXPECTED_RESULT": 0.53652775,
+              "OTHER": 0.37470746
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "OTHER",
+            "confidence": 0.788889,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.033582,
+              "REQUIREMENT": 0.05023768,
+              "ACTIVITY": 0.027672464,
+              "EXPECTED_RESULT": 0.09961881,
+              "OTHER": 0.788889
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.3155229,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.082052656,
+              "REQUIREMENT": 0.20450793,
+              "ACTIVITY": 0.2949319,
+              "EXPECTED_RESULT": 0.10298457,
+              "OTHER": 0.3155229
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E10",
+      "validation_row_1based": 45,
+      "csv_line_1based": 46,
+      "document_id": "PSAI017",
+      "full_text": "Adding comprehensive and consistent tags is a key part of developing a training dataset for machine learning.",
+      "old_section": "",
+      "new_section": "Project Description",
+      "gold_frozen_reference_label": "OTHER",
+      "prev_text": "This metadata usually takes the form of tags, which can be added to any type of data, including text, images, and video.",
+      "next_text": "Deep learning data annotation is the next 100Billion dollar market, it is a pretty mature market in China and india.",
+      "pos": "0.06896551724137931",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "Adding comprehensive and consistent tags is a key part of developing a training dataset for machine learning.",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "Project Description",
+      "encoder_previous_tail150": "This metadata usually takes the form of tags, which can be added to any type of data, including text, images, and video.",
+      "encoder_next_head150": "Deep learning data annotation is the next 100Billion dollar market, it is a pretty mature market in China and india.",
+      "observed_pattern": "other_to_expected_result_regression_seed42",
+      "evidence_note_vi": "C42 ra EXPECTED_RESULT dù ba baseline và C123/C2026 đều OTHER. Đây là một lỗi mới của run context tốt nhất; không thể mô tả context42 là cải thiện mọi câu.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "OTHER",
+            "confidence": 0.9093426,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.025730683,
+              "REQUIREMENT": 0.020155178,
+              "ACTIVITY": 0.021928117,
+              "EXPECTED_RESULT": 0.02284352,
+              "OTHER": 0.9093426
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.24335001,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.21920392,
+              "REQUIREMENT": 0.20737685,
+              "ACTIVITY": 0.17457671,
+              "EXPECTED_RESULT": 0.15549259,
+              "OTHER": 0.24335001
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "OTHER",
+            "confidence": 0.88139385,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.035397906,
+              "REQUIREMENT": 0.029146705,
+              "ACTIVITY": 0.033889618,
+              "EXPECTED_RESULT": 0.020171998,
+              "OTHER": 0.88139385
+            }
+          },
+          "context": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.4240939,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.058551144,
+              "REQUIREMENT": 0.09900781,
+              "ACTIVITY": 0.13101394,
+              "EXPECTED_RESULT": 0.4240939,
+              "OTHER": 0.28733316
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "OTHER",
+            "confidence": 0.76664984,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.045289945,
+              "REQUIREMENT": 0.05294931,
+              "ACTIVITY": 0.09464491,
+              "EXPECTED_RESULT": 0.04046611,
+              "OTHER": 0.76664984
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.20690013,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.2054366,
+              "REQUIREMENT": 0.18526247,
+              "ACTIVITY": 0.19849077,
+              "EXPECTED_RESULT": 0.20391001,
+              "OTHER": 0.20690013
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E11",
+      "validation_row_1based": 290,
+      "csv_line_1based": 291,
+      "document_id": "PSAI052",
+      "full_text": "With a sharply decreasing weight function, we can find rank-maximal matchings, which match the maximum number of agents to their first choice, and subject to this, the maximum number to their second choice, and so on",
+      "old_section": "",
+      "new_section": "1 Introduction > 2.1 Static Objective Functions",
+      "gold_frozen_reference_label": "OTHER",
+      "prev_text": "A matching algorithm selects a matching based on the preferences of agents over outcomes",
+      "next_text": "There has been some nice recent work on finding faster algorithms for these objectives",
+      "pos": "0.07692307692307693",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "With a sharply decreasing weight function, we can find rank-maximal matchings, which match the maximum number of agents to their first choice, and subject to this, the maximum number to their second choice, and so on",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "1 Introduction > 2.1 Static Objective Functions",
+      "encoder_previous_tail150": "A matching algorithm selects a matching based on the preferences of agents over outcomes",
+      "encoder_next_head150": "There has been some nice recent work on finding faster algorithms for these objectives",
+      "observed_pattern": "other_to_objective_or_expected_result",
+      "evidence_note_vi": "Ba baseline đúng OTHER; C123/C2026 ra OBJECTIVE, C42 ra EXPECTED_RESULT. Text mô tả cơ chế matching trong phần Static Objective Functions. Từ objective trong heading là dấu hiệu cần xem xét, chưa chứng minh gây lệch nhãn.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "OTHER",
+            "confidence": 0.46904358,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.06849183,
+              "REQUIREMENT": 0.13427818,
+              "ACTIVITY": 0.22137971,
+              "EXPECTED_RESULT": 0.106806725,
+              "OTHER": 0.46904358
+            }
+          },
+          "context": {
+            "label": "OBJECTIVE",
+            "confidence": 0.24550761,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.24550761,
+              "REQUIREMENT": 0.1862535,
+              "ACTIVITY": 0.20993097,
+              "EXPECTED_RESULT": 0.21229063,
+              "OTHER": 0.1460173
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "OTHER",
+            "confidence": 0.912259,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.026191575,
+              "REQUIREMENT": 0.016416464,
+              "ACTIVITY": 0.014098801,
+              "EXPECTED_RESULT": 0.031034155,
+              "OTHER": 0.912259
+            }
+          },
+          "context": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.8171208,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.023171302,
+              "REQUIREMENT": 0.019877387,
+              "ACTIVITY": 0.029895997,
+              "EXPECTED_RESULT": 0.8171208,
+              "OTHER": 0.109934516
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "OTHER",
+            "confidence": 0.9106421,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.023497568,
+              "REQUIREMENT": 0.013329126,
+              "ACTIVITY": 0.01644796,
+              "EXPECTED_RESULT": 0.036083236,
+              "OTHER": 0.9106421
+            }
+          },
+          "context": {
+            "label": "OBJECTIVE",
+            "confidence": 0.21641354,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.21641354,
+              "REQUIREMENT": 0.1796482,
+              "ACTIVITY": 0.19650963,
+              "EXPECTED_RESULT": 0.21026109,
+              "OTHER": 0.19716753
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E12",
+      "validation_row_1based": 386,
+      "csv_line_1based": 387,
+      "document_id": "PSAI056",
+      "full_text": "A computer vision (CV) module will be implemented to detect the location of physical checker pieces placed on the screen.",
+      "old_section": "",
+      "new_section": "Computer Vision",
+      "gold_frozen_reference_label": "ACTIVITY",
+      "prev_text": "Block Diagram",
+      "next_text": "The module interacts with inputs from the NTSC camera and the central game logic module.",
+      "pos": "0.2391304347826087",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "A computer vision (CV) module will be implemented to detect the location of physical checker pieces placed on the screen.",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "Computer Vision",
+      "encoder_previous_tail150": "Block Diagram",
+      "encoder_next_head150": "The module interacts with inputs from the NTSC camera and the central game logic module.",
+      "observed_pattern": "activity_to_objective_or_other",
+      "evidence_note_vi": "Ba baseline và C42 đúng ACTIVITY; C123 ra OBJECTIVE, C2026 ra OTHER. Text về module CV và neighbors được giữ nguyên; Section được bổ sung Computer Vision. Chưa có bằng chứng lỗi tách PDF.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "ACTIVITY",
+            "confidence": 0.9162062,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.029747108,
+              "REQUIREMENT": 0.02125114,
+              "ACTIVITY": 0.9162062,
+              "EXPECTED_RESULT": 0.014155234,
+              "OTHER": 0.018640324
+            }
+          },
+          "context": {
+            "label": "OBJECTIVE",
+            "confidence": 0.24300893,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.24300893,
+              "REQUIREMENT": 0.17829017,
+              "ACTIVITY": 0.22295353,
+              "EXPECTED_RESULT": 0.22847389,
+              "OTHER": 0.12727347
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "ACTIVITY",
+            "confidence": 0.92609096,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.019977646,
+              "REQUIREMENT": 0.013918662,
+              "ACTIVITY": 0.92609096,
+              "EXPECTED_RESULT": 0.025115011,
+              "OTHER": 0.014897716
+            }
+          },
+          "context": {
+            "label": "ACTIVITY",
+            "confidence": 0.8166284,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.044819914,
+              "REQUIREMENT": 0.02857118,
+              "ACTIVITY": 0.8166284,
+              "EXPECTED_RESULT": 0.08568811,
+              "OTHER": 0.024292314
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "ACTIVITY",
+            "confidence": 0.92796665,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.016648374,
+              "REQUIREMENT": 0.012473701,
+              "ACTIVITY": 0.92796665,
+              "EXPECTED_RESULT": 0.01872043,
+              "OTHER": 0.02419077
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.3072844,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.077345125,
+              "REQUIREMENT": 0.20988093,
+              "ACTIVITY": 0.30508214,
+              "EXPECTED_RESULT": 0.10040737,
+              "OTHER": 0.3072844
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E13",
+      "validation_row_1based": 111,
+      "csv_line_1based": 112,
+      "document_id": "PSAI028",
+      "full_text": "This project is to explore the technical designs for it.",
+      "old_section": "",
+      "new_section": "Project Description",
+      "gold_frozen_reference_label": "OBJECTIVE",
+      "prev_text": "Putting data on layer-1, which is the standard solution for data availability, is very expensive.",
+      "next_text": "The goal is to enable a zk-Rollup layer-2 to prove that certain data has been stored on Filecoin.",
+      "pos": "0.08888888888888889",
+      "section_changed": true,
+      "encoder_text_before_token_truncation": "This project is to explore the technical designs for it.",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "Project Description",
+      "encoder_previous_tail150": "Putting data on layer-1, which is the standard solution for data availability, is very expensive.",
+      "encoder_next_head150": "The goal is to enable a zk-Rollup layer-2 to prove that certain data has been stored on Filecoin.",
+      "observed_pattern": "objective_to_other",
+      "evidence_note_vi": "Ba baseline và C42 đúng OBJECTIVE; C123/C2026 ra OTHER. Câu kế tiếp có The goal; neighbors không đổi trong cặp so sánh. Không có thí nghiệm riêng bỏ Section hoặc neighbors trong phân tích này.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "OBJECTIVE",
+            "confidence": 0.9038177,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.9038177,
+              "REQUIREMENT": 0.012612597,
+              "ACTIVITY": 0.04749335,
+              "EXPECTED_RESULT": 0.0238058,
+              "OTHER": 0.012270551
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.31631166,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.18916938,
+              "REQUIREMENT": 0.21924563,
+              "ACTIVITY": 0.15071106,
+              "EXPECTED_RESULT": 0.1245623,
+              "OTHER": 0.31631166
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "OBJECTIVE",
+            "confidence": 0.9454636,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.9454636,
+              "REQUIREMENT": 0.009510899,
+              "ACTIVITY": 0.015451389,
+              "EXPECTED_RESULT": 0.015461221,
+              "OTHER": 0.014112868
+            }
+          },
+          "context": {
+            "label": "OBJECTIVE",
+            "confidence": 0.86750156,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.86750156,
+              "REQUIREMENT": 0.025891542,
+              "ACTIVITY": 0.03535553,
+              "EXPECTED_RESULT": 0.04547424,
+              "OTHER": 0.025777182
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "OBJECTIVE",
+            "confidence": 0.9351169,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.9351169,
+              "REQUIREMENT": 0.015220133,
+              "ACTIVITY": 0.01822298,
+              "EXPECTED_RESULT": 0.010519017,
+              "OTHER": 0.020920975
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.2650497,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.1373598,
+              "REQUIREMENT": 0.20771968,
+              "ACTIVITY": 0.2371883,
+              "EXPECTED_RESULT": 0.1526825,
+              "OTHER": 0.2650497
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E14",
+      "validation_row_1based": 903,
+      "csv_line_1based": 904,
+      "document_id": "PSAI102",
+      "full_text": "RQ3: What is the impact of diverse raters on the amount of data needed for reproducibility?",
+      "old_section": "",
+      "new_section": "",
+      "gold_frozen_reference_label": "OBJECTIVE",
+      "prev_text": "RQ2: How do we optimize the allocation of a fixed human annotation budget for reproducible evaluation?",
+      "next_text": "In the case of LLMs, humans continue to play a vital role in all stages of their development.",
+      "pos": "0.2",
+      "section_changed": false,
+      "encoder_text_before_token_truncation": "RQ3: What is the impact of diverse raters on the amount of data needed for reproducibility?",
+      "encoder_old_section_tail120": "",
+      "encoder_new_section_tail120": "",
+      "encoder_previous_tail150": "RQ2: How do we optimize the allocation of a fixed human annotation budget for reproducible evaluation?",
+      "encoder_next_head150": "In the case of LLMs, humans continue to play a vital role in all stages of their development.",
+      "observed_pattern": "objective_failure_with_unchanged_empty_section",
+      "evidence_note_vi": "Section vẫn trống trong cả hai biến thể. Ba baseline và C42 đúng OBJECTIVE; C123 ra OTHER, C2026 ra EXPECTED_RESULT. Loại trừ phát biểu rằng lỗi của riêng câu này đến từ Section validation bị thay; khác biệt model sau huấn luyện vẫn chưa được phân rã.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "OBJECTIVE",
+            "confidence": 0.92027104,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.92027104,
+              "REQUIREMENT": 0.012826477,
+              "ACTIVITY": 0.016989876,
+              "EXPECTED_RESULT": 0.023251675,
+              "OTHER": 0.02666094
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.28562623,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.20071682,
+              "REQUIREMENT": 0.21809623,
+              "ACTIVITY": 0.15987809,
+              "EXPECTED_RESULT": 0.1356826,
+              "OTHER": 0.28562623
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "OBJECTIVE",
+            "confidence": 0.9502257,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.9502257,
+              "REQUIREMENT": 0.008556799,
+              "ACTIVITY": 0.012664022,
+              "EXPECTED_RESULT": 0.015229471,
+              "OTHER": 0.0133238975
+            }
+          },
+          "context": {
+            "label": "OBJECTIVE",
+            "confidence": 0.8735211,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.8735211,
+              "REQUIREMENT": 0.020814633,
+              "ACTIVITY": 0.0314965,
+              "EXPECTED_RESULT": 0.05117524,
+              "OTHER": 0.022992538
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "OBJECTIVE",
+            "confidence": 0.9421527,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.9421527,
+              "REQUIREMENT": 0.013161968,
+              "ACTIVITY": 0.0131263,
+              "EXPECTED_RESULT": 0.016963268,
+              "OTHER": 0.014595776
+            }
+          },
+          "context": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.20616561,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.20570225,
+              "REQUIREMENT": 0.18321593,
+              "ACTIVITY": 0.19950873,
+              "EXPECTED_RESULT": 0.20616561,
+              "OTHER": 0.20540747
+            }
+          }
+        }
+      }
+    },
+    {
+      "case_id": "E15",
+      "validation_row_1based": 1190,
+      "csv_line_1based": 1191,
+      "document_id": "PSAI137",
+      "full_text": "This approach allows to distribute the model across multiple GPUs, enabling large-scale simulations without being limited by the memory of a single GPU.",
+      "old_section": "PROPOSAL FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Implementation:",
+      "new_section": "PROPOSAL FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Implementation:",
+      "gold_frozen_reference_label": "EXPECTED_RESULT",
+      "prev_text": "One of the ways of implementing this is to use a hybrid approach that combines MPI (Message Passing Interface) with CUDA-aware MPI for domain decomposition and memory sharing.",
+      "next_text": "Here's a general flowchart of the process:",
+      "pos": "0.6174496644295302",
+      "section_changed": false,
+      "encoder_text_before_token_truncation": "This approach allows to distribute the model across multiple GPUs, enabling large-scale simulations without being limited by the memory of a single GPU.",
+      "encoder_old_section_tail120": "PROPOSAL FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Implementation:",
+      "encoder_new_section_tail120": "PROPOSAL FOR GSoC 2023 > Title: Multi-GPU model execution Organization : gprMax > Personal Information > Implementation:",
+      "encoder_previous_tail150": "enting this is to use a hybrid approach that combines MPI (Message Passing Interface) with CUDA-aware MPI for domain decomposition and memory sharing.",
+      "encoder_next_head150": "Here's a general flowchart of the process:",
+      "observed_pattern": "expected_result_failure_with_unchanged_nonempty_section",
+      "evidence_note_vi": "Section dài và không đổi; ba baseline/C42 đúng EXPECTED_RESULT, C123 ra ACTIVITY, C2026 ra OTHER. Đây là lỗi trên input không đổi, nhất quán với khác biệt model giữa hai biến thể, chưa xác định cơ chế huấn luyện.",
+      "cause_classification": {
+        "observed": "saved_model_output_and_input_metadata",
+        "direct_section_or_neighbor_causation": "unverified",
+        "pdf_or_ocr_or_segmentation_error": "unverified",
+        "reference_label_error": "unverified"
+      },
+      "predictions": {
+        "123": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.902739,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.04521779,
+              "REQUIREMENT": 0.022990799,
+              "ACTIVITY": 0.016805047,
+              "EXPECTED_RESULT": 0.902739,
+              "OTHER": 0.012247294
+            }
+          },
+          "context": {
+            "label": "ACTIVITY",
+            "confidence": 0.3133897,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.19356765,
+              "REQUIREMENT": 0.11951642,
+              "ACTIVITY": 0.3133897,
+              "EXPECTED_RESULT": 0.28641567,
+              "OTHER": 0.087110594
+            }
+          }
+        },
+        "42": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.9382387,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.01338138,
+              "REQUIREMENT": 0.012839603,
+              "ACTIVITY": 0.013206979,
+              "EXPECTED_RESULT": 0.9382387,
+              "OTHER": 0.022333449
+            }
+          },
+          "context": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.8735908,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.023938969,
+              "REQUIREMENT": 0.018534191,
+              "ACTIVITY": 0.01903842,
+              "EXPECTED_RESULT": 0.8735908,
+              "OTHER": 0.06489757
+            }
+          }
+        },
+        "2026": {
+          "baseline": {
+            "label": "EXPECTED_RESULT",
+            "confidence": 0.928502,
+            "correct_against_frozen_reference": true,
+            "probabilities": {
+              "OBJECTIVE": 0.03315845,
+              "REQUIREMENT": 0.007096912,
+              "ACTIVITY": 0.0149672795,
+              "EXPECTED_RESULT": 0.928502,
+              "OTHER": 0.016275395
+            }
+          },
+          "context": {
+            "label": "OTHER",
+            "confidence": 0.20825928,
+            "correct_against_frozen_reference": false,
+            "probabilities": {
+              "OBJECTIVE": 0.20467532,
+              "REQUIREMENT": 0.18554391,
+              "ACTIVITY": 0.20249401,
+              "EXPECTED_RESULT": 0.1990275,
+              "OTHER": 0.20825928
+            }
+          }
+        }
+      }
+    }
+  ],
+  "source_sha256": {
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_123/validation_predictions.csv": "034c0a0a9faccca324004e609706dd44b6a178b6ed7896dc50f617d299fe6ea7",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_123/validation_metrics.json": "aded84f266d672d3402ea729c5bd40ad95aecef11219f337c553e95720225f14",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_123/validation_confusion.csv": "7db21d4662cedda680d24be56cec6b8b302bfbcd1e177e9d0c9b78d5c4674e12",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_123/provenance.json": "28837e3ed08476470367a36c2e55fcd836932376fedf3d139cbcdf1a7ed06e19",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_123/checkpoints/checkpoint-1235/trainer_state.json": "bbd4c7f951901517dbe3e6d718b41bb37736eb68e9d908ba08bb31b8e42f1c03",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_123/validation_predictions.csv": "a890351be204ffccd0a26d9a946ff0d3a6bab85f93facf80e9e1958251773eb3",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_123/validation_metrics.json": "94bf7e34d80e09ef3e8bd2eb52194e187f0848405da7d3c13d746a242fe913f3",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_123/validation_confusion.csv": "fa4f8061b5f1d896080da7de7ef997372e20d45989b7ad9ebe97d9a4982cb204",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_123/provenance.json": "09dd10bf25bb9601b67cefa8d2983e300ba91a6e3375e22c4df0c41bb040c5e3",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_123/checkpoints/checkpoint-1235/trainer_state.json": "52cf522b1a70805acb0bf53fb539d1e09a67c4a4270356f2ceaa9c4261fc8a02",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_42/validation_predictions.csv": "a56c409144b6c5e11a6ca7e8566da2272e110d313a3e38b912db905fa8a4ce09",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_42/validation_metrics.json": "ff1974de7ebbc169c89d83ed38f5eddeb190f54b1acc0cb2276b537e6c8dd018",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_42/validation_confusion.csv": "62914c15a7a6421b72f602a4e39bf55e0b4157bcef06d0273da2c88bb6bcc09f",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_42/provenance.json": "6f119344f49de9bd9025529cd85ac0573b96a7b093ca052cff6315d8a7e4a3ad",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_42/checkpoints/checkpoint-1235/trainer_state.json": "d07393e1ee892b6cc87afd98f5d945989ee54cbb94d4ba806d3ce32537801985",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_42/validation_predictions.csv": "6b93ad3a9abff0704b90c1830aca811a43ccb52f05bd6c97f0fb46e55baa66df",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_42/validation_metrics.json": "35bd1a5a6874d3db65b96b86d2bf9e40960c927f9044abdac6eb935e4a07e179",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_42/validation_confusion.csv": "f4cb9f6d93d52867389b9761d71314f7b63723bf290219d0206aa1ffe0b161e1",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_42/provenance.json": "085b84cc121dda71b6004cbe2121756e0546594d1356087e4eb8001c02e45083",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_42/checkpoints/checkpoint-1235/trainer_state.json": "a5114ebfac2d13e8793fca1bdf34cd153211babf178bccd8a7a78d2c9f57ce92",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_2026/validation_predictions.csv": "dca0fe40e18ea33179f54cd8fb5e5fbbbb16109e141b6345f068011ac02dac9d",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_2026/validation_metrics.json": "73ee8fed03c0a2c49422635839d19d89d823515691de6f53bf22b4de95f75bf7",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_2026/validation_confusion.csv": "b6f759a7f02977d5f4ad71d4101245eceb2d790b3eb7dedb34d30b7fba244e2f",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_2026/provenance.json": "d7cf98450d5b3e853ff8997f56b1d89e50926e37915b30911fbb66f2b8879653",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/baseline_seed_2026/checkpoints/checkpoint-1235/trainer_state.json": "94fd64fa69cafc2506142bf2f7ea1b8f7b4c2c26f227ab0db36686051a32c04e",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_2026/validation_predictions.csv": "8156c1e040b20a09bdc3e5afa67840dae69d6b63130cf64877e9e173416c1e24",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_2026/validation_metrics.json": "733cd5ebb4a9acb20a322a12b93af5893fea7a26dc450a816b9c45a8250263cc",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_2026/validation_confusion.csv": "068af34603c554a844d4e2079bd44f09c0739569f067ead341df8ed4c8dae9fb",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_2026/provenance.json": "3057b9c9ba9ef2764ce6437b61f54819fa80a9f329cac0e952ee4627a1469bc1",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiments/context_seed_2026/checkpoints/checkpoint-1235/trainer_state.json": "0682dd33495e9de3b2926b2c8882a39bd3c55ec25beab9702596172b1b9df6bc",
+    "reports/research_review/studies/user_labels_v1/dataset_revision.json": "e7c74f512ef13a53e7ce90a0cddb48ff8542681d95798e65de06116302c8acfe",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/experiment_plan.json": "ba5fee3195fb34bfafbee6a0f1f658fb47773959037b529e95ca194ab26c0c42",
+    "reports/research_review/studies/classifier_source_clean_context_study_v1/source_snapshot/study_inputs.py": "5d631de18f473955dc1b9a1720a6b644d281392cf472a7d93a1067c3706dcfd3"
+  }
+}

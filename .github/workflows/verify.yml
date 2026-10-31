@@ -1,0 +1,45 @@
+name: Runnable demo and extension
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fast-demo:
+    name: Python ${{ matrix.python }} - no model downloads
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.13']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Backend integration tests (Python standard library)
+        run: python -m unittest discover -s tests -p test_extension_backend.py -v
+      - name: Extension logic tests
+        run: node --test extension/psai/tests/core.test.mjs
+      - name: Extension JavaScript syntax
+        run: |
+          node --check extension/psai/app.mjs
+          node --check extension/psai/core.mjs
+          node --check extension/psai/service_worker.js
+      - name: Actual CLI and authenticated API in an empty source-only venv
+        run: python tools/verify_clean_clone.py --output outputs/ci_clean_clone
+      - name: Preserve smoke logs and source-bound reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clean-clone-python-${{ matrix.python }}
+          path: outputs/ci_clean_clone
+          if-no-files-found: ignore
+          retention-days: 7

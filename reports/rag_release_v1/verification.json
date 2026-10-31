@@ -1,0 +1,17 @@
+{
+  "checked_utc": "2026-10-29T02:48:05.080398+00:00",
+  "unit_test_command": ".venv/psai_runtime/Scripts/python.exe -m unittest discover -p test_*.py",
+  "unit_test_count": 193,
+  "unit_test_status": "passed",
+  "review_javascript_syntax": "node --check passed",
+  "pdf_functional_smoke": "outputs/rag_ready/pdf_demo_20261029T024803Z_tfn00lwz/smoke_receipt.json",
+  "hybrid_adapter_reranker_functional_demo": "outputs/rag_ready/release_demo_v1_1/analysis.json",
+  "runtime_release_verification": "36 file hashes and unchanged source adapter weights verified",
+  "final_test_scored": false,
+  "human_relevance_complete": false,
+  "functional_checks_are_not_quality_evaluation": true,
+  "actual_model_acceptance_receipt": "reports/rag_release_v1/model_runtime_smoke.json",
+  "release_version": "rag-runtime-1.1",
+  "post_source_export_fix_tests": "193 passed in 10.375 seconds",
+  "exact_utf8_source_export_regression": "Covered in tests.test_psai_completion"
+}

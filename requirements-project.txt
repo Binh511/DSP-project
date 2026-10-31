@@ -1,0 +1,4 @@
+# Full local runtime; native Windows OCR does not require RapidOCR/PDFium.
+-r requirements-rag.txt
+Pillow==12.0.0
+# Optional non-Windows OCR dependencies are listed in psai_ocr/requirements.txt.

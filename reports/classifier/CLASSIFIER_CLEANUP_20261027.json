@@ -1,0 +1,104 @@
+﻿{
+    "deleted_intermediate_checkpoints":  [
+                                             {
+                                                 "run":  "baseline_seed_123",
+                                                 "path":  "D:\\DSP_PROJECT\\DSP_PROJECT\\reports\\research_review\\studies\\classifier_source_clean_context_study_v1\\experiments\\baseline_seed_123\\checkpoints\\checkpoint-988",
+                                                 "retained":  "D:\\DSP_PROJECT\\DSP_PROJECT\\reports\\research_review\\studies\\classifier_source_clean_context_study_v1\\experiments\\baseline_seed_123\\checkpoints\\checkpoint-1235",
+                                                 "bytes":  3362014459
+                                             },
+                                             {
+                                                 "run":  "context_seed_123",
+                                                 "path":  "D:\\DSP_PROJECT\\DSP_PROJECT\\reports\\research_review\\studies\\classifier_source_clean_context_study_v1\\experiments\\context_seed_123\\checkpoints\\checkpoint-988",
+                                                 "retained":  "D:\\DSP_PROJECT\\DSP_PROJECT\\reports\\research_review\\studies\\classifier_source_clean_context_study_v1\\experiments\\context_seed_123\\checkpoints\\checkpoint-1235",
+                                                 "bytes":  3362014467
+                                             },
+                                             {
+                                                 "run":  "baseline_seed_42",
+                                                 "path":  "D:\\DSP_PROJECT\\DSP_PROJECT\\reports\\research_review\\studies\\classifier_source_clean_context_study_v1\\experiments\\baseline_seed_42\\checkpoints\\checkpoint-988",
+                                                 "retained":  "D:\\DSP_PROJECT\\DSP_PROJECT\\reports\\research_review\\studies\\classifier_source_clean_context_study_v1\\experiments\\baseline_seed_42\\checkpoints\\checkpoint-1235",
+                                                 "bytes":  3362014397
+                                             }
+                                         ],
+    "archived_sources":  [
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\kfold_step5.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\kfold_step5.py",
+                                 "sha256":  "ca513f8eb57d1209998f19bb92c8eb7e403d3ece66d5e278c1b8e73f6b47da61"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\kfold_step6.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\kfold_step6.py",
+                                 "sha256":  "6f913c265faabd0290658c8687e94faa0c8105b3e66ea1bfa5d30b3fdba601c2"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\kfold_step7.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\kfold_step7.py",
+                                 "sha256":  "4318064fceb72de5be9f9df9b63cc3f6502eff374060447971e80ebbae224dca"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\make_check30.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\make_check30.py",
+                                 "sha256":  "c212ea9eca302c535d43a8642b5cceb429a65299141457b28de21986f98463e0"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\make_check30b.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\make_check30b.py",
+                                 "sha256":  "c2603227395f90284aae3763da9553c588099a7923b2742ed4d77ed8d7d6f6fd"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\compare30.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\compare30.py",
+                                 "sha256":  "7ce462ebaee38ca9e80681f1bfcac3ab3d2dc78cea939578b10baf6dc133897b"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\compare30b.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\compare30b.py",
+                                 "sha256":  "a224dec7044f2597589951f274832d0aeff8b27304366a1349fbdbb9e9b6ff93"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\make_label_queue.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\make_label_queue.py",
+                                 "sha256":  "6b547628ab5c2733987a25c584d735f21d4d681a503ee4cfba3d4b5b06ae067a"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\make_label_queue2.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\make_label_queue2.py",
+                                 "sha256":  "3b4f2ddc75ce7bf1b8445808c52d669da8bb37af2bafc2460d24b77bb6c06274"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\make_label_queue3.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\make_label_queue3.py",
+                                 "sha256":  "abfc58dae67ce56040479310e0de7df41e9dceb2469eee6209ba4517819834e7"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\make_relabel.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\make_relabel.py",
+                                 "sha256":  "b60cb0535e0e0b1a8ca08b168ce81b6b0739c15a64b16db18bf077ad47ed7e66"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\merge_extra.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\merge_extra.py",
+                                 "sha256":  "a18583f8082637dfd0a313142b55bbdcb9fbb3b1c97ef43588fd01dc6049dd45"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\merge_extra2.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\merge_extra2.py",
+                                 "sha256":  "0b91fad7c1042c74d9695153a46cd1d11b76a23284b23b29efc68776876dffff"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\fix_relabel.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\fix_relabel.py",
+                                 "sha256":  "a7eb3ed9ad8f45ae5bac74643f173a0e239454920f15775a4a1eb12f7a95ab7b"
+                             },
+                             {
+                                 "archived":  "D:\\DSP_PROJECT\\DSP_PROJECT\\archive\\classifier_legacy\\apply_review.py",
+                                 "original":  "D:\\DSP_PROJECT\\DSP_PROJECT\\apply_review.py",
+                                 "sha256":  "55a587942dc8584a36609b6872b1fd67801c161fed349dbeca425231bade5a10"
+                             }
+                         ],
+    "created_local":  "2026-10-27T22:06:50.0372423+07:00",
+    "data_labels_exports_reports_preserved":  true,
+    "exact_step_988_resume_removed":  true,
+    "frozen_training_code_unchanged":  true,
+    "step_1235_resume_preserved":  true
+}

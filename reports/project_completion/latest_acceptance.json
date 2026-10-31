@@ -1,0 +1,81 @@
+{
+  "status": "passed",
+  "created_utc": "2026-10-29T03:55:25.384221+00:00",
+  "fixture": "outputs\\project_completion\\acceptance\\20261029T035402Z_d7f749a6\\complete_project_fixture.pdf",
+  "report": "outputs\\project_completion\\acceptance\\20261029T035402Z_d7f749a6\\project\\report.html",
+  "workspace": "outputs\\project_completion\\acceptance\\20261029T035402Z_d7f749a6\\project\\workspace.html",
+  "source_checks": {
+    "extracted_evidence_count": 14,
+    "model_label_evidence_count": 11,
+    "retrieved_evidence_count": 5,
+    "plan_step_count": 6,
+    "all_exported_source_spans_verified": true,
+    "retrieval_context_connected_to_plan": true,
+    "research_accuracy_measured": false,
+    "human_label_quality_verified": false
+  },
+  "ocr_pages": 1,
+  "llm_tasks": 6,
+  "llm_model_loaded": true,
+  "source_byte_hash_verified": true,
+  "all_report_anchors_resolve": true,
+  "checkpoint_hashes_unchanged": true,
+  "classifier_checkpoints_sha256": {
+    "models\\final_s11\\model.safetensors": "40f664f9a8fc5457cee5bbd497444b9912bc97224efcee9eca9a69c22e4fc2f8",
+    "models\\final_s22\\model.safetensors": "a586db0b8bdbaf4f4933ef2deb1afb3555b94096693a67765d0129d1bb0be020",
+    "models\\final_s33\\model.safetensors": "7862babcf015b431e3d0dab7c6cc72ce13460e5f88b4ed13bb1488f6978381b8"
+  },
+  "gpu_peaks": {
+    "extract": {
+      "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+      "peak_allocated_bytes": 3468439552,
+      "peak_reserved_bytes": 3594518528
+    },
+    "retrieve": {
+      "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+      "peak_allocated_bytes": 1145427968,
+      "peak_reserved_bytes": 1166016512
+    },
+    "plan": {
+      "device": "NVIDIA GeForce RTX 4050 Laptop GPU",
+      "peak_allocated_bytes": 3232241152,
+      "peak_reserved_bytes": 3474980864
+    }
+  },
+  "stages": [
+    {
+      "stage": "extract",
+      "returncode": 0,
+      "elapsed_seconds": 27.707652,
+      "request": "jobs/extract.request.json",
+      "response": "jobs/extract.response.json",
+      "stdout": "jobs/extract.stdout.log",
+      "stderr": "jobs/extract.stderr.log",
+      "local_only": true,
+      "gpu_lifecycle": "worker_process_exited_before_next_stage"
+    },
+    {
+      "stage": "retrieve",
+      "returncode": 0,
+      "elapsed_seconds": 19.353793,
+      "request": "jobs/retrieve.request.json",
+      "response": "jobs/retrieve.response.json",
+      "stdout": "jobs/retrieve.stdout.log",
+      "stderr": "jobs/retrieve.stderr.log",
+      "local_only": true,
+      "gpu_lifecycle": "worker_process_exited_before_next_stage"
+    },
+    {
+      "stage": "plan",
+      "returncode": 0,
+      "elapsed_seconds": 26.839387,
+      "request": "jobs/plan.request.json",
+      "response": "jobs/plan.response.json",
+      "stdout": "jobs/plan.stdout.log",
+      "stderr": "jobs/plan.stderr.log",
+      "local_only": true,
+      "gpu_lifecycle": "worker_process_exited_before_next_stage"
+    }
+  ],
+  "quality_scope": "Authored functional fixture only; no final-test score or independent human quality claim"
+}

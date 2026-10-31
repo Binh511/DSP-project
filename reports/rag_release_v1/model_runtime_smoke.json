@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "created_utc": "2026-10-29T02:47:42.306775+00:00",
+  "base_index_manifest": "outputs\\rag_ready\\release_base_index\\manifest.json",
+  "base_index_chunks": 10,
+  "base_search_verified_hits": 3,
+  "portable_adapter_report": "outputs\\rag_ready\\release_demo_v1_1\\report.html",
+  "portable_adapter_verified_hits": 5,
+  "portable_adapter_base_sha_binding_verified": true,
+  "report_files_sha256": {
+    "analysis.json": "9a57c668d33684e82b0c514d3cb4684694f5d4761d369f50b7065180eb3dd60d",
+    "extraction.json": "52bdfee9d5edc61a265793d9c49a5f4aea47995eca2ad77d4872912cbfa48b93",
+    "manifest.json": "b1713375437760c73e2e7e4c84666200e52c7578e84cb3a32fa981a72af31556",
+    "plan.json": "a971480ebf507e0d239a8f25ef6c39a55638a32834e30345d60dfe4bfe2af4dc",
+    "report.html": "6c15b1d75370473c88b78db2340b51fe1aa04d4c876a1eccc35b54b80e6264cd",
+    "report.md": "5115ceb85066362aa59e704dfa0910cd06275f656b76857db9a241701411c3a5",
+    "retrieval.json": "b0ef94752290a9f12cc058ceefea69d3db4c686dc4315c8b96d059c7532b48ba",
+    "source.txt": "460bafba7be06cadf48af43478da7eaa904ff3f895d5b01d284c389c039994f8"
+  },
+  "purpose": "Functional acceptance with authored examples; not benchmark or final-test scoring",
+  "release_version": "rag-runtime-1.1",
+  "source_utf8_bytes_hash_verified": true
+}
