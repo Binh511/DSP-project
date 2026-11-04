@@ -31,6 +31,8 @@ Tác giả chia sẻ các thư mục export nguyên vẹn qua ổ đĩa hoặc k
 
 BGE-M3 dùng revision `5617a9f61b028005a4858fdac845db406aefb181`; giữ tên thư mục snapshot revision và cấu hình pooling/normalize. Qwen đã nghiệm thu dùng revision `989aa7980e4cf806f80c7fef2b1adb7bc71aa306`. [Manifest](../reports/project_completion/PROJECT_RELEASE_MANIFEST.json) và [biên bản chạy](../reports/project_completion/latest_acceptance.json) có hash để đối chiếu.
 
+Các báo cáo nghiên cứu nằm trong repository đầy đủ. Nếu bạn chỉ nhận ZIP backend, có thể xem [manifest trên GitHub](https://github.com/Binh511/DSP-project/blob/main/reports/project_completion/PROJECT_RELEASE_MANIFEST.json) và [biên bản trên GitHub](https://github.com/Binh511/DSP-project/blob/main/reports/project_completion/latest_acceptance.json). ZIP backend tập trung vào source chạy và các công cụ setup/demo.
+
 Nếu muốn tự tải Qwen base từ Hugging Face, sau khi cài dependency, chạy [công cụ setup](../tools/setup_project_planner_model.py). Đây là thao tác tải model riêng, cần mạng:
 
 ```powershell

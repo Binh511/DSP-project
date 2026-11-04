@@ -61,11 +61,21 @@ class WorkerReportTests(unittest.TestCase):
         self.assertEqual(result['source_texts'][self.common['source_sha256']], TEXT)
 
     def test_classifier_cpu_request_is_honored_before_loading_members(self):
-        import numpy as np
+        class ProbabilityRow(list):
+            def argmax(self):
+                return max(range(len(self)), key=self.__getitem__)
+
+        class Probabilities:
+            shape = (1, 5)
+
+            def __iter__(self):
+                yield ProbabilityRow([.8, .1, .05, .03, .02])
+
         seen = []
         fake = SimpleNamespace(_device='cuda', _members=None, MODEL_NAMES=[],
             MODELS_DIR=self.root, LABELS=['OBJECTIVE', 'REQUIREMENT', 'ACTIVITY', 'EXPECTED_RESULT', 'OTHER'])
-        fake.classify_probs = lambda items, batch_size=32: np.asarray([[.8, .1, .05, .03, .02]])
+        fake.classify_probs = lambda items, batch_size=32: Probabilities()
+        original_classify_probs = fake.classify_probs
         def extract(*args, **kwargs):
             seen.append(fake._device)
             fake.classify_probs([{'text': 'Source text'}])
@@ -75,7 +85,13 @@ class WorkerReportTests(unittest.TestCase):
             result = execute_job({**self.common, 'stage': 'extract', 'classifier': 'ensemble'})
         self.assertEqual(seen, ['cpu'])
         self.assertEqual(result['provenance']['device'], 'cpu')
+        self.assertTrue(result['provenance']['probabilities_observed_without_modification'])
+        self.assertEqual(result['classifier_predictions']['labels'], fake.LABELS)
+        self.assertEqual(result['classifier_predictions']['items'], [
+            {'input': {'text': 'Source text'}, 'probabilities': [.8, .1, .05, .03, .02],
+             'label': 'OBJECTIVE'}])
         self.assertEqual(fake._device, 'cuda')
+        self.assertIs(fake.classify_probs, original_classify_probs)
 
     def test_ocr_image_hash_is_verified_before_embedding(self):
         path = self.root / 'page.png'

@@ -9,14 +9,22 @@ from __future__ import annotations
 import argparse
 import ast
 import hashlib
+from html.parser import HTMLParser
 import io
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
+import posixpath
+import re
 import sys
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.1.0"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from psai_extension import __version__
+
+VERSION = __version__
 PACKAGES = (
     "psai_extension", "psai_project", "psai_planner", "psai_ocr", "psai_rules",
     "psai_retrieval", "psai_rag",
@@ -27,10 +35,60 @@ ROOT_FILES = (
     "requirements.txt", "requirements-project.txt", "requirements-rag.txt",
     "requirements-pdf.txt", "requirements-retrieval.txt", "examples/proposal.md",
     "tools/start_extension_backend.ps1", "tools/package_extension.py", "tools/verify_extension_demo.py",
-    "tools/verify_extension_browser.mjs",
+    "tools/verify_extension_browser.mjs", "tools/verify_clean_clone.py",
+    "tools/demo_project.py", "tools/demo_rag.py",
+    "tools/setup_project_planner_model.py",
+    "docs/REFACTOR_GUIDE.md", "docs/FULL_RUNTIME_SETUP.md",
     "psai_ocr/windows_native.ps1", "psai_ocr/requirements.txt", "psai_ocr/README.md",
 )
 EXTENSION_SUFFIXES = {".html", ".css", ".js", ".mjs", ".svg", ".png", ".ico"}
+MODULE_IMPORT = re.compile(r'''\bfrom\s*["']([^"']+)["']|\bimport\s*(?:\(\s*)?["']([^"']+)["']''')
+
+
+class _AssetParser(HTMLParser):
+    """Collect local resources needed to open an extension page offline."""
+
+    def __init__(self):
+        super().__init__()
+        self.references = []
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        key = 'href' if tag == 'link' else 'src'
+        if tag in ('script', 'link', 'img') and attrs.get(key):
+            self.references.append(attrs[key])
+
+
+def _require_asset(payload, source, reference):
+    if reference.startswith('data:'):
+        return
+    if '://' in reference or reference.startswith(('/', '\\')):
+        raise ValueError(f'Extension resource must be local: {source}: {reference}')
+    name = posixpath.normpath(posixpath.join(posixpath.dirname(source), reference))
+    if name.startswith('../') or name not in payload:
+        raise ValueError(f'Missing extension resource: {source}: {reference}')
+
+
+def _verify_extension_assets(payload, manifest):
+    if manifest.get('permissions', []) != ['storage'] or manifest.get('host_permissions') != ['http://127.0.0.1/*']:
+        raise ValueError('The release must retain storage-only permissions and loopback host access')
+    worker = manifest.get('background', {}).get('service_worker')
+    if worker:
+        _require_asset(payload, 'manifest.json', worker)
+    for filename in manifest.get('icons', {}).values():
+        _require_asset(payload, 'manifest.json', filename)
+    for name, content in payload.items():
+        if name.endswith('.html'):
+            parser = _AssetParser()
+            parser.feed(content.decode('utf-8-sig'))
+            for reference in parser.references:
+                _require_asset(payload, name, reference)
+        elif name.endswith(('.js', '.mjs')):
+            for match in MODULE_IMPORT.finditer(content.decode('utf-8-sig')):
+                reference = match.group(1) or match.group(2)
+                if not reference.startswith('.'):
+                    raise ValueError(f'Extension modules must be bundled locally: {name}: {reference}')
+                _require_asset(payload, name, reference)
 
 
 def _source(path: Path) -> bytes:
@@ -63,6 +121,7 @@ def _extension_files() -> dict[str, bytes]:
         raise ValueError(f"Expected Manifest V3 with version {VERSION}")
     if "app.html" not in payload:
         raise ValueError("Extension application is missing: extension/psai/app.html")
+    _verify_extension_assets(payload, manifest)
     return payload
 
 
@@ -87,21 +146,34 @@ def _verify_local_imports(payload: dict[str, bytes]) -> None:
     local_modules = {path.stem for path in ROOT.glob("*.py")}
     local_modules.update(path.name for path in ROOT.iterdir()
                          if path.is_dir() and (path / "__init__.py").is_file())
-    bundled_modules = {Path(name).stem for name in payload if "/" not in name and name.endswith(".py")}
-    bundled_modules.update(name.split("/", 1)[0] for name in payload if name.endswith("/__init__.py"))
     missing = set()
+
+    def require_module(parts, source):
+        module = '/'.join(parts)
+        if module + '.py' not in payload and module + '/__init__.py' not in payload:
+            missing.add(f'{source}: {".".join(parts)}')
+
     for name, data in payload.items():
         if not name.endswith(".py") or name.startswith("tools/"):
             continue
         tree = ast.parse(data.decode("utf-8-sig"), filename=name)
         for node in ast.walk(tree):
-            modules = []
             if isinstance(node, ast.Import):
-                modules = [alias.name.split(".", 1)[0] for alias in node.names]
-            elif isinstance(node, ast.ImportFrom) and not node.level and node.module:
-                modules = [node.module.split(".", 1)[0]]
-            missing.update(f"{name}: {module}" for module in modules
-                           if module in local_modules and module not in bundled_modules)
+                for alias in node.names:
+                    parts = alias.name.split('.')
+                    if parts[0] in local_modules:
+                        require_module(parts, name)
+            elif isinstance(node, ast.ImportFrom):
+                if node.level:
+                    package = list(PurePosixPath(name).parts[:-1])
+                    parts = package[:len(package) - node.level + 1]
+                    if node.module:
+                        parts += node.module.split('.')
+                    require_module(parts, name)
+                elif node.module:
+                    parts = node.module.split('.')
+                    if parts[0] in local_modules:
+                        require_module(parts, name)
     if missing:
         raise ValueError("Unbundled local imports: " + ", ".join(sorted(missing)))
 
@@ -127,6 +199,29 @@ def _digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _write_release(output_dir, outputs, extension):
+    """Preflight every destination before writing ZIPs or the unpacked folder."""
+    unpacked = output_dir / f'PSAI_EXTENSION_CHROME_EDGE_v{VERSION}'
+    destinations = {output_dir / name: data for name, data in outputs.items()}
+    destinations.update({unpacked / name: data for name, data in extension.items()})
+    if unpacked.exists():
+        if unpacked.is_symlink() or not unpacked.is_dir():
+            raise FileExistsError(f'Existing release is preserved: {unpacked}')
+        extra = {path.relative_to(unpacked).as_posix() for path in unpacked.rglob('*') if path.is_file()} - set(extension)
+        if extra:
+            raise FileExistsError(f'Existing unpacked release contains additional files: {unpacked}')
+    for target, data in destinations.items():
+        if not target.resolve().is_relative_to(output_dir):
+            raise ValueError(f'Refusing release destination outside output directory: {target}')
+        if target.exists() and (not target.is_file() or target.is_symlink() or target.read_bytes() != data):
+            raise FileExistsError(f'Existing release is preserved: {target}. Choose a new --output-dir.')
+    for target, data in destinations.items():
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if not target.exists():
+            with target.open('xb') as handle:
+                handle.write(data)
+
+
 def package(output_dir: Path) -> dict:
     extension = _extension_files()
     backend = _backend_files(extension)
@@ -140,6 +235,7 @@ def package(output_dir: Path) -> dict:
         "distribution": "source_only_local_backend_required",
         "reproducible_zip_timestamps": True,
         "existing_outputs": "preserved_unless_byte_identical",
+        "unpacked_extension": f'PSAI_EXTENSION_CHROME_EDGE_v{VERSION}',
         "excluded": ["model_weights", "checkpoints", "datasets", "user_documents", "outputs",
                      "virtual_environments", "credentials", "machine_specific_model_manifests"],
         "archives": {
@@ -154,22 +250,13 @@ def package(output_dir: Path) -> dict:
     outputs = {**archives, "package_receipt.json":
                (json.dumps(receipt, ensure_ascii=False, indent=2) + "\n").encode("utf-8")}
     output_dir = Path(output_dir).resolve()
-    output_dir.mkdir(parents=True, exist_ok=True)
-    for name, data in outputs.items():
-        target = output_dir / name
-        if target.exists() and (not target.is_file() or target.is_symlink() or target.read_bytes() != data):
-            raise FileExistsError(f"Existing release is preserved: {target}. Choose a new --output-dir.")
-    for name, data in outputs.items():
-        target = output_dir / name
-        if not target.exists():
-            with target.open("xb") as handle:
-                handle.write(data)
+    _write_release(output_dir, outputs, extension)
     return receipt
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "dist/extension")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / 'dist/extension' / f'v{VERSION}')
     args = parser.parse_args()
     receipt = package(args.output_dir)
     for name, details in receipt["archives"].items():

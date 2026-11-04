@@ -2,13 +2,17 @@
 // No browser libraries or npm installation are required (Node >= 22).
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const edge = process.env.PSAI_EDGE_PATH || "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe";
+const extensionOption = process.argv.indexOf('--extension-dir');
+if (extensionOption >= 0 && !process.argv[extensionOption + 1]) throw new Error('--extension-dir requires a folder');
+const extensionPath = extensionOption >= 0
+  ? path.resolve(process.argv[extensionOption + 1]) : path.join(root, 'extension/psai');
 const output = path.join(root, "outputs/extension", `browser_${Date.now()}`);
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const children = [];
@@ -98,7 +102,13 @@ try {
     if (backend.exitCode !== null) throw new Error("Backend exited during browser setup.");
     return /Pairing token: ([A-Za-z0-9_-]+)/.exec(backendText)?.[1];
   }, "backend pairing token");
-  const extensionPath = path.join(root, "extension/psai");
+  const manifest = JSON.parse(await readFile(path.join(extensionPath, 'manifest.json'), 'utf8'));
+  const health = await (await fetch(`http://127.0.0.1:${backendPort}/api/health`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })).json();
+  if (health.status !== 'ok' || health.version !== manifest.version) {
+    throw new Error('Backend and selected extension versions must agree.');
+  }
   const edgeProcess = launch(edge, ["--headless=new", "--disable-gpu", "--no-first-run", "--no-default-browser-check",
     `--user-data-dir=${path.join(output, "profile")}`, `--remote-debugging-port=${debugPort}`,
     `--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`, "about:blank"]);
@@ -121,6 +131,8 @@ try {
   await page.call("Runtime.enable");
   await page.call("Page.enable");
   await until(() => page.evaluate("document.readyState === 'complete' && Boolean(document.getElementById('connect-button'))"), "extension UI");
+  const loadedVersion = await page.evaluate('chrome.runtime.getManifest().version');
+  if (loadedVersion !== manifest.version) throw new Error('Loaded extension version differs from the selected release');
   await page.evaluate(`document.getElementById('backend-url').value=${JSON.stringify(`http://127.0.0.1:${backendPort}`)};
     document.getElementById('pairing-token').value=${JSON.stringify(token)};
     document.getElementById('connection-form').requestSubmit();`);
@@ -158,6 +170,7 @@ try {
   await until(() => page.evaluate("document.getElementById('connection-badge')?.textContent==='Đã kết nối' && document.getElementById('detail-status')?.textContent==='Hoàn tất'"), "saved settings and history after reload");
   if (page.errors.length || workspace.errors.length) throw new Error("Browser JavaScript errors: " + [...page.errors, ...workspace.errors].join("; "));
   await writeFile(path.join(output, "acceptance.json"), JSON.stringify({ status: "passed", browser: version.Browser,
+    extension_version: loadedVersion, backend_version: health.version, extension_source: extensionPath,
     extension_id: extensionId, manifest_version: 3, mode: "fast", actual_unpacked_extension: true,
     authenticated_connection: true, file_upload: true, real_pipeline_executed: true, result_tab_opened: true,
     saved_settings_and_history_after_reload: true, responsive_width_390: true, javascript_errors: [] }, null, 2));

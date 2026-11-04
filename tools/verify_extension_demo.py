@@ -26,13 +26,21 @@ if str(ROOT) not in sys.path:
 from psai_extension.server import JobManager, create_server
 
 
-def verify(output: Path, input_path: Path, full=False, timeout=900, python_executable=None):
+def _require(condition, message):
+    if not condition:
+        raise AssertionError(message)
+
+
+def verify(output: Path, input_path: Path, full=False, timeout=900, python_executable=None,
+           *, resource_dir=None, base_model_dir=None, planner_model_dir=None):
     output = Path(output).resolve()
     if output.exists():
         raise FileExistsError('Choose a new verification directory; existing evidence is preserved')
     output.mkdir(parents=True)
     token = secrets.token_urlsafe(32)
-    manager = JobManager(output / 'jobs', python_executable=python_executable)
+    manager = JobManager(output / 'jobs', python_executable=python_executable,
+                         resource_dir=resource_dir, base_model_dir=base_model_dir,
+                         planner_model_dir=planner_model_dir)
     server = create_server(manager, token, port=0)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -52,11 +60,11 @@ def verify(output: Path, input_path: Path, full=False, timeout=900, python_execu
         try:
             request('/api/jobs', authenticated=False)
         except HTTPError as error:
-            assert error.code == 401
+            _require(error.code == 401, 'Unauthenticated API request did not return HTTP 401')
         else:
             raise AssertionError('Unauthenticated API access was accepted')
         health = json.loads(request('/api/health')[0])
-        assert health['status'] == 'ok'
+        _require(health['status'] == 'ok', 'Backend health check failed')
         job = json.loads(request('/api/jobs', {
             'filename': input_path.name,
             'content_base64': base64.b64encode(input_path.read_bytes()).decode('ascii'),
@@ -72,26 +80,29 @@ def verify(output: Path, input_path: Path, full=False, timeout=900, python_execu
             time.sleep(.5)
         if job['status'] != 'completed':
             raise RuntimeError(str(job.get('error')) + '\n' + job.get('log_tail', ''))
+        _require(set(job['results']) == {'report', 'workspace', 'analysis'}, 'Completed job has missing exports')
         exported = {}
         for key, path in job['results'].items():
             raw, headers = request(path, authenticated=False)
-            assert raw and headers.get('Cache-Control') == 'no-store'
+            _require(raw and headers.get('Cache-Control') == 'no-store', 'Export is empty or cache policy differs')
             exported[key] = {'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}
             if key == 'analysis':
                 analysis = json.loads(raw)
         metadata = analysis['metadata']
-        assert metadata['input_sha256'] == hashlib.sha256(input_path.read_bytes()).hexdigest()
-        assert metadata['classifier'] == ('ensemble' if full else 'rules')
-        assert metadata['retrieval_mode'] == ('hybrid' if full else 'bm25')
-        assert metadata['planner_mode'] == ('local' if full else 'evidence')
+        _require(metadata['input_sha256'] == hashlib.sha256(input_path.read_bytes()).hexdigest(), 'Input hash differs')
+        for name, expected in (('classifier', 'ensemble' if full else 'rules'),
+                               ('retrieval_mode', 'hybrid' if full else 'bm25'),
+                               ('planner_mode', 'local' if full else 'evidence')):
+            _require(metadata[name] == expected, f'Unexpected {name}: {metadata[name]}')
         report_path = job['results']['report']
         try:
             request(report_path.replace(report_path.split('/')[3], 'invalid-capability'), authenticated=False)
         except HTTPError as error:
-            assert error.code == 404
+            _require(error.code == 404, 'Invalid result capability did not return HTTP 404')
         else:
             raise AssertionError('Invalid result capability was accepted')
         evidence = {'status': 'passed', 'created_utc': datetime.now(timezone.utc).isoformat(),
+                    'backend_version': health['version'],
                     'mode': job['mode'], 'input': str(input_path), 'job_id': job['id'],
                     'elapsed_seconds': round(time.monotonic() - started, 3),
                     'api_auth_checked': True, 'result_capability_checked': True,
@@ -116,10 +127,14 @@ def main():
     parser.add_argument('--output', type=Path)
     parser.add_argument('--timeout', type=int, default=900)
     parser.add_argument('--python', dest='python_executable')
+    for flag in ('resource-dir', 'base-model-dir', 'planner-model-dir'):
+        parser.add_argument('--' + flag, type=Path)
     args = parser.parse_args()
     output = args.output or ROOT / 'outputs/extension' / (
         'verify_' + datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S_') + uuid.uuid4().hex[:8])
-    verify(output, args.input, args.full, args.timeout, args.python_executable)
+    verify(output, args.input, args.full, args.timeout, args.python_executable,
+           resource_dir=args.resource_dir, base_model_dir=args.base_model_dir,
+           planner_model_dir=args.planner_model_dir)
     return 0
 
 

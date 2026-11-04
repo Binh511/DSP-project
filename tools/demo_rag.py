@@ -11,6 +11,10 @@ import sys
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from psai_project.execution import local_path_arguments, runtime_python
 
 
 def _verified_adapter() -> Path:
@@ -58,8 +62,7 @@ def main(argv=None):
         parser.error('--top-k must be positive')
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')
-    runtime = ROOT / '.venv/psai_runtime/Scripts/python.exe'
-    python = str(runtime if runtime.is_file() else Path(sys.executable))
+    python = runtime_python(ROOT)
     output = args.output or ROOT / 'outputs/rag_ready' / (
         'demo_' + datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ_') + uuid.uuid4().hex[:8])
     command = [python, '-u', str(ROOT / 'psai.py'), 'analyze', '--input', str(args.input.resolve()),
@@ -67,9 +70,8 @@ def main(argv=None):
                '--top-k', str(args.top_k), '--device', args.device]
     for query in args.query or []:
         command += ['--query', query]
-    for flag, value in [('--resource-dir', args.resource_dir), ('--base-model-dir', args.base_model_dir)]:
-        if value is not None:
-            command += [flag, str(value.resolve())]
+    command += local_path_arguments({'resource-dir': args.resource_dir,
+                                     'base-model-dir': args.base_model_dir})
     try:
         if args.use_adapter:
             command += ['--adapter-dir', str(_verified_adapter())]

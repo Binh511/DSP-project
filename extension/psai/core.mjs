@@ -7,6 +7,10 @@ const DEVICES = new Set(["auto", "cpu", "cuda"]);
 const OCR_OPTIONS = new Set(["auto", "none", "always"]);
 const ID_PATTERN = /^[A-Za-z0-9_-]{1,128}$/;
 
+export function isJobId(value) {
+  return typeof value === "string" && ID_PATTERN.test(value);
+}
+
 export class ApiError extends Error {
   constructor(message, status = 0) {
     super(message);
@@ -63,7 +67,7 @@ export function normalizeHealth(payload) {
 }
 
 export function normalizeJob(payload) {
-  if (!payload || typeof payload.id !== "string" || !ID_PATTERN.test(payload.id) || typeof payload.filename !== "string" ||
+  if (!payload || !isJobId(payload.id) || typeof payload.filename !== "string" ||
       !STATUSES.has(payload.status) || !MODES.has(payload.mode) ||
       !DEVICES.has(payload.device) || !OCR_OPTIONS.has(payload.ocr)) {
     throw new ApiError("Backend trả về tác vụ không hợp lệ. Hãy kiểm tra phiên bản backend.");
@@ -94,7 +98,7 @@ export function normalizeJobs(payload) {
 
 export function resultUrl(baseUrl, path, jobId) {
   const base = validateBackendUrl(baseUrl);
-  if (typeof path !== "string" || typeof jobId !== "string" || !ID_PATTERN.test(jobId)) return null;
+  if (typeof path !== "string" || !isJobId(jobId)) return null;
   const match = /^\/results\/([A-Za-z0-9_-]{1,128})\/([A-Za-z0-9_-]+)\/([A-Za-z0-9][A-Za-z0-9._-]*)$/.exec(path);
   if (!match || match[1] !== jobId || match[3] === "." || match[3] === "..") return null;
   return new URL(path, base).href;

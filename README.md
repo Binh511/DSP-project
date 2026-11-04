@@ -7,6 +7,7 @@
 | Đọc code và đánh giá | [Hướng dẫn review](docs/REVIEW_GUIDE.md) |
 | Chuẩn bị thuyết trình và demo | [Kịch bản 8–10 slide](docs/PRESENTATION_GUIDE.md) |
 | Dùng giao diện Chrome/Edge | [Cài extension](README_EXTENSION.md) |
+| Hiểu cấu trúc mã sau refactor | [Bản đồ module v0.2.0](docs/REFACTOR_GUIDE.md) |
 | Chạy model AI đầy đủ | [Thiết lập full trên máy nhận](docs/FULL_RUNTIME_SETUP.md) |
 | Xem kết quả mẫu | [Bản demo bàn giao](docs/demo/README.md) |
 
@@ -19,6 +20,16 @@ python tools/demo_project.py --fast
 ```
 
 Trên máy dùng lệnh `python3`, thay `python` bằng `python3`. Lệnh in đường dẫn thư mục output mới; mở `report.html` và `workspace.html` trong thư mục đó. Bấm một dẫn chứng trong báo cáo để đối chiếu đoạn nguồn. Trong workspace, đổi trạng thái công việc và xuất JSON tiến độ để lưu. Mỗi lượt tạo một thư mục mới, không ghi đè kết quả cũ.
+
+Nếu đã clone bản trước, tại thư mục dự án chạy:
+
+```sh
+git pull --ff-only
+python tools/verify_clean_clone.py
+python tools/demo_project.py --fast
+```
+
+Nếu có thay đổi mã cục bộ, lưu hoặc commit chúng trước khi cập nhật. Người tải bằng **Code → Download ZIP** hãy giải nén bản mới vào thư mục mới rồi chạy demo từ thư mục đó. Khi dùng extension 0.2.0, khởi động lại backend, Reload extension và ghép nối bằng mã mới; hướng dẫn ở [README_EXTENSION](README_EXTENSION.md).
 
 Thử tài liệu Markdown/TXT UTF-8 của bạn:
 
@@ -51,7 +62,7 @@ PSAI trích thông tin từ văn bản đề xuất, phân loại câu vào năm
 
 ## Chạy nhanh
 
-Bản extension Chrome/Edge v0.1.0 đã có giao diện tải tài liệu và kết nối backend Python cục bộ. Xem [cài extension và chạy backend](README_EXTENSION.md); mã extension nằm trong [extension/psai](extension/psai/). Gói ZIP được tạo bằng `python tools/package_extension.py`.
+Bản extension Chrome/Edge v0.2.0 có giao diện tải tài liệu và backend Python được tách module theo trách nhiệm. Xem [cài extension và chạy backend](README_EXTENSION.md), [cấu trúc mã sau refactor](docs/REFACTOR_GUIDE.md) và [mã extension](extension/psai/). Gói ZIP và thư mục Load unpacked được tạo bằng `python tools/package_extension.py`.
 
 Điểm vào cho toàn bộ luồng mới:
 

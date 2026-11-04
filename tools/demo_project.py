@@ -9,6 +9,10 @@ import sys
 import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from psai_project.execution import project_command, runtime_python
 
 
 def main(argv=None):
@@ -25,25 +29,18 @@ def main(argv=None):
     args = parser.parse_args(argv)
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')
-    runtime = ROOT / '.venv/psai_runtime/Scripts/python.exe'
-    executable = str(runtime if runtime.is_file() else Path(sys.executable))
+    executable = runtime_python(ROOT)
     output = args.output or ROOT / 'outputs/project_completion' / (
         'demo_' + datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ_') + uuid.uuid4().hex[:8])
-    command = [executable, '-u', '-m', 'psai_project', '--input', str(args.input.resolve()),
-               '--output', str(output.resolve()), '--device', args.device, '--ocr', args.ocr]
+    command = project_command(executable, args.input, output,
+        mode='fast' if args.fast else 'full', device=args.device, ocr=args.ocr,
+        path_options={'resource-dir': args.resource_dir, 'base-model-dir': args.base_model_dir,
+                      'planner-model-dir': args.planner_model_dir}, queries=args.query)
     if args.fast:
-        command += ['--classifier', 'rules', '--retrieval', 'bm25', '--planner', 'evidence']
         print('FAST MODE: rules + BM25 + source-ordered plan; no learned model is used.', flush=True)
     else:
-        command += ['--classifier', 'ensemble', '--retrieval', 'hybrid', '--planner', 'local']
         print('FULL LOCAL MODE: production ensemble -> hybrid RAG -> local LLM.', flush=True)
         print('Models run one stage at a time. No new training or API calls.', flush=True)
-    for flag, value in [('--resource-dir', args.resource_dir), ('--base-model-dir', args.base_model_dir),
-                        ('--planner-model-dir', args.planner_model_dir)]:
-        if value is not None:
-            command += [flag, str(value.resolve())]
-    for query in args.query or []:
-        command += ['--query', query]
     print('Input:', args.input.resolve(), flush=True)
     completed = subprocess.run(command, cwd=ROOT, check=False)
     if completed.returncode:

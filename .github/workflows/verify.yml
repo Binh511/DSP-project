@@ -25,14 +25,14 @@ jobs:
         with:
           node-version: '22'
       - name: Backend integration tests (Python standard library)
-        run: python -m unittest discover -s tests -p test_extension_backend.py -v
+        run: python -m unittest discover -s tests -p 'test_extension_*.py' -v
+      - name: Project orchestration and launcher contracts
+        run: python -m unittest discover -s tests -p 'test_project_*.py' -v
       - name: Extension logic tests
-        run: node --test extension/psai/tests/core.test.mjs
+        run: node --test extension/psai/tests/*.test.mjs
       - name: Extension JavaScript syntax
         run: |
-          node --check extension/psai/app.mjs
-          node --check extension/psai/core.mjs
-          node --check extension/psai/service_worker.js
+          for file in extension/psai/*.mjs extension/psai/*.js; do node --check "$file"; done
       - name: Actual CLI and authenticated API in an empty source-only venv
         run: python tools/verify_clean_clone.py --output outputs/ci_clean_clone
       - name: Preserve smoke logs and source-bound reports

@@ -9,13 +9,14 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
-import os
 from pathlib import Path
 import subprocess
 import sys
 import tempfile
 import time
 import uuid
+
+from .execution import offline_environment
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKER_TIMEOUT_SECONDS = 1800
@@ -46,10 +47,7 @@ def _run_worker(stage_name: str, request: dict, stage_dir: Path) -> dict:
     _json(request_path, {**request, 'stage': stage_name})
     command = [sys.executable, '-u', '-m', 'psai_project.worker',
                '--request', str(request_path), '--response', str(response_path)]
-    environment = dict(os.environ)
-    environment.update(HF_HUB_OFFLINE='1', TRANSFORMERS_OFFLINE='1',
-                       HF_HUB_DISABLE_TELEMETRY='1', TOKENIZERS_PARALLELISM='false',
-                       PYTHONIOENCODING='utf-8')
+    environment = offline_environment(disable_tokenizer_parallelism=True)
     started = time.monotonic()
     print(f'PSAI stage: {stage_name} (serial local worker)', flush=True)
     with stdout_path.open('w', encoding='utf-8', newline='') as stdout, \
@@ -105,6 +103,27 @@ def _local_planner(path: Path | None) -> Path:
     return path
 
 
+def _read_source(input_path: Path, stage: Path, ocr: str) -> tuple[str, dict]:
+    """Read source text and retain OCR evidence paths inside the staged report."""
+    if input_path.suffix.lower() == '.pdf':
+        from psai_ocr import extract_pdf_with_ocr
+        source_metadata = extract_pdf_with_ocr(input_path, mode=ocr, cache_dir=stage / 'page_images')
+        text = source_metadata.pop('text')
+        for page in source_metadata.get('pages', []):
+            if page.get('image_path'):
+                image = Path(page['image_path']).resolve()
+                if not image.is_relative_to(stage):
+                    raise ValueError('OCR image path escaped the staged report')
+                page['image_path'] = image.relative_to(stage).as_posix()
+    else:
+        text = input_path.read_text('utf-8-sig')
+        source_metadata = {'source_path': str(input_path), 'method': 'local_text',
+                           'pdf_visual_review_complete': False, 'ocr_applied': False}
+    if not isinstance(text, str) or not text.strip():
+        raise ValueError('Source contains no usable text')
+    return text, source_metadata
+
+
 def run_project(input_path: Path, output_dir: Path, *, classifier: str = 'ensemble',
                 retrieval: str = 'hybrid', planner: str = 'local', ocr: str = 'auto',
                 queries: list[str] | None = None, resource_dir: Path | None = None,
@@ -152,22 +171,7 @@ def run_project(input_path: Path, output_dir: Path, *, classifier: str = 'ensemb
                 'pipeline_quality_score': None, 'final_test_evaluated': False,
                 'worker_policy': 'serial_processes_no_concurrent_model_allocations'}
     try:
-        if input_path.suffix.lower() == '.pdf':
-            from psai_ocr import extract_pdf_with_ocr
-            source_metadata = extract_pdf_with_ocr(input_path, mode=ocr, cache_dir=stage / 'page_images')
-            text = source_metadata.pop('text')
-            for page in source_metadata.get('pages', []):
-                if page.get('image_path'):
-                    image = Path(page['image_path']).resolve()
-                    if not image.is_relative_to(stage):
-                        raise ValueError('OCR image path escaped the staged report')
-                    page['image_path'] = image.relative_to(stage).as_posix()
-        else:
-            text = input_path.read_text('utf-8-sig')
-            source_metadata = {'source_path': str(input_path), 'method': 'local_text',
-                               'pdf_visual_review_complete': False, 'ocr_applied': False}
-        if not isinstance(text, str) or not text.strip():
-            raise ValueError('Source contains no usable text')
+        text, source_metadata = _read_source(input_path, stage, ocr)
         source_path = stage / 'source.txt'
         source_path.write_text(text, encoding='utf-8', newline='')
         source_hash = hashlib.sha256(text.encode('utf-8')).hexdigest()
