@@ -47,14 +47,27 @@ class RetrievalTests(unittest.TestCase):
         self.temp.cleanup()
 
     def test_bm25_import_and_execution_require_no_ml_packages(self):
-        code = (
-            "import sys; from psai_retrieval import retrieve_document; "
-            "r=retrieve_document('# Scope\\n\\nUsers must log audit events.','D',queries=['audit']); "
-            "assert len(r['hits'])==1; "
-            "assert not ({'torch','transformers','sentence_transformers','peft','numpy','tokenizers','chromadb'} & set(sys.modules))"
-        )
-        subprocess.run([sys.executable, "-c", code], cwd=Path(__file__).resolve().parents[1],
-                       check=True, capture_output=True, text=True)
+        # Ignore user/site startup hooks: some scientific environments import
+        # NumPy before the tested code starts. Also block attempted ML imports,
+        # including ones caught as optional dependencies by application code.
+        code = """
+import sys
+sys.path.insert(0, sys.argv[1])
+blocked = {'torch', 'transformers', 'sentence_transformers', 'peft', 'numpy', 'tokenizers', 'chromadb'}
+class RejectMLImports:
+    def find_spec(self, fullname, path=None, target=None):
+        if fullname.split('.', 1)[0] in blocked:
+            raise AssertionError('BM25 attempted an ML import: ' + fullname)
+sys.meta_path.insert(0, RejectMLImports())
+from psai_retrieval import retrieve_document
+result = retrieve_document('# Scope\\n\\nUsers must log audit events.', 'D', queries=['audit'])
+assert len(result['hits']) == 1
+assert not (blocked & set(sys.modules)), blocked & set(sys.modules)
+"""
+        root = Path(__file__).resolve().parents[1]
+        result = subprocess.run([sys.executable, "-I", "-S", "-c", code, str(root)], cwd=root,
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_exact_source_offsets_unicode_crlf_and_repeated_text(self):
         text = "# Yêu cầu\r\n\r\nPhải ghi nhật ký 😀.\r\n\r\n## Đợt hai\r\n\r\nPhải ghi nhật ký 😀.\r\n"

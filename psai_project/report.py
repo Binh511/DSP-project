@@ -15,13 +15,22 @@ def _write(path, value):
 
 def _validate_local_plan(plan, record, source_text, retrieval, snapshots):
     """Recheck the public export boundary, including every nested LLM claim."""
-    if plan.get('planning_method') != 'local_llm_evidence_catalog_v1':
+    method = plan.get('planning_method')
+    methods = {'local_llm_evidence_catalog_v1': 'psai-local-evidence-catalog-v1',
+               'local_llm_evidence_catalog_v2': 'psai-local-evidence-catalog-v2'}
+    if method not in methods:
+        if isinstance(method, str) and method.startswith('local_llm_evidence_catalog_'):
+            raise ValueError('Unknown local planner protocol at export boundary')
         return
     from psai_planner.planner import build_catalog, build_prompt, validate_response
     provenance = plan.get('provenance')
     if not isinstance(provenance, dict) or not isinstance(provenance.get('config'), dict):
         raise ValueError('Local plan export requires its exact planner protocol provenance')
-    catalog = build_catalog(record, source_text, {**retrieval, 'source_texts': snapshots}, provenance['config'])
+    protocol = methods[method]
+    if provenance.get('protocol_version', protocol) != protocol:
+        raise ValueError('Local planner method and protocol disagree')
+    config = {**provenance['config'], 'protocol_version': protocol}
+    catalog = build_catalog(record, source_text, {**retrieval, 'source_texts': snapshots}, config)
     messages = build_prompt(catalog)
     def digest(value):
         raw = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False)
@@ -33,7 +42,12 @@ def _validate_local_plan(plan, record, source_text, retrieval, snapshots):
     raw = plan.get('raw_response')
     empty_without_model = raw is None and not catalog['tasks'] and provenance.get('model_loaded') is False
     if empty_without_model:
-        raw = json.dumps({'tasks': [], 'dependency_candidates': [], 'resource_references': []})
+        raw = json.dumps({'task_ids': [], 'link_ids': []}
+                         if catalog.get('response_format') == 'candidate_ids_v1' else
+                         {'task_ids': [], 'checklist_links': [], 'resource_links': [],
+                          'dependency_candidates': [], 'resource_references': []}
+                         if catalog.get('response_format') == 'links_v1' else
+                         {'tasks': [], 'dependency_candidates': [], 'resource_references': []})
     elif not isinstance(raw, str) or provenance.get('model_loaded') is not True:
         raise ValueError('Local plan must retain its exact model response and execution state')
     expected = validate_response(raw, catalog)
@@ -47,9 +61,13 @@ def _validate_local_plan(plan, record, source_text, retrieval, snapshots):
 
 
 def _planner_html(plan, record, source_text):
-    if plan.get('planning_method') != 'local_llm_evidence_catalog_v1':
+    if plan.get('planning_method') not in ('local_llm_evidence_catalog_v1', 'local_llm_evidence_catalog_v2'):
         return ''
     evidence = {item['evidence_id']: item for items in record['fields'].values() for item in items}
+    catalog = plan.get('catalog', {})
+    for name in ('context_evidence', 'project_resources', 'document_references'):
+        for item in catalog.get(name, []):
+            evidence[item['evidence_id']] = item
     starts, cursor = [0], 0
     for line in source_text.splitlines(keepends=True):
         cursor += len(line); starts.append(cursor)
@@ -62,12 +80,23 @@ def _planner_html(plan, record, source_text):
             result.append(f'<a href="#src-{digest}-L{line}">{escape(identity)}</a>')
         return ' '.join(result)
     parts = ['<section id="llm-plan"><h2>LLM lập kế hoạch cục bộ</h2>',
-             '<p class="notice">LLM chọn và sắp xếp các công việc có bằng chứng. Kiểm tra schema/hash/span '
+             '<p class="notice">Công việc xuất phát từ nguồn; LLM có thể gợi ý thứ tự và liên kết. Kiểm tra schema/hash/span '
              'chưa chứng minh nhãn, quan hệ phụ thuộc hoặc kế hoạch đã đủ; cần người duyệt trước sử dụng.</p>',
-             f'<p>Trạng thái: {escape(plan["status"])}; mô hình đã nạp: {plan["provenance"]["model_loaded"]}.</p>']
+             f'<p>Trạng thái: {escape(plan["status"])}; mô hình đã nạp: {plan["provenance"]["model_loaded"]}.</p>',
+             '<details><summary>Chi tiết lựa chọn, checklist và liên kết của LLM</summary>']
+    if plan.get('task_policy') == 'preserve_source_catalog':
+        kept = len(plan.get('source_catalog_preserved_task_ids', []))
+        parts.append('<p>Chính sách giữ công việc trong catalog nguồn: ' + str(kept)
+                     + ' công việc không nằm trong lựa chọn của model được code giữ lại để rà soát. '
+                       'Không coi đây là công việc do model chọn hoặc sinh thêm.</p>')
     for step in plan['steps']:
         parts += [f'<article class="evidence"><h3>{escape(step["task_id"])} — {escape(step["description"])}</h3>',
                   '<p>' + ref(step['evidence_ids']) + '</p>']
+        if step.get('selection_origin'):
+            origin = ('Giữ từ catalog nguồn, chưa được model chọn' if
+                      step['selection_origin'] == 'source_catalog_preserved' else
+                      'Có trong lựa chọn của model; câu chữ vẫn lấy từ nguồn')
+            parts.append('<p class="muted">' + origin + '</p>')
         if step.get('parent_task_id'):
             parts += ['<p>Công việc cha được đề xuất: ' + escape(step['parent_task_id']) + '</p>']
         for title, entries in [('Checklist trích từ nguồn', step['checklist']),
@@ -82,14 +111,37 @@ def _planner_html(plan, record, source_text):
         parts += ['<h3>Ứng viên phụ thuộc — chưa xác nhận</h3><ul>']
         for candidate in plan['dependency_candidates']:
             parts += ['<li>' + escape(candidate['before_task_id']) + ' → ' + escape(candidate['after_task_id'])
-                      + ' · gợi ý của LLM, cần người kiểm tra</li>']
+                      + ' · gợi ý của LLM, cần người kiểm tra '
+                      + ref(candidate.get('evidence_ids', [])) + '</li>']
         parts += ['</ul>']
     if plan['resource_references']:
         parts += ['<p>Tài liệu bên ngoài chỉ được dùng làm tham khảo, không tự tạo yêu cầu dự án.</p>']
     for warning in plan.get('warnings', []):
         parts += ['<p class="muted">' + escape(warning) + '</p>']
-    parts += ['</section>']
+    parts += ['</details></section>']
     return ''.join(parts)
+
+
+def _comparison_html(comparison):
+    rows = []
+    for key, title in (('tasks', 'Công việc'), ('checklist_excerpts', 'Mục kiểm tra trích nguồn'),
+                       ('model_selected_tasks', 'Công việc có trong lựa chọn của model'),
+                       ('source_preserved_tasks', 'Công việc giữ theo nguồn, không gán cho model'),
+                       ('resource_associations', 'Liên kết nguồn lực'),
+                       ('dependency_candidates', 'Ứng viên phụ thuộc')):
+        rows.append('<tr><td>' + title + '</td><td>' + str(comparison['baseline'][key])
+                    + '</td><td>' + str(comparison['selected'][key]) + '</td></tr>')
+    same_method = comparison['baseline_method'] == comparison['selected_method']
+    status = ('Hai cột đang dùng cùng phương pháp theo bằng chứng.' if same_method else
+              'Hai cột dùng phương pháp theo bằng chứng và phương pháp được chọn của lượt chạy.')
+    return ('<section id="planning-comparison"><h2>Đối chiếu cấu trúc kế hoạch</h2>'
+            '<p>Giữ nguyên nguồn, kết quả trích xuất và truy xuất của lượt chạy; so sánh kế hoạch '
+            'theo bằng chứng với kế hoạch được chọn. Đây là đối chiếu cấu trúc, chưa đo chất lượng.</p><p>'
+            + status + '</p>'
+            '<table class="report-table"><thead><tr><th>Đầu ra</th><th>Theo bằng chứng</th>'
+            '<th>Kế hoạch được chọn</th></tr></thead><tbody>' + ''.join(rows) + '</tbody></table>'
+            '<p class="notice">Nhiều liên kết hơn chưa chứng minh kế hoạch tốt hơn. '
+            'Cần người đánh giá tính đúng, mức bao phủ và thời gian rà soát.</p></section>')
 
 
 def _facts_html(facts, warnings, text):
@@ -101,7 +153,8 @@ def _facts_html(facts, warnings, text):
              '<p>Quy tắc chỉ nhận diện mẫu xuất hiện trong nguồn. Chuẩn hóa còn mơ hồ được giữ để người kiểm tra; '
              'không tự suy ra lịch, ngân sách hoặc phân công.</p>']
     names = {'dates': 'Ngày', 'identifiers': 'Mã định danh', 'milestones': 'Mốc', 'durations': 'Thời lượng',
-             'budgets': 'Ngân sách', 'technologies': 'Công nghệ', 'personnel': 'Nhân sự'}
+             'budgets': 'Ngân sách', 'technologies': 'Công nghệ', 'personnel': 'Nhân sự',
+             'measures': 'Chỉ số, ngưỡng và thời lượng được đề cập'}
     for field, values in facts['fields'].items():
         if not values: continue
         parts.append('<h3>' + names.get(field, escape(field)) + '</h3><ul>')
@@ -148,6 +201,9 @@ def export_project_report(stage, source_text, source_metadata, extraction_respon
     from planning import _evidence_index, validate_plan
     from psai_rules import extract_facts, resource_warnings
     from .workspace import render_workspace, initial_progress
+    from .briefing import present_project_report
+    from psai_planner import build_review_context, validate_review_context
+    from .comparison import compare_plans
 
     stage = Path(stage)
     record = extraction_response['record']
@@ -155,10 +211,16 @@ def export_project_report(stage, source_text, source_metadata, extraction_respon
     snapshots = retrieval_response['source_texts']
     plan, source_plan = plan_response['plan'], plan_response['source_plan']
     _validate_local_plan(plan, record, source_text, retrieved, snapshots)
+    retrieval_context = {**retrieved, 'source_texts': snapshots}
+    review_context = plan_response.get('review_context')
+    if review_context is None:
+        review_context = build_review_context(record, source_text, retrieval_context)
+    validate_review_context(review_context, record, source_text, retrieval_context)
     evidence = _evidence_index(record, source_text)
     validate_plan(plan, set(evidence), evidence_by_id=evidence)
     record['related_context'] = retrieved['hits']
     plan['related_context'] = retrieved['hits']
+    comparison = compare_plans(record, source_text, retrieved, source_plan, plan)
     metadata['source'] = source_metadata
     starts, cursor = [0], 0
     for line in source_text.splitlines(keepends=True):
@@ -168,13 +230,14 @@ def export_project_report(stage, source_text, source_metadata, extraction_respon
                            'human_review_complete': False, 'provenance': plan.get('provenance')}
     rendered = render_report_html(record, plan, source_text, metadata,
                                   retrieval={**retrieved, 'source_texts': snapshots})
-    extra = _planner_html(plan, record, source_text)
+    extra = _comparison_html(comparison) + _planner_html(plan, record, source_text)
     facts = extract_facts(record['document_id'], source_text)
     warnings = resource_warnings(record, plan, facts)
+    rendered = present_project_report(rendered, record, plan, retrieved, facts, warnings, metadata, source_text,
+                                      review_context=review_context)
     extra += _facts_html(facts, warnings, source_text)
     extra += _ocr_images_html(stage, source_metadata)
     rendered = rendered.replace('<div id="sources">', extra + '<div id="sources">', 1)
-    rendered = rendered.replace('<nav>', '<nav><a href="workspace.html">Không gian dự án / tiến độ</a>', 1)
     for identity, info in retrieved['sources'].items():
         artifact = (stage / info['artifact']).resolve()
         if not artifact.is_relative_to(stage.resolve()):
@@ -188,7 +251,8 @@ def export_project_report(stage, source_text, source_metadata, extraction_respon
     (stage / 'report.html').write_text(rendered, encoding='utf-8')
     analysis = {'schema_version': 2, 'document_id': record['document_id'], 'source': source_metadata,
                 'extraction': record, 'retrieval': retrieved, 'plan': plan,
-                'source_plan': source_plan, 'rule_facts': facts,
+                'source_plan': source_plan, 'rule_facts': facts, 'review_context': review_context,
+                'planning_comparison': comparison,
                 'resource_matching': {'method': 'source_mentions_and_review_warnings', 'warnings': warnings},
                 'metadata': metadata}
     _write(stage / 'analysis.json', analysis)
@@ -198,6 +262,8 @@ def export_project_report(stage, source_text, source_metadata, extraction_respon
     _write(stage / 'source_plan.json', source_plan)
     _write(stage / 'manifest.json', metadata)
     _write(stage / 'rule_facts.json', facts)
+    _write(stage / 'review_context.json', review_context)
+    _write(stage / 'planning_comparison.json', comparison)
     _write(stage / 'progress_initial.json', initial_progress(analysis))
     (stage / 'workspace.html').write_text(render_workspace(analysis), encoding='utf-8')
     _write(stage / 'classifier_predictions.json', extraction_response['classifier_predictions'])

@@ -42,7 +42,7 @@ def selection():
 class PlannerProtocolTests(unittest.TestCase):
     def setUp(self):
         self.record, self.text = fixture()
-        self.catalog = build_catalog(self.record, self.text)
+        self.catalog = build_catalog(self.record, self.text, config={"response_format": "expanded_v1"})
 
     def validate(self, response):
         return validate_response(json.dumps(response), self.catalog)
@@ -146,6 +146,9 @@ class PlannerProtocolTests(unittest.TestCase):
         self.assertEqual(result["steps"][1]["parent_task_id"], "T001")
 
     def test_dependencies_suggestions_only_and_cycles_rejected(self):
+        # Frozen v1 permits uncited inference candidates. New v2 requires a
+        # source constraint citation (tested independently below).
+        self.catalog = build_catalog(self.record, self.text, config={"protocol_version": "psai-local-evidence-catalog-v1"})
         forward = {"before_task_id": "T001", "after_task_id": "T002", "status": "suggested", "needs_review": True}
         response = selection()
         response["dependency_candidates"] = [forward]
@@ -185,7 +188,7 @@ class PlannerProtocolTests(unittest.TestCase):
                     "source_sha256": hashlib.sha256(source.encode()).hexdigest(), "snapshot_id": "tool-snapshot",
                     "char_start": 0, "char_end": len(source), "quote": source, "citation_source": "retrieval_sources/tool.txt"}
         retrieval = {"hits": [external], "source_texts": {"tool-snapshot": source}}
-        catalog = build_catalog(self.record, self.text, retrieval)
+        catalog = build_catalog(self.record, self.text, retrieval, config={"response_format": "expanded_v1"})
         response = selection()
         response["resource_references"] = [external["evidence_id"]]
         result = validate_response(json.dumps(response), catalog)
@@ -236,7 +239,7 @@ class PlannerProtocolTests(unittest.TestCase):
             (folder / "config.json").write_text('{"model_type":"fixture"}', encoding="utf-8")
             (folder / "model.safetensors").write_bytes(b"test weights only")
             with patch("psai_planner.planner._generate_local_response", return_value=(raw, {"input_tokens": 100})):
-                result = plan_project(self.record, self.text, model_dir=folder)
+                result = plan_project(self.record, self.text, model_dir=folder, config={"response_format": "expanded_v1"})
         self.assertEqual(result["raw_response"], raw)
         self.assertEqual(result["messages"], build_prompt(self.catalog))
         self.assertEqual(result["provenance"]["response_sha256"], hashlib.sha256(raw.encode()).hexdigest())

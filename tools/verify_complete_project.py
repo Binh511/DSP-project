@@ -64,7 +64,7 @@ def main():
     analysis = json.loads((folder / 'analysis.json').read_text('utf-8'))
     checks = verify_export(folder)
     assert analysis['source']['ocr_pages'] >= 1
-    assert analysis['plan']['planning_method'] == 'local_llm_evidence_catalog_v1'
+    assert analysis['plan']['planning_method'] in ('local_llm_evidence_catalog_v1', 'local_llm_evidence_catalog_v2')
     assert analysis['plan']['provenance']['model_loaded'] is True
     assert analysis['plan']['steps'] and (folder / 'workspace.html').is_file()
     assert analysis['rule_facts']['fields']['budgets']

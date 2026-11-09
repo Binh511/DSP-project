@@ -15,6 +15,32 @@ SOURCE = '# Project\n\n## Work\nWe will implement a Python collector for API met
 
 
 class ProjectOrchestratorTests(unittest.TestCase):
+    def test_transient_windows_publish_lock_is_retried_without_changing_permissions(self):
+        lock = PermissionError('Transient scanner sharing lock')
+        lock.winerror = 32
+        with tempfile.TemporaryDirectory() as folder:
+            stage, output = Path(folder) / 'staging', Path(folder) / 'result'
+            stage.mkdir()
+            with patch.object(runtime.sys, 'platform', 'win32'), \
+                    patch.object(Path, 'rename', side_effect=[lock, None]) as rename, \
+                    patch.object(runtime.time, 'sleep') as sleep:
+                runtime._publish_directory(stage, output)
+            self.assertEqual(rename.call_count, 2)
+            sleep.assert_called_once_with(.05)
+
+    def test_publish_never_replaces_an_existing_output_or_hides_permanent_denial(self):
+        with tempfile.TemporaryDirectory() as folder:
+            stage, output = Path(folder) / 'staging', Path(folder) / 'result'
+            stage.mkdir()
+            output.mkdir()
+            with self.assertRaises(FileExistsError):
+                runtime._publish_directory(stage, output)
+            with patch.object(Path, 'rename', side_effect=PermissionError('Permanent denial')) as rename, \
+                    patch.object(runtime.time, 'sleep') as sleep, self.assertRaises(PermissionError):
+                runtime._publish_directory(stage, Path(folder) / 'new-result')
+            self.assertEqual(rename.call_count, 1)
+            sleep.assert_not_called()
+
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)

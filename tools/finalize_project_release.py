@@ -5,7 +5,8 @@ import argparse
 from datetime import datetime, timezone
 import hashlib
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,22 +24,91 @@ def sha(path):
     return digest.hexdigest()
 
 
+def _check_files(root, files, *, optional=False, label='Project source/artifact'):
+    """Allow absent optional assets, but never accept changed or unsafe files."""
+    root = Path(root).resolve()
+    if not isinstance(files, dict) or not files:
+        raise ValueError(label + ' needs a nonempty file/hash mapping')
+    checked, missing = [], []
+    for name, expected in files.items():
+        if (not isinstance(name, str) or not name or '\\' in name or ':' in name
+                or PurePosixPath(name).is_absolute() or '..' in PurePosixPath(name).parts
+                or PurePosixPath(name).as_posix() != name
+                or not isinstance(expected, str) or not re.fullmatch(r'[0-9a-f]{64}', expected)):
+            raise ValueError(label + ' contains an unsafe path or invalid SHA-256: ' + str(name))
+        path = (root / name).resolve()
+        if not path.is_relative_to(root):
+            raise ValueError(label + ' path escapes its root: ' + name)
+        if not path.exists() and optional:
+            missing.append(name)
+            continue
+        if not path.is_file() or sha(path) != expected:
+            raise ValueError(label + ' integrity mismatch: ' + name)
+        checked.append(name)
+    return checked, missing
+
+
+def verify_source_bundle(manifest_path, *, root=None):
+    """Verify a new package inventory independently of the frozen release.
+
+    ``files_sha256`` (or the handoff inventory's ``files``) lists mandatory
+    packaged files. Only explicitly declared ``optional_components`` may be
+    absent, each with its own nonempty ``files_sha256`` mapping. A present
+    optional file with the wrong hash always fails. This checks file integrity,
+    never full model execution or historical release compatibility.
+    """
+    root = Path(ROOT if root is None else root).resolve()
+    manifest_path = Path(manifest_path)
+    if not manifest_path.is_absolute():
+        manifest_path = root / manifest_path
+    data = read(manifest_path)
+    if not isinstance(data, dict):
+        raise ValueError('Source bundle manifest must be an object')
+    if 'files_sha256' in data and 'files' in data:
+        raise ValueError('Source bundle must use exactly one mandatory file/hash mapping')
+    required = data.get('files_sha256', data.get('files'))
+    checked, _ = _check_files(root, required, label='Source bundle')
+    optional = data.get('optional_components', {})
+    if not isinstance(optional, dict):
+        raise ValueError('Source bundle optional_components must be a mapping')
+    occupied = set(required)
+    components = {}
+    for name, component in optional.items():
+        if not isinstance(name, str) or not name.strip() or not isinstance(component, dict):
+            raise ValueError('Source bundle optional components need names and file mappings')
+        files = component.get('files_sha256')
+        if isinstance(files, dict) and occupied.intersection(files):
+            raise ValueError('Source bundle file is declared in multiple components: ' + name)
+        present, missing = _check_files(root, files, optional=True, label='Optional component ' + name)
+        occupied.update(files)
+        components[name] = {
+            'status': 'missing_optional' if not present else 'partial' if missing else 'verified',
+            'files_checked': len(present), 'missing_files': missing,
+        }
+    missing_components = [name for name, component in components.items() if component['missing_files']]
+    result = {
+        'status': 'partial' if missing_components else 'verified',
+        'verification_scope': 'source_bundle_integrity',
+        'source_status': 'verified', 'files_checked': len(checked),
+        'optional_components': components, 'missing_optional_components': missing_components,
+        'historical_release_verified': False, 'full_runtime_verified': False,
+        'independent_quality_evaluation_complete': False,
+    }
+    print(json.dumps(result, indent=2), flush=True)
+    return result
+
+
 def verify(models=False):
     data = read(FOLDER / 'PROJECT_RELEASE_MANIFEST.json')
-    for name, expected in data['files_sha256'].items():
-        path = (ROOT / name).resolve()
-        if not path.is_relative_to(ROOT) or not path.is_file() or sha(path) != expected:
-            raise ValueError('Project source/artifact integrity mismatch: ' + name)
+    _check_files(ROOT, data['files_sha256'])
     if models:
-        for name, expected in data['classifier_model_files_sha256'].items():
-            if sha(ROOT / name) != expected: raise ValueError('Classifier model changed: ' + name)
+        _check_files(ROOT, data['classifier_model_files_sha256'], label='Classifier model')
         from psai_retrieval.runtime import DEFAULT_BASE
-        for name, expected in data['embedding_base']['files_sha256'].items():
-            if sha(DEFAULT_BASE / name) != expected: raise ValueError('Embedding base changed: ' + name)
+        _check_files(DEFAULT_BASE, data['embedding_base']['files_sha256'], label='Embedding base')
         model_dir = Path(read(FOLDER / 'local_planner_model.json')['local_path'])
-        for name, expected in data['planner_model']['files_sha256'].items():
-            if sha(model_dir / name) != expected: raise ValueError('Planner model changed: ' + name)
+        _check_files(model_dir, data['planner_model']['files_sha256'], label='Planner model')
     result = {'status': 'verified', 'release_version': data['release_version'],
+              'verification_scope': 'historical_release_integrity',
               'files': len(data['files_sha256']), 'model_weights_checked': models,
               'functional_acceptance': data['functional_acceptance'],
               'independent_quality_evaluation_complete': False, 'production_models_changed': False}
@@ -95,8 +165,23 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--verify-only', action='store_true')
     parser.add_argument('--models', action='store_true', help='Also hash local model files; requires installed weights')
+    source = parser.add_mutually_exclusive_group()
+    source.add_argument('--source-manifest', type=Path,
+                        help='Verify a package-specific inventory; never bypasses a mismatched file')
+    source.add_argument('--source-only', action='store_true',
+                        help='Verify SOURCE_BUNDLE_MANIFEST.json or COMPLETE_HANDOFF_FILES.json in this checkout')
     args = parser.parse_args()
-    verify(args.models) if args.verify_only else build()
+    if args.source_manifest or args.source_only:
+        if args.models:
+            parser.error('--models checks the historical release; do not combine it with source-bundle verification')
+        manifest = args.source_manifest
+        if manifest is None:
+            manifest = ROOT / 'SOURCE_BUNDLE_MANIFEST.json'
+            if not manifest.is_file():
+                manifest = ROOT / 'COMPLETE_HANDOFF_FILES.json'
+        verify_source_bundle(manifest)
+    else:
+        verify(args.models) if args.verify_only else build()
 
 
 if __name__ == '__main__': main()

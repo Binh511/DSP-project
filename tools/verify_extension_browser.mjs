@@ -146,7 +146,17 @@ try {
   const { nodeId } = await page.call("DOM.querySelector", { nodeId: documentRoot.nodeId, selector: "#document-file" });
   await page.call("DOM.setFileInputFiles", { nodeId, files: [path.join(root, "examples/proposal.md")] });
   await page.evaluate("document.querySelector('input[name=mode][value=fast]').checked=true; document.getElementById('analysis-form').requestSubmit()");
-  await until(() => page.evaluate("document.getElementById('detail-status').textContent === 'Hoàn tất'"), "actual pipeline result in extension", 90000);
+  await until(async () => {
+    const status = await page.evaluate("document.getElementById('detail-status').textContent");
+    if (status === 'Có lỗi') {
+      const response = await fetch(`http://127.0.0.1:${backendPort}/api/jobs`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const failed = (await response.json()).jobs.find((job) => job.status === 'failed');
+      throw new Error('Actual pipeline failed: ' + (failed?.error || 'inspect job logs') + '\n' + (failed?.log_tail || ''));
+    }
+    return status === 'Hoàn tất';
+  }, "actual pipeline result in extension", 90000);
   if (!await page.evaluate("!document.getElementById('open-report').hidden && !document.getElementById('open-workspace').hidden && !document.getElementById('download-analysis').hidden")) {
     throw new Error("Completed extension job is missing result actions.");
   }

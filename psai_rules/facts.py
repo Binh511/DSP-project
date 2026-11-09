@@ -7,23 +7,39 @@ import hashlib
 import re
 
 
-METHOD = "deterministic_source_patterns_v1"
-FIELD_NAMES = ("dates", "identifiers", "milestones", "durations", "budgets", "technologies", "personnel")
+METHOD = "deterministic_source_patterns_v2"
+FIELD_NAMES = ("dates", "identifiers", "milestones", "durations", "budgets", "technologies", "personnel", "measures")
 _ISO_DATE = re.compile(r"(?<![\w/])(?P<year>\d{4})-(?P<month>\d{2})-(?P<day>\d{2})(?![\w/])")
 _SLASH_DATE = re.compile(r"(?<![\w/])(?P<day>\d{1,2})/(?P<month>\d{1,2})/(?P<year>\d{4})(?![\w/])")
 _NUMBER = r"(?:\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?|\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?|\d+(?:[.,]\d{1,2})?)"
 _BUDGET = re.compile(r"(?<![\w.,])(?:(?P<prefix>USD|EUR|VND|\$)\s*(?P<amount1>" + _NUMBER + r")(?!\d|[.,]\d)|"
                      r"(?P<amount2>" + _NUMBER + r")\s*(?P<suffix>USD|EUR|VND))(?!\w)", re.I)
-_DURATION = re.compile(r"(?<![\w.,])(?P<number>\d{1,4}(?:[.,]\d{1,2})?)\s*(?P<unit>"
-                       r"hours?|days?|weeks?|months?|years?|minutes?|giờ|ngày|tuần|tháng|năm|phút)(?!\w)", re.I)
-_PERSONNEL = re.compile(r"(?<![\w.,])(?P<number>\d{1,3})\s*(?P<unit>"
-                        r"developers?|engineers?|staff|people|persons?|team\s+members?|"
-                        r"lập\s+trình\s+viên|kỹ\s+sư|nhân\s+sự|người)(?!\w)", re.I)
+_COUNT_WORDS = dict(zip(
+    "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty".split(),
+    range(21)))
+_COUNT_WORDS.update({"không": 0, "một": 1, "hai": 2, "ba": 3, "bốn": 4, "năm": 5,
+                     "sáu": 6, "bảy": 7, "tám": 8, "chín": 9, "mười": 10})
+_WORD_QUANTITY = "|".join(re.escape(word) for word in sorted(_COUNT_WORDS, key=len, reverse=True))
+_QUANTITY = r"(?:\d{1,6}(?:[.,]\d{1,2})?|(?:" + _WORD_QUANTITY + r")(?!\w))"
+_TIME_UNIT = r"hours?|days?|weeks?|months?|years?|minutes?|seconds?|giờ|ngày|tuần|tháng|năm|phút|giây"
+_DURATION = re.compile(r"(?<![\w.,])(?P<number>" + _QUANTITY + r")[ \t]*(?:-[ \t]*)?"
+                       r"(?P<unit>" + _TIME_UNIT + r")(?!\w)", re.I)
+_MEASURE = re.compile(r"(?<![\w.,])(?P<number>" + _QUANTITY + r")[ \t]*(?:-[ \t]*)?"
+                      r"(?P<unit>" + _TIME_UNIT + r"|percent|per[ \t]+cent|phần[ \t]+trăm|%)(?!\w)", re.I)
+_WORKLOAD = r"part[- ]time|full[- ]time|bán[ \t]+thời[ \t]+gian|toàn[ \t]+thời[ \t]+gian"
+_ROLE_PREFIX = (r"(?:(?:software|site[ \t]+reliability|operations?|data|security|quality[ \t]+assurance|"
+                r"backend|frontend|senior|junior|maintenance|laboratory|lab|applications?|project|systems?|"
+                r"network|infrastructure|support|technical|field|business|product|research|electrical|mechanical)[ \t]+){0,2}")
+_PERSONNEL = re.compile(r"(?<![\w.,])(?P<number>\d{1,3}|" + _WORD_QUANTITY + r")[ \t]+"
+                        r"(?P<unit>(?:(?P<workload>" + _WORKLOAD + r")[ \t]+)?" + _ROLE_PREFIX +
+                        r"(?:developers?|engineers?|leads?|analysts?|testers?|designers?|representatives?|coordinators?|"
+                        r"technicians?|staff|people|persons?|team[ \t]+members?|"
+                        r"lập[ \t]+trình[ \t]+viên|kỹ[ \t]+sư|nhân[ \t]+sự|người))(?!\w)", re.I)
 _IDENTIFIER = re.compile(r"(?<!\w)(?:(?:project|proposal|document|ticket|issue|grant|contract)\s+"
                          r"(?:id|identifier|no\.?|number)|ID|mã\s+(?:dự\s+án|tài\s+liệu|hồ\s+sơ))"
                          r"[ \t]*[:#=]?[ \t]+(?P<identifier>[A-Za-z0-9][A-Za-z0-9._/-]{0,63})(?!\w)", re.I)
 _MILESTONE = re.compile(r"(?<!\w)(?:milestone|cột\s+mốc|mốc\s+tiến\s+độ)[ \t]*"
-                        r"(?:#?\d{1,3}|[A-Z])?[ \t]*[:\-][ \t]*[^\n.!?]{3,160}", re.I)
+                        r"(?:#?\d{1,3}|[A-Z]\d{0,3})?[ \t]*(?:[:\-]|\bis\b|\blà\b)[ \t]*[^\n.!?]{3,160}", re.I)
 _TECHNOLOGIES = ("Python", "JavaScript", "TypeScript", "Java", "Rust", "C++", "C#", "Docker",
                  "Kubernetes", "PostgreSQL", "MySQL", "SQLite", "Redis", "GitHub", "GitLab",
                  "PyTorch", "TensorFlow", "scikit-learn", "ChromaDB", "FAISS", "Prometheus",
@@ -34,11 +50,73 @@ _TECH_PATTERN = re.compile(r"(?<![\w])(?:" + "|".join(re.escape(value) for value
 _CANONICAL_TECH = {value.casefold(): value for value in _TECHNOLOGIES}
 _UNITS = {"hour": "hour", "hours": "hour", "giờ": "hour", "day": "day", "days": "day", "ngày": "day",
           "week": "week", "weeks": "week", "tuần": "week", "month": "month", "months": "month", "tháng": "month",
-          "year": "year", "years": "year", "năm": "year", "minute": "minute", "minutes": "minute", "phút": "minute"}
+          "year": "year", "years": "year", "năm": "year", "minute": "minute", "minutes": "minute", "phút": "minute",
+          "second": "second", "seconds": "second", "giây": "second", "percent": "percent", "per cent": "percent",
+          "phần trăm": "percent", "%": "percent"}
+_UNSUPPORTED_NUMBER_PREFIX = re.compile(
+    r"(?:\b(?:" + _WORD_QUANTITY + r"|hundred|thousand|million|trăm|nghìn|triệu)|\d)"
+    r"(?:[-– \t]+(?:and[ \t]+)?|[ \t]+(?:to|đến)[ \t]+)$", re.I)
+_CONTEXT_BOUNDARY = re.compile(r"[.!?](?=\s|$)|\n")
+_PROPOSED = re.compile(r"\b(?:propos\w*|target\w*|aim\w*|objective\w*|must|should|shall|will|planned|pending|unconfirmed|"
+                       r"not[ \t]+(?:yet[ \t]+)?approved|đề[ \t]+xuất|mục[ \t]+tiêu|phải|cần|dự[ \t]+kiến|chưa[ \t]+phê[ \t]+duyệt)\b", re.I)
+_COMPARATOR = re.compile(r"(?P<phrase>at[ \t]+least|at[ \t]+most|no[ \t]+more[ \t]+than|no[ \t]+less[ \t]+than|"
+                         r"within|under|less[ \t]+than|more[ \t]+than|after|tối[ \t]+thiểu|tối[ \t]+đa|ít[ \t]+nhất|"
+                         r"không[ \t]+quá|trong[ \t]+vòng)[ \t]+$", re.I)
 
 
 def _hash(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _quantity(number: str) -> str:
+    if number.casefold() in _COUNT_WORDS:
+        return str(_COUNT_WORDS[number.casefold()])
+    return format(Decimal(number.replace(",", ".")), "f")
+
+
+def _partial_quantity(source: str, match: re.Match) -> bool:
+    """Do not turn an unsupported range, negative or compound number into a scalar."""
+    prefix = source[max(0, match.start() - 80):match.start()]
+    return bool(re.search(r"[-−][ \t]*$", prefix)
+                or _UNSUPPORTED_NUMBER_PREFIX.search(prefix))
+
+
+def _context(source: str, start: int, end: int) -> dict:
+    """Bounded, exact source context; do not borrow proposal status from another sentence."""
+    left, right = max(0, start - 400), min(len(source), end + 400)
+    before = list(_CONTEXT_BOUNDARY.finditer(source, left, start))
+    if before:
+        left = before[-1].end()
+    after = _CONTEXT_BOUNDARY.search(source, end, right)
+    if after:
+        right = after.end()
+    while left < start and source[left].isspace():
+        left += 1
+    return {"quote": source[left:right], "char_start": left, "char_end": right}
+
+
+def _measure_value(source: str, match: re.Match) -> dict:
+    unit = _UNITS[re.sub(r"[ \t]+", " ", match["unit"].casefold())]
+    context = _context(source, match.start(), match.end())
+    text = context["quote"]
+    prefix = source[max(context["char_start"], match.start() - 40):match.start()]
+    comparator_match = _COMPARATOR.search(prefix)
+    phrase = re.sub(r"[ \t]+", " ", comparator_match["phrase"].casefold()) if comparator_match else ""
+    comparators = {"at least": "at_least", "no less than": "at_least", "tối thiểu": "at_least", "ít nhất": "at_least",
+                   "at most": "at_most", "no more than": "at_most", "within": "at_most", "tối đa": "at_most",
+                   "không quá": "at_most", "trong vòng": "at_most", "under": "less_than", "less than": "less_than",
+                   "more than": "greater_than", "after": "after"}
+    proposed = bool(_PROPOSED.search(text))
+    if re.search(r"\b(?:retention|retain\w*|rolling|lưu[ \t]+trữ|lưu[ \t]+giữ)\b", text, re.I):
+        kind = "retention"
+    elif re.search(r"\b(?:threshold|heartbeat[ \t]+alert|ngưỡng)\b", text, re.I):
+        kind = "threshold"
+    else:
+        kind = "target" if proposed else ("measure_mention" if unit == "percent" else "duration_mention")
+    return {"quantity": _quantity(match["number"]), "unit": unit,
+            "comparator": comparators.get(phrase, "exact_mention"),
+            "status": "proposed_or_unconfirmed" if proposed else "mention_only", "kind": kind,
+            "context": context}
 
 
 def _amount(number: str) -> tuple[str | None, list[str]]:
@@ -131,12 +209,22 @@ def extract_facts(document_id: str, source_text: str) -> dict:
             "explicit_currency_only_separator_ambiguity_preserved_no_dollar_country_inference",
             needs_review=ambiguous)
     for match in _DURATION.finditer(source_text):
-        number = format(Decimal(match["number"].replace(",", ".")), "f")
+        if _partial_quantity(source_text, match):
+            continue
+        number = _quantity(match["number"])
         add("durations", match, {"quantity": number, "unit": _UNITS[match["unit"].casefold()]},
-            "literal_numeric_duration_no_calendar_conversion_or_start_end_inference")
+            "literal_duration_no_calendar_conversion_or_start_end_inference")
     for match in _PERSONNEL.finditer(source_text):
-        add("personnel", match, {"quantity": int(match["number"]), "role_mention": match["unit"]},
-            "literal_numeric_staff_mention_not_assignment_or_availability", needs_review=True)
+        if _partial_quantity(source_text, match):
+            continue
+        add("personnel", match, {"quantity": int(_quantity(match["number"])), "role_mention": match["unit"],
+                                  "workload_mention": match["workload"], "status": "mention_only"},
+            "literal_staff_mention_not_assignment_availability_or_full_time_equivalent", needs_review=True)
+    for match in _MEASURE.finditer(source_text):
+        if _partial_quantity(source_text, match):
+            continue
+        add("measures", match, _measure_value(source_text, match),
+            "literal_measure_with_source_context_not_achieved_result_or_validated_acceptance", needs_review=True)
     for match in _IDENTIFIER.finditer(source_text):
         identifier = match["identifier"].rstrip(".,/")
         if not identifier or (not any(char.isdigit() for char in identifier)

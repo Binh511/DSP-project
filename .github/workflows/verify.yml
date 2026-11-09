@@ -28,6 +28,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_extension_*.py' -v
       - name: Project orchestration and launcher contracts
         run: python -m unittest discover -s tests -p 'test_project_*.py' -v
+      - name: Literal source facts and grounded planner protocols
+        run: python -m unittest psai_rules.test_facts psai_planner.test_planner psai_planner.test_context test_psai_reports -v
       - name: Extension logic tests
         run: node --test extension/psai/tests/*.test.mjs
       - name: Extension JavaScript syntax

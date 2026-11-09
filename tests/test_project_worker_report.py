@@ -109,9 +109,8 @@ class WorkerReportTests(unittest.TestCase):
         record = extract_document('demo', TEXT, use_model=False)
         retrieval = {'hits': []}
         catalog = build_catalog(record, TEXT, retrieval, DEFAULT_CONFIG)
-        raw = json.dumps({'tasks': [{'task_id': catalog['tasks'][0]['task_id'], 'parent_task_id': None,
-                                    'checklist': [], 'required_resources': []}],
-                          'dependency_candidates': [], 'resource_references': []})
+        raw = json.dumps({'task_ids': [catalog['tasks'][0]['task_id']],
+                          'link_ids': []})
         messages = build_prompt(catalog)
         digest = lambda value: hashlib.sha256(json.dumps(value,ensure_ascii=False,sort_keys=True,
                                                 separators=(',', ':')).encode()).hexdigest()

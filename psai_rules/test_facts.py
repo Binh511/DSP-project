@@ -103,6 +103,101 @@ class FactTests(unittest.TestCase):
         self.assertTrue(all(item["needs_review"] for item in people))
         self.assertTrue(all("not_assignment" in item["normalization_policy"] for item in people))
 
+    def test_written_counts_compound_roles_and_workload_are_literal_mentions(self):
+        text = ("The scenario team has two software engineers, one part-time site reliability engineer, "
+                "and one operations lead. Availability and individual ownership are unconfirmed. "
+                "A separate review names twenty testers and zero designers.")
+        people = extract_facts("a", text)["fields"]["personnel"]
+        self.assertEqual([item["value"]["quantity"] for item in people], [2, 1, 1, 20, 0])
+        self.assertEqual([item["value"]["role_mention"] for item in people[:3]],
+                         ["software engineers", "part-time site reliability engineer", "operations lead"])
+        self.assertEqual(people[1]["value"]["workload_mention"], "part-time")
+        self.assertTrue(all(item["value"]["status"] == "mention_only" for item in people))
+        self.assertTrue(all(not ({"fte", "owner", "available", "assigned"} & set(item["value"])) for item in people))
+        self.assertTrue(all(text[item["char_start"]:item["char_end"]] == item["quote"] for item in people))
+
+    def test_vietnamese_written_staff_counts_and_novel_english_roles(self):
+        text = "Cần ba kỹ sư và hai lập trình viên. Also four security analysts and 6 full-time data engineers."
+        people = extract_facts("a", text)["fields"]["personnel"]
+        self.assertEqual([item["value"]["quantity"] for item in people], [3, 2, 4, 6])
+        self.assertEqual(people[-1]["value"]["workload_mention"], "full-time")
+
+    def test_non_software_staff_compound_roles_and_workload(self):
+        text = ("The pilot needs three project coordinators, one part-time maintenance technician, "
+                "two laboratory representatives and 4 application support engineers. "
+                "These mentions do not confirm availability or assignments.")
+        people = extract_facts("a", text)["fields"]["personnel"]
+        self.assertEqual([item["value"]["quantity"] for item in people], [3, 1, 2, 4])
+        self.assertEqual([item["value"]["role_mention"] for item in people],
+                         ["project coordinators", "part-time maintenance technician", "laboratory representatives",
+                          "application support engineers"])
+        self.assertEqual(people[1]["value"]["workload_mention"], "part-time")
+        self.assertTrue(all(item["value"]["status"] == "mention_only" and item["needs_review"] for item in people))
+        self.assertTrue(all(text[item["char_start"]:item["char_end"]] == item["quote"] for item in people))
+
+    def test_equipment_modifiers_do_not_become_staff_without_person_role(self):
+        text = ("We have two laboratory instruments, one maintenance workstation, three project servers, "
+                "four application containers and five system components.")
+        self.assertFalse(extract_facts("a", text)["fields"]["personnel"])
+
+    def test_unsupported_compound_staff_counts_not_partially_parsed(self):
+        for text in ("twenty-one engineers", "one hundred and five engineers", "-2 developers", "2.5 engineers",
+                     "between 3 and 5 developers", "10 to 12 engineers", "three software servers"):
+            with self.subTest(text=text):
+                self.assertFalse(extract_facts("a", text)["fields"]["personnel"])
+
+    def test_measures_normalize_units_comparators_and_keep_exact_context(self):
+        text = ("📄 A target of identifying a fault within five minutes of a simulated event is proposed. "
+                "The pilot aims to preserve at least 95 percent of samples during a healthy-network rehearsal. "
+                "A critical heartbeat alert should be proposed only after 180 seconds without a heartbeat. "
+                "The pilot should keep a 30-day rolling retention window; final approval is pending.")
+        facts = extract_facts("a", text)
+        measures = facts["fields"]["measures"]
+        self.assertEqual([item["value"]["quantity"] for item in measures], ["5", "95", "180", "30"])
+        self.assertEqual([item["value"]["unit"] for item in measures], ["minute", "percent", "second", "day"])
+        self.assertEqual([item["value"]["comparator"] for item in measures],
+                         ["at_most", "at_least", "after", "exact_mention"])
+        self.assertEqual([item["value"]["kind"] for item in measures], ["target", "target", "threshold", "retention"])
+        for item in measures:
+            self.assertEqual(item["value"]["status"], "proposed_or_unconfirmed")
+            self.assertTrue(item["needs_review"])
+            self.assertEqual(text[item["char_start"]:item["char_end"]], item["quote"])
+            context = item["value"]["context"]
+            self.assertEqual(text[context["char_start"]:context["char_end"]], context["quote"])
+            self.assertLessEqual(context["char_start"], item["char_start"])
+            self.assertGreaterEqual(context["char_end"], item["char_end"])
+            self.assertNotIn("achieved", item["value"])
+
+    def test_hyphenated_targets_percent_symbol_and_decimal_units(self):
+        text = "Proposed five-minute target, 95-percent sample target and at most 2.5 hours. Also 99% and 1,5 giây."
+        measures = extract_facts("a", text)["fields"]["measures"]
+        self.assertEqual([(item["value"]["quantity"], item["value"]["unit"]) for item in measures],
+                         [("5", "minute"), ("95", "percent"), ("2.5", "hour"), ("99", "percent"), ("1.5", "second")])
+        self.assertEqual(measures[2]["value"]["comparator"], "at_most")
+
+    def test_measure_status_scoped_to_own_sentence_no_claim_of_achievement(self):
+        text = "A target will be proposed. Last week's report measured 83 percent. The archive mentions 7 days."
+        measures = extract_facts("a", text)["fields"]["measures"]
+        self.assertEqual([item["value"]["status"] for item in measures], ["mention_only", "mention_only"])
+        self.assertEqual([item["value"]["kind"] for item in measures], ["measure_mention", "duration_mention"])
+        self.assertNotIn("proposed", measures[0]["value"]["context"]["quote"])
+
+    def test_unsupported_measures_do_not_become_partial_positive_values(self):
+        for text in ("-5 minutes", "5-10 days", "one hundred and five minutes", "twenty-one percent", "10 to 12 seconds"):
+            with self.subTest(text=text):
+                self.assertFalse(extract_facts("a", text)["fields"]["measures"])
+        self.assertFalse(extract_facts("a", "Version 2.5, 95 records, 30 IDs and 2027-03-09.")["fields"]["measures"])
+
+    def test_milestone_labels_allow_alphanumeric_ids_and_is_without_date_invention(self):
+        text = ("Milestone M1 is a source review proposed for 2027-03-09. "
+                "Milestone M2 is an integrated rehearsal proposed for 2027-03-26.\n"
+                "Mốc tiến độ B3: Kiểm tra bàn giao chưa được phê duyệt")
+        milestones = extract_facts("a", text)["fields"]["milestones"]
+        self.assertEqual(len(milestones), 3)
+        self.assertTrue(all(isinstance(item["value"], str) for item in milestones))
+        self.assertTrue(all(item["needs_review"] for item in milestones))
+        self.assertEqual(milestones[0]["quote"], "Milestone M1 is a source review proposed for 2027-03-09")
+
     def test_repeated_literal_at_distinct_source_locations_kept_once_each(self):
         result = extract_facts("a", "Python Python USD 12 USD 12")
         for field in ("technologies", "budgets"):

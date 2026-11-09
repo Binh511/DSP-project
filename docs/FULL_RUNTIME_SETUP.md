@@ -1,47 +1,46 @@
-# Chạy đầy đủ model trên máy nhận
+# Thiết lập runtime đầy đủ
 
-Demo fast trong [README](../README.md) chạy từ bản clone với Python chuẩn. Full dùng ensemble classifier, BGE-M3 và Qwen; cần chuẩn bị các model dưới đây. Runtime không huấn luyện lại hoặc tự tải model trong quá trình phân tích.
+Chế độ full chạy ensemble classifier, truy hồi hybrid với BGE-M3 và planner Qwen cục bộ. Cần Python 3.11 trở lên, dependency tương thích với thiết bị và các model đã có trên máy. Runtime suy luận offline, không huấn luyện hoặc tự tải model.
 
-## Chuẩn bị môi trường
+Nếu chỉ cần kiểm tra Markdown/TXT, dùng [chế độ fast](../README.md) với thư viện chuẩn Python.
 
-Tại gốc dự án, tạo môi trường riêng:
+## Môi trường Python
+
+Tại gốc dự án, trên Windows:
 
 ```powershell
 python -m venv .venv/psai_runtime
 .venv/psai_runtime/Scripts/python.exe -m pip install -r requirements-project.txt
 ```
 
-Trên macOS/Linux, đường dẫn Python là `.venv/psai_runtime/bin/python`. Các phiên bản trong [requirements RAG](../requirements-rag.txt) ghi nhận môi trường Windows đã dùng; chọn Torch CPU/CUDA phù hợp máy nhận. Cài dependency cần mạng; runtime dùng model đã có trên máy.
+Trên Linux/macOS:
 
-Môi trường đã nghiệm thu dùng Python 3.13 và NVIDIA RTX 4050 6 GB. Chưa chứng nhận tốc độ/mức dùng RAM cho mọi máy khác. CPU có thể chậm. Xem [OCR](../psai_ocr/README.md) nếu cần PDF scan.
+```sh
+python3 -m venv .venv/psai_runtime
+.venv/psai_runtime/bin/python -m pip install -r requirements-project.txt
+```
 
-## Những model cần chuyển riêng
+[requirements-project.txt](../requirements-project.txt) tập hợp dependency runtime. Chọn bản PyTorch CPU/CUDA phù hợp với thiết bị. Việc cài dependency hoặc chuẩn bị model có thể cần mạng; đó là bước thiết lập tách khỏi quá trình phân tích.
 
-| Model | Vị trí trên máy nhận | Thành phần |
+Trình demo trên Windows tự ưu tiên `.venv/psai_runtime/Scripts/python.exe` khi có sẵn. Trên Linux/macOS, gọi rõ `.venv/psai_runtime/bin/python` trong các lệnh để dùng đúng môi trường.
+
+## Model cục bộ
+
+| Thành phần | Vị trí/cấu hình | Nội dung cần giữ |
 |---|---|---|
 | Classifier seed 11 | `models/final_s11/` | Weights, config, tokenizer, `inference_config.json` |
 | Classifier seed 22 | `models/final_s22/` | Export đầy đủ cùng cấu trúc |
 | Classifier seed 33 | `models/final_s33/` | Export đầy đủ cùng cấu trúc |
-| BGE-M3 base | Snapshot cục bộ, truyền qua `--base-model-dir` | Weights, tokenizer, pooling/normalize config, đúng revision |
-| Qwen2.5-1.5B-Instruct | Model cục bộ, truyền qua `--planner-model-dir` | Weights, config, tokenizer, generation config |
+| BGE-M3 | `--base-model-dir` | Snapshot đầy đủ, tokenizer và cấu hình pooling/normalize |
+| Qwen2.5-1.5B-Instruct | `--planner-model-dir` | Weights, config, tokenizer và generation config |
 
-Các đường dẫn trên là tài nguyên sau khi chép model, không có sẵn trong clone. **Ba export classifier production do tác giả cung cấp.** Classifier nghiên cứu v2 và các model k-fold lịch sử không thay thế ba export này. Không dùng `git lfs pull` để coi model lịch sử là production mặc định.
+Ba export classifier phải nằm đúng vị trí trên. Checkpoint thí nghiệm khác không tự thay thế ensemble này.
 
-Tác giả chia sẻ các thư mục export nguyên vẹn qua ổ đĩa hoặc kênh chuyển file thống nhất với người nhận. Gói model phải tách khỏi tài liệu/nhãn riêng. Bản GitHub không chứa weights hoặc đường link tải do tác giả chưa cung cấp.
+BGE-M3 dùng revision `5617a9f61b028005a4858fdac845db406aefb181`; giữ thư mục snapshot mang tên revision cùng cấu hình tương ứng. Qwen dùng revision `989aa7980e4cf806f80c7fef2b1adb7bc71aa306`. Chuẩn bị các thư mục model đầy đủ trước khi chạy, rồi truyền đường dẫn bằng hai cờ trên.
 
-BGE-M3 dùng revision `5617a9f61b028005a4858fdac845db406aefb181`; giữ tên thư mục snapshot revision và cấu hình pooling/normalize. Qwen đã nghiệm thu dùng revision `989aa7980e4cf806f80c7fef2b1adb7bc71aa306`. [Manifest](../reports/project_completion/PROJECT_RELEASE_MANIFEST.json) và [biên bản chạy](../reports/project_completion/latest_acceptance.json) có hash để đối chiếu.
+Kho mã không kèm trọng số, dữ liệu nghiên cứu, báo cáo sinh ra hoặc môi trường ảo. Không dựa vào manifest chứa đường dẫn tuyệt đối của máy khác. Việc tái lập huấn luyện/đánh giá còn cần dữ liệu, nhãn và cấu hình của thí nghiệm; runtime full không yêu cầu huấn luyện lại.
 
-Các báo cáo nghiên cứu nằm trong repository đầy đủ. Nếu bạn chỉ nhận ZIP backend, có thể xem [manifest trên GitHub](https://github.com/Binh511/DSP-project/blob/main/reports/project_completion/PROJECT_RELEASE_MANIFEST.json) và [biên bản trên GitHub](https://github.com/Binh511/DSP-project/blob/main/reports/project_completion/latest_acceptance.json). ZIP backend tập trung vào source chạy và các công cụ setup/demo.
-
-Nếu muốn tự tải Qwen base từ Hugging Face, sau khi cài dependency, chạy [công cụ setup](../tools/setup_project_planner_model.py). Đây là thao tác tải model riêng, cần mạng:
-
-```powershell
-.venv/psai_runtime/Scripts/python.exe tools/setup_project_planner_model.py
-```
-
-Công cụ tạo manifest đường dẫn của máy nhận. Không sao chép `local_planner_model.json` chứa đường dẫn tuyệt đối của máy tác giả. BGE-M3 có thể được chuẩn bị từ snapshot đã kiểm tra của tác giả; runtime không tự tải thay.
-
-## Chạy và kiểm tra
+## Chạy pipeline
 
 Kiểm tra tài nguyên classifier:
 
@@ -49,24 +48,26 @@ Kiểm tra tài nguyên classifier:
 .venv/psai_runtime/Scripts/python.exe psai.py doctor
 ```
 
-Doctor không thay thế việc chạy full. Thay hai đường dẫn ví dụ dưới đây bằng thư mục model thật:
+Thay hai đường dẫn model sau bằng thư mục thực tế trên máy:
 
 ```powershell
-.venv/psai_runtime/Scripts/python.exe tools/demo_project.py --input examples/proposal.md --device auto --base-model-dir "D:/PSAI_MODELS/BGE-M3/snapshots/5617a9f61b028005a4858fdac845db406aefb181" --planner-model-dir "D:/PSAI_MODELS/Qwen"
+.venv/psai_runtime/Scripts/python.exe tools/demo_project.py --input examples/PSAI_DEMO_01_MINER_MONITORING.md --device auto --base-model-dir "D:/PSAI_MODELS/BGE-M3/snapshots/5617a9f61b028005a4858fdac845db406aefb181" --planner-model-dir "D:/PSAI_MODELS/Qwen2.5-1.5B-Instruct/snapshots/989aa7980e4cf806f80c7fef2b1adb7bc71aa306"
 ```
 
-Lệnh in các bước extract/retrieve/plan và đường dẫn báo cáo/workspace. Mỗi lượt tạo output mới. Khi có lỗi, giữ log để xem nguyên nhân; không ghi nhận full đạt chỉ vì fast chạy được.
+Trên Linux/macOS, dùng cùng tham số với `.venv/psai_runtime/bin/python` và đường dẫn model tương ứng. Có thể đổi đầu vào sang [mẫu bảo trì phòng thí nghiệm](../examples/PSAI_DEMO_02_LAB_MAINTENANCE.md). Với PDF, xem [dependency và giới hạn OCR](../psai_ocr/README.md).
 
-Để dùng extension với cùng tài nguyên:
+Các bước model chạy tuần tự trong worker riêng. Mỗi lượt tạo thư mục mới chứa `report.html`, `workspace.html`, `analysis.json`, văn bản nguồn, metadata và log. Lỗi được lưu trong thư mục chẩn đoán riêng. Nếu dùng `--output`, chọn đường dẫn chưa tồn tại.
+
+Planner v2 trong pipeline mặc định giữ các công việc đủ điều kiện trong catalog bằng `preserve_source_catalog`. Raw response và nguồn lựa chọn được lưu để kiểm tra. Các liên kết vẫn là đề xuất cần rà soát; xem [giao thức planner](../psai_planner/README.md).
+
+## Dùng extension
+
+Khởi động backend với cùng model:
 
 ```powershell
-.venv/psai_runtime/Scripts/python.exe -m psai_extension --base-model-dir "D:/PSAI_MODELS/BGE-M3/snapshots/5617a9f61b028005a4858fdac845db406aefb181" --planner-model-dir "D:/PSAI_MODELS/Qwen"
+.venv/psai_runtime/Scripts/python.exe -m psai_extension --base-model-dir "D:/PSAI_MODELS/BGE-M3/snapshots/5617a9f61b028005a4858fdac845db406aefb181" --planner-model-dir "D:/PSAI_MODELS/Qwen2.5-1.5B-Instruct/snapshots/989aa7980e4cf806f80c7fef2b1adb7bc71aa306"
 ```
 
-Ghép nối theo [hướng dẫn extension](../README_EXTENSION.md), sau đó chọn **Đầy đủ**. Backend chạy từng model tuần tự trước khi chuyển bước tiếp theo.
+Trên Linux/macOS, dùng Python trong `.venv/psai_runtime/bin/python`. Backend in URL loopback và token ghép nối mới mỗi lần khởi động. Giữ terminal mở, kết nối giao diện theo [README_EXTENSION](../README_EXTENSION.md), rồi chọn **Đầy đủ**.
 
-## Khi review và thuyết trình
-
-Ghi phiên bản Python/Torch, thiết bị, commit và chế độ demo. Đối chiếu nguồn → bằng chứng → công việc, không chỉ hash/schema. Xem [hướng dẫn review](REVIEW_GUIDE.md) và [kịch bản thuyết trình](PRESENTATION_GUIDE.md).
-
-Các báo cáo/manifest nghiên cứu mô tả những lần chạy đã lưu. Chạy lại study hoặc các công cụ `finalize_*` lịch sử cần đúng dữ liệu, nhãn, checkpoint và artifact của study. Bản clone cùng demo fast không cung cấp các tài nguyên này.
+Khi thiếu dependency hoặc model, kiểm tra thông báo và log của bước lỗi. `doctor` kiểm tra cấu hình/tài nguyên; chạy fast thành công chỉ xác nhận luồng fast, chưa xác nhận suy luận full hoặc chất lượng đầu ra.

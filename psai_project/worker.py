@@ -108,6 +108,7 @@ def _retrieve(job, text):
 
 def _plan(job, text):
     from planning import generate_plan
+    from psai_planner import build_review_context
     record = _read(job['record_path'])['record']
     retrieval_result = _read(job['retrieval_path'])
     retrieved = retrieval_result['retrieval']
@@ -120,6 +121,8 @@ def _plan(job, text):
         from psai_planner import plan_project
         model_dir = job.get('planner_model_dir')
         config = {'device': job.get('device', 'auto'), **job.get('planner_config', {})}
+        if config.get('protocol_version') != 'psai-local-evidence-catalog-v1':
+            config.setdefault('task_policy', 'preserve_source_catalog')
         if model_dir is None:
             manifest = _read(ROOT / 'reports/project_completion/local_planner_model.json')
             model_dir = manifest['local_path']
@@ -132,7 +135,9 @@ def _plan(job, text):
         plan['related_context'] = retrieved['hits']
     else:
         raise ValueError('Planner must be local or evidence')
-    return {'plan': plan, 'source_plan': source_plan,
+    review_context = build_review_context(record, text,
+        {**retrieved, 'source_texts': retrieval_result['source_texts']})
+    return {'plan': plan, 'source_plan': source_plan, 'review_context': review_context,
             'provenance': plan.get('provenance', {'method': plan['planning_method'], 'model_loaded': False})}
 
 

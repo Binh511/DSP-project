@@ -28,7 +28,7 @@ SOURCE_FILES = (
     'examples/proposal.md',
 )
 SOURCE_PACKAGES = (
-    'psai_project', 'psai_extension', 'psai_retrieval', 'psai_rules', 'psai_rag',
+    'psai_project', 'psai_extension', 'psai_retrieval', 'psai_rules', 'psai_rag', 'psai_planner',
 )
 
 

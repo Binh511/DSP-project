@@ -39,6 +39,27 @@ def _json(path: Path, value: dict) -> None:
                           encoding='utf-8', newline='')
 
 
+def _publish_directory(staging: Path, destination: Path) -> None:
+    """Keep atomic publication while tolerating brief Windows scanner locks.
+
+    Retry only Windows sharing/access errors, for at most 1.55 seconds. No
+    permissions are changed, no existing output is removed, and persistent
+    failures still produce a failed run with diagnostics.
+    """
+    delays = (.05, .1, .2, .4, .8)
+    for attempt in range(len(delays) + 1):
+        if destination.exists() or destination.is_symlink():
+            raise FileExistsError('Output appeared during analysis; existing directory is preserved')
+        try:
+            staging.rename(destination)
+            return
+        except PermissionError as error:
+            if (sys.platform != 'win32' or getattr(error, 'winerror', None) not in (5, 32, 33)
+                    or attempt == len(delays)):
+                raise
+            time.sleep(delays[attempt])
+
+
 def _run_worker(stage_name: str, request: dict, stage_dir: Path) -> dict:
     jobs = Path(stage_dir) / 'jobs'
     jobs.mkdir(parents=True, exist_ok=True)
@@ -218,7 +239,7 @@ def run_project(input_path: Path, output_dir: Path, *, classifier: str = 'ensemb
         _json(stage / 'run_manifest.json', metadata)
         if output_dir.exists():
             raise FileExistsError('Output appeared during analysis; existing directory is preserved')
-        stage.rename(output_dir)
+        _publish_directory(stage, output_dir)
         return output_dir / 'report.html'
     except Exception as error:
         failed = output_dir.with_name(output_dir.name + '.failed_' + uuid.uuid4().hex[:8])
@@ -227,7 +248,7 @@ def run_project(input_path: Path, output_dir: Path, *, classifier: str = 'ensemb
                    'requested_output': str(output_dir), 'diagnostic_dir': str(failed),
                    'report_completed': False, 'metadata': metadata}
         _json(stage / 'failure.json', failure)
-        stage.rename(failed)
+        _publish_directory(stage, failed)
         raise ProjectStageError(f'{current_phase}: {error}. Diagnostics preserved at {failed}') from error
 
 

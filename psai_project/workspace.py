@@ -192,6 +192,24 @@ def render_workspace(analysis: dict) -> str:
     progress = initial_progress(analysis)
     evidence = {entry['evidence_id']: entry for entries in analysis['extraction'].get('fields', {}).values()
                 for entry in entries}
+    if analysis['plan'].get('planning_method') == 'local_llm_evidence_catalog_v2':
+        catalog = analysis['plan'].get('catalog', {})
+        if catalog.get('source_sha256') != identity['source_sha256']:
+            raise ValueError('Workspace planner catalog has a different source')
+        for name in ('context_evidence', 'project_resources', 'document_references'):
+            for entry in catalog.get(name, []):
+                eid = entry.get('evidence_id')
+                prior = evidence.get(eid)
+                if prior is not None:
+                    if any(entry.get(key) != prior.get(key) for key in ('quote', 'char_start', 'char_end')):
+                        raise ValueError('Workspace evidence ID has conflicting source spans')
+                    continue
+                start, end, quote = (entry.get(key) for key in ('char_start', 'char_end', 'quote'))
+                if (not isinstance(eid, str) or not eid or type(start) is not int or type(end) is not int
+                        or not 0 <= start < end or not isinstance(quote, str) or len(quote) != end - start
+                        or entry.get('source_sha256') != identity['source_sha256']):
+                    raise ValueError('Workspace additional evidence must retain its main-source binding')
+                evidence[eid] = entry
     starts = analysis.get('metadata', {}).get('source_line_starts', [0])
     if (type(starts) is not list or not starts or starts[0] != 0
             or any(type(number) is not int or number < 0 for number in starts)

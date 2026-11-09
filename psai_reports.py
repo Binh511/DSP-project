@@ -158,13 +158,13 @@ nav{{display:flex;gap:16px;flex-wrap:wrap}} .footer{{font-size:12px;color:#52657
 </style></head><body>
 <header><h1>Báo cáo phân tích tài liệu PSAI</h1><p><strong>{_safe(record.get('document_id', ''))}</strong> · {_safe(classifier_name)}</p>
 <p class="muted">Tạo lúc {_safe(generated)} · Đọc nguồn bằng {_safe(source_method)}</p>
-<nav><a href="#content">Nội dung chính</a><a href="#plan">Các bước theo nguồn</a><a href="#sources">Văn bản nguồn</a><a href="#provenance">Thông tin tái lập</a></nav>
+<nav><a href="#content">Nội dung chính</a><a href="#plan">Công việc theo bằng chứng</a><a href="#sources">Văn bản nguồn</a><a href="#provenance">Thông tin tái lập</a></nav>
 <p class="notice">Các trích dẫn đã được đối chiếu hash và vị trí ký tự với văn bản nguồn.
 Điều này xác nhận nội dung trích dẫn, chưa xác nhận nhãn phân loại, tính đầy đủ hoặc chất lượng kế hoạch.
 Đây là kế hoạch lấy câu từ nguồn; không tự tạo cam kết hay phụ thuộc chưa có bằng chứng.</p>
 <ul>{warning_html}</ul></header>
 <main id="content">{''.join(cards)}{retrieval_html}
-<section id="plan"><h2>Các bước lấy trực tiếp từ nguồn</h2>{plan_html}</section>
+<section id="plan"><h2>Công việc theo bằng chứng</h2><details><summary>Xem danh sách công việc và trích dẫn nguồn</summary>{plan_html}</details></section>
 <div id="sources">{''.join(source_blocks)}</div>
 <section id="provenance"><h2>Thông tin tái lập</h2><pre>{_safe(json.dumps(provenance, ensure_ascii=False, indent=2, allow_nan=False))}</pre></section></main>
 <p class="footer">Báo cáo chứa văn bản nguồn ngay trong file, mở được khi không có project gốc hoặc kết nối mạng.

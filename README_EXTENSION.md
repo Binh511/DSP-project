@@ -1,10 +1,10 @@
 # PSAI Extension cho Chrome và Microsoft Edge
 
-Bản demo v0.2.0 dùng giao diện Manifest V3 và backend Python chạy cục bộ. Backend, API client, bộ điều khiển giao diện và phần hiển thị đã được tách module; xem [cấu trúc mã](./docs/REFACTOR_GUIDE.md). Bạn chọn một tệp PDF, Markdown hoặc TXT, gửi phân tích, theo dõi trạng thái rồi mở/tải báo cáo. Bản này cài bằng chế độ nhà phát triển; chưa phát hành lên Chrome Web Store hoặc Microsoft Edge Add-ons.
+Bản demo v0.3.0 dùng giao diện Manifest V3 và backend Python chạy cục bộ. Backend, API client, bộ điều khiển giao diện và phần hiển thị đã được tách module; xem [cấu trúc mã](./docs/REFACTOR_GUIDE.md). Bạn chọn một tệp PDF, Markdown hoặc TXT, gửi phân tích, theo dõi trạng thái rồi mở/tải báo cáo. Bản này cài bằng chế độ nhà phát triển; chưa phát hành lên Chrome Web Store hoặc Microsoft Edge Add-ons.
 
 ## 1. Cài giao diện extension
 
-1. Với mã nguồn, chọn trực tiếp thư mục [extension/psai](./extension/psai/). Để xuất bản v0.2.0, chạy `python tools/package_extension.py`; kết quả nằm ở `dist/extension/v0.2.0`. Chọn thư mục `PSAI_EXTENSION_CHROME_EDGE_v0.2.0` đã được tạo sẵn, hoặc giải nén ZIP cùng tên vào thư mục cố định. Thư mục được chọn phải chứa trực tiếp `manifest.json`.
+1. Với mã nguồn, chọn trực tiếp thư mục [extension/psai](./extension/psai/). Để xuất bản v0.3.0, chạy `python tools/package_extension.py`; kết quả nằm ở `dist/extension/v0.3.0`. Chọn thư mục `PSAI_EXTENSION_CHROME_EDGE_v0.3.0` đã được tạo sẵn, hoặc giải nén ZIP cùng tên vào thư mục cố định. Thư mục được chọn phải chứa trực tiếp `manifest.json`.
 2. Mở `chrome://extensions` trong Chrome hoặc `edge://extensions` trong Edge.
 3. Bật **Developer mode / Chế độ nhà phát triển**.
 4. Chọn **Load unpacked / Tải tiện ích đã giải nén**, rồi chọn thư mục ở bước 1.
@@ -55,7 +55,7 @@ Các job và báo cáo được lưu mặc định trong `outputs/extension/jobs
 
 ## 4. Dùng gói backend trên máy khác
 
-Gói `dist/extension/v0.2.0/PSAI_EXTENSION_BACKEND_v0.2.0.zip` được tạo bằng `python tools/package_extension.py`, chứa mã nguồn backend, pipeline cần thiết, extension, tệp dependency, tài liệu mẫu và trình khởi động. Gói không kèm Python, môi trường ảo, trọng số model, checkpoint, tập dữ liệu hay tài liệu cá nhân. Đây là gói bàn giao mã nguồn, cần chuẩn bị môi trường cục bộ trước khi chạy full.
+Gói `dist/extension/v0.3.0/PSAI_EXTENSION_BACKEND_v0.3.0.zip` được tạo bằng `python tools/package_extension.py`, chứa mã nguồn backend, pipeline cần thiết, extension, tệp dependency, tài liệu mẫu và trình khởi động. Gói không kèm Python, môi trường ảo, trọng số model, checkpoint, tập dữ liệu hay tài liệu cá nhân. Đây là gói bàn giao mã nguồn, cần chuẩn bị môi trường cục bộ trước khi chạy full.
 
 Giải nén vào thư mục mới. Với Python 3.11 trở lên đã cài, tạo môi trường để chạy fast:
 
@@ -103,7 +103,7 @@ node tools/verify_extension_browser.mjs
 
 Công cụ dùng hồ sơ Edge tạm trong thư mục output, chạy luồng fast, kiểm tra mở workspace, lưu kết nối/lịch sử và giao diện ở chiều rộng 390 px; sau đó đóng các tiến trình do công cụ tạo. Mặc định tìm Edge ở `C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`; có thể đặt biến môi trường `PSAI_EDGE_PATH` nếu Edge được cài ở vị trí khác. Một số sandbox chặn tiến trình GPU của Edge nên cần chạy kiểm tra trình duyệt trong môi trường cho phép.
 
-Để kiểm tra chính thư mục đã xuất, dùng `node tools/verify_extension_browser.mjs --extension-dir dist/extension/v0.2.0/PSAI_EXTENSION_CHROME_EDGE_v0.2.0`.
+Để kiểm tra chính thư mục đã xuất, dùng `node tools/verify_extension_browser.mjs --extension-dir dist/extension/v0.3.0/PSAI_EXTENSION_CHROME_EDGE_v0.3.0`.
 
 - **Không kết nối được:** kiểm tra backend đang chạy, địa chỉ/cổng trùng với thông tin in trên console và token của phiên hiện tại. Dùng `127.0.0.1` trong địa chỉ.
 - **Cổng đã được sử dụng:** khởi động với `-Port 8766` và cập nhật địa chỉ trong extension.
@@ -119,7 +119,7 @@ Công cụ dùng hồ sơ Edge tạm trong thư mục output, chạy luồng fas
 python tools\package_extension.py
 ```
 
-[Công cụ đóng gói](./tools/package_extension.py) tạo hai ZIP, thư mục extension đã giải nén sẵn và `package_receipt.json` trong `dist/extension/v0.2.0`. Receipt có SHA-256 từng tệp và từng ZIP; CRC cũng được kiểm tra. Công cụ kiểm tra phiên bản backend/manifest và module frontend/Python được đóng gói đầy đủ. Đây là output tạo cục bộ. ZIP extension đặt manifest ở gốc. Model, môi trường, secrets và kết quả cũ được loại khỏi bản phân phối. Chạy lại với nguồn giống hệt cho ra cùng bytes; nguồn thay đổi sẽ không ghi đè bản phát hành cũ. Dùng thư mục đầu ra mới khi tạo bản khác:
+[Công cụ đóng gói](./tools/package_extension.py) tạo hai ZIP, thư mục extension đã giải nén sẵn và `package_receipt.json` trong `dist/extension/v0.3.0`. Receipt có SHA-256 từng tệp và từng ZIP; CRC cũng được kiểm tra. Công cụ kiểm tra phiên bản backend/manifest và module frontend/Python được đóng gói đầy đủ. Đây là output tạo cục bộ. ZIP extension đặt manifest ở gốc. Model, môi trường, secrets và kết quả cũ được loại khỏi bản phân phối. Chạy lại với nguồn giống hệt cho ra cùng bytes; nguồn thay đổi sẽ không ghi đè bản phát hành cũ. Dùng thư mục đầu ra mới khi tạo bản khác:
 
 ```powershell
 python tools\package_extension.py --output-dir dist\extension-next
